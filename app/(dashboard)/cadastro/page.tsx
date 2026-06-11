@@ -39,6 +39,7 @@ export default function CadastroPage() {
   const [servico, setServico] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
   const [observacoes, setObservacoes] = useState('')
+  const [autorizaContato, setAutorizaContato] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<Toast>(null)
@@ -73,7 +74,6 @@ export default function CadastroPage() {
 
     setSalvando(true)
 
-    // Verificar se cliente já existe pelo WhatsApp normalizado
     const { data: clienteExistente, error: erroConsulta } = await supabase
       .from('clientes')
       .select('id, nome')
@@ -87,7 +87,6 @@ export default function CadastroPage() {
     }
 
     if (clienteExistente) {
-      // Cliente existe → insere apenas o atendimento
       const { error: erroAtend } = await supabase.from('atendimentos').insert({
         cliente_id: clienteExistente.id,
         servico: servico.trim(),
@@ -105,13 +104,13 @@ export default function CadastroPage() {
         'sucesso',
       )
     } else {
-      // Cliente nova → insere em clientes e em atendimentos
       const { data: novaCliente, error: erroCliente } = await supabase
         .from('clientes')
         .insert({
           nome: nome.trim(),
           whatsapp: whatsappNormalizado,
           observacoes: observacoes.trim() || null,
+          autoriza_contato: autorizaContato,
         })
         .select('id, nome')
         .single()
@@ -140,12 +139,11 @@ export default function CadastroPage() {
       )
     }
 
-    // Mantém o botão desabilitado durante o redirecionamento para evitar duplo envio
     setTimeout(() => router.push('/clientes'), 1500)
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50">
+    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
       {/* Toast */}
       {toast && (
         <div
@@ -160,10 +158,10 @@ export default function CadastroPage() {
       )}
 
       {/* Cabeçalho */}
-      <header className="flex items-center gap-3 border-b border-zinc-100 bg-white px-4 py-4">
+      <header className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4">
         <Link
           href="/clientes"
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-100"
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
           aria-label="Voltar para lista de clientes"
         >
           <svg
@@ -180,7 +178,7 @@ export default function CadastroPage() {
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </Link>
-        <h1 className="text-base font-semibold text-zinc-900">Novo atendimento</h1>
+        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Novo atendimento</h1>
       </header>
 
       {/* Formulário */}
@@ -189,7 +187,7 @@ export default function CadastroPage() {
 
           {/* Nome */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="nome" className="text-sm font-medium text-zinc-700">
+            <label htmlFor="nome" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Nome <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -201,8 +199,8 @@ export default function CadastroPage() {
               onChange={(e) => setNome(e.target.value)}
               disabled={salvando}
               placeholder="Nome da cliente"
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                erros.nome ? 'border-red-500' : 'border-zinc-300'
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
+                erros.nome ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
               }`}
             />
             {erros.nome && (
@@ -214,7 +212,7 @@ export default function CadastroPage() {
 
           {/* WhatsApp */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
+            <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -225,8 +223,8 @@ export default function CadastroPage() {
               onChange={(e) => setWhatsapp(e.target.value)}
               disabled={salvando}
               placeholder="(38) 99999-0000"
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                erros.whatsapp ? 'border-red-500' : 'border-zinc-300'
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
+                erros.whatsapp ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
               }`}
             />
             {erros.whatsapp && (
@@ -238,7 +236,7 @@ export default function CadastroPage() {
 
           {/* Serviço */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="servico" className="text-sm font-medium text-zinc-700">
+            <label htmlFor="servico" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Serviço <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -249,8 +247,8 @@ export default function CadastroPage() {
               onChange={(e) => setServico(e.target.value)}
               disabled={salvando}
               placeholder="Ex: Manicure, Pedicure…"
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                erros.servico ? 'border-red-500' : 'border-zinc-300'
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
+                erros.servico ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
               }`}
             />
             <datalist id="lista-servicos">
@@ -267,7 +265,7 @@ export default function CadastroPage() {
 
           {/* Data do atendimento */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="dataAtendimento" className="text-sm font-medium text-zinc-700">
+            <label htmlFor="dataAtendimento" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Data do atendimento <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -276,15 +274,15 @@ export default function CadastroPage() {
               value={dataAtendimento}
               onChange={(e) => setDataAtendimento(e.target.value)}
               disabled={salvando}
-              className="h-12 rounded-lg border border-zinc-300 px-4 text-base text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100"
+              className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
             />
           </div>
 
           {/* Observações */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700">
+            <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Observações
-              <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+              <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
             </label>
             <textarea
               id="observacoes"
@@ -293,9 +291,23 @@ export default function CadastroPage() {
               disabled={salvando}
               placeholder="Preferências, alergias…"
               rows={3}
-              className="resize-none rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100"
+              className="resize-none rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 py-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
             />
           </div>
+
+          {/* Consentimento */}
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={autorizaContato}
+              onChange={(e) => setAutorizaContato(e.target.checked)}
+              disabled={salvando}
+              className="mt-0.5 h-5 w-5 flex-shrink-0 accent-pink-500"
+            />
+            <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              Cliente autoriza contato via WhatsApp para lembretes e reativação
+            </span>
+          </label>
 
           <button
             type="submit"
@@ -304,6 +316,11 @@ export default function CadastroPage() {
           >
             {salvando ? 'Salvando…' : 'Salvar atendimento'}
           </button>
+
+          <p className="text-center text-xs leading-relaxed text-zinc-400 dark:text-zinc-500">
+            Os dados cadastrados são usados exclusivamente para gestão interna do salão,
+            conforme a <abbr title="Lei Geral de Proteção de Dados">LGPD</abbr>.
+          </p>
         </form>
       </main>
     </div>
