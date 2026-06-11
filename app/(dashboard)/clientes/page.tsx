@@ -535,7 +535,7 @@ export default function ClientesPage() {
                 <>
                   <button
                     onClick={salvarEdicao}
-                    disabled={salvandoEdicao}
+                    disabled={salvandoEdicao || !edicao.autorizaContato}
                     className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {salvandoEdicao ? 'Salvando…' : 'Salvar alterações'}

@@ -43,14 +43,21 @@ export default function LoginPage() {
 
     setEnviando(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
+    const resposta = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha }),
+    })
 
-    if (error) {
-      setErroCredenciais('E-mail ou senha incorretos')
+    const dados = await resposta.json()
+
+    if (!resposta.ok) {
+      setErroCredenciais(dados.erro ?? 'Erro ao entrar. Tente novamente.')
       setEnviando(false)
       return
     }
 
+    await supabase.auth.setSession(dados.sessao)
     document.cookie = 'sb-logged-in=1; path=/; SameSite=Lax; Max-Age=604800'
     router.push('/clientes')
   }
