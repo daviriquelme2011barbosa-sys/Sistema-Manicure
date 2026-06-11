@@ -309,9 +309,15 @@ export default function CadastroPage() {
             </span>
           </label>
 
+          {!autorizaContato && (
+            <p role="alert" className="text-center text-xs text-amber-600 dark:text-amber-400">
+              O consentimento é necessário para cadastrar a cliente no sistema.
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled={salvando}
+            disabled={salvando || !autorizaContato}
             className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {salvando ? 'Salvando…' : 'Salvar atendimento'}
