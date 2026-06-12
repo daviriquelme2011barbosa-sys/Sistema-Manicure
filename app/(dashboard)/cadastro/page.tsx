@@ -36,6 +36,8 @@ function CadastroAtendimento() {
   const [carregandoCliente, setCarregandoCliente] = useState(!!clienteId)
   const [servico, setServico] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
+  const [horario, setHorario] = useState('')
+  const [preco, setPreco] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<Toast>(null)
@@ -63,6 +65,11 @@ function CadastroAtendimento() {
 
     const novosErros: Record<string, string> = {}
     if (!servico.trim()) novosErros.servico = 'Selecione ou descreva o serviço'
+    if (!horario) novosErros.horario = 'Informe o horário'
+    const precoNum = parseFloat(preco.replace(',', '.'))
+    if (!preco.trim() || isNaN(precoNum) || precoNum < 0) {
+      novosErros.preco = 'Informe um valor válido'
+    }
     setErros(novosErros)
     if (Object.keys(novosErros).length > 0) return
 
@@ -72,6 +79,8 @@ function CadastroAtendimento() {
       cliente_id: clienteId,
       servico: servico.trim(),
       data_atendimento: dataAtendimento,
+      horario,
+      preco: precoNum,
     })
 
     if (error) {
@@ -193,22 +202,81 @@ function CadastroAtendimento() {
                 )}
               </div>
 
-              {/* Data do atendimento */}
+              {/* Data e Horário */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="dataAtendimento"
+                    className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  >
+                    Data <span aria-hidden="true" className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="dataAtendimento"
+                    type="date"
+                    value={dataAtendimento}
+                    onChange={(e) => setDataAtendimento(e.target.value)}
+                    disabled={salvando}
+                    className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="horario"
+                    className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  >
+                    Horário <span aria-hidden="true" className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="horario"
+                    type="time"
+                    value={horario}
+                    onChange={(e) => setHorario(e.target.value)}
+                    disabled={salvando}
+                    className={`h-12 rounded-lg border px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
+                      erros.horario ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+                    }`}
+                  />
+                  {erros.horario && (
+                    <span role="alert" className="text-sm text-red-600">
+                      {erros.horario}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Preço */}
               <div className="flex flex-col gap-1">
                 <label
-                  htmlFor="dataAtendimento"
+                  htmlFor="preco"
                   className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
                 >
-                  Data do atendimento <span aria-hidden="true" className="text-red-500">*</span>
+                  Preço <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
-                <input
-                  id="dataAtendimento"
-                  type="date"
-                  value={dataAtendimento}
-                  onChange={(e) => setDataAtendimento(e.target.value)}
-                  disabled={salvando}
-                  className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
-                />
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base text-zinc-400 dark:text-zinc-500 select-none">
+                    R$
+                  </span>
+                  <input
+                    id="preco"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    min="0"
+                    value={preco}
+                    onChange={(e) => setPreco(e.target.value)}
+                    disabled={salvando}
+                    placeholder="0,00"
+                    className={`h-12 w-full rounded-lg border pl-10 pr-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
+                      erros.preco ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+                    }`}
+                  />
+                </div>
+                {erros.preco && (
+                  <span role="alert" className="text-sm text-red-600">
+                    {erros.preco}
+                  </span>
+                )}
               </div>
 
               <button
