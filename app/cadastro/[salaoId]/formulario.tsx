@@ -119,6 +119,20 @@ export default function FormularioCadastroPublico({
     }
   }
 
+  if (sucesso) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
+        <p className="text-5xl">💜</p>
+        <h2 className="mt-4 text-lg font-semibold text-zinc-800">
+          Obrigado pelo seu cadastro! 💜
+        </h2>
+        <p className="mt-2 text-sm text-zinc-500">
+          Seus dados foram registrados. Até a próxima visita!
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50">
       {/* Toast */}
@@ -149,22 +163,11 @@ export default function FormularioCadastroPublico({
       </header>
 
       <main className="flex-1 px-4 pb-12 pt-6">
-        {sucesso ? (
-          <div className="flex flex-col items-center py-10 text-center">
-            <p className="text-5xl">💜</p>
-            <h2 className="mt-4 text-lg font-semibold text-zinc-800">
-              Obrigado pelo seu cadastro! 💜
-            </h2>
-            <p className="mt-2 text-sm text-zinc-500">
-              Seus dados foram registrados. Até a próxima visita!
-            </p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            className="flex flex-col gap-5"
-          >
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-5"
+        >
             {/* Nome */}
             <div className="flex flex-col gap-1">
               <label htmlFor="nome" className="text-sm font-medium text-zinc-700">
@@ -311,7 +314,6 @@ export default function FormularioCadastroPublico({
               <abbr title="Lei Geral de Proteção de Dados">LGPD</abbr>.
             </p>
           </form>
-        )}
       </main>
     </div>
   )
