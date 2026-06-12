@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   if (!request.cookies.get('sb-logged-in')) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
@@ -9,5 +9,10 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/clientes/:path*', '/cadastro/:path*', '/reativar/:path*'],
+  matcher: [
+    '/clientes/:path*',
+    '/cadastro',
+    '/cadastros',
+    '/reativar/:path*',
+  ],
 }
