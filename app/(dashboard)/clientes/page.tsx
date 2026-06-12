@@ -155,6 +155,7 @@ export default function ClientesPage() {
     nome: '',
     whatsapp: '',
     servico: '',
+    ultimaVisita: '',
     observacoes: '',
     autorizaContato: true,
   })
@@ -227,6 +228,7 @@ export default function ClientesPage() {
       nome: cliente.nome,
       whatsapp: cliente.whatsapp,
       servico: cliente.ultimo_servico ?? '',
+      ultimaVisita: cliente.ultima_visita ?? '',
       observacoes: cliente.observacoes ?? '',
       autorizaContato: cliente.autoriza_contato ?? true,
     })
@@ -296,7 +298,11 @@ export default function ClientesPage() {
       edicao.servico.trim() !== '' &&
       edicao.servico.trim() !== (clienteEditando.ultimo_servico ?? '')
 
-    if (servicoAlterado) {
+    const dataAlterada =
+      !!clienteEditando.ultima_visita &&
+      edicao.ultimaVisita !== clienteEditando.ultima_visita
+
+    if (servicoAlterado || dataAlterada) {
       const { data: ultimoAtend } = await supabase
         .from('atendimentos')
         .select('id')
@@ -306,9 +312,13 @@ export default function ClientesPage() {
         .maybeSingle()
 
       if (ultimoAtend) {
+        const atualizacao: Record<string, unknown> = {}
+        if (servicoAlterado) atualizacao.servico = edicao.servico.trim()
+        if (dataAlterada) atualizacao.data_atendimento = edicao.ultimaVisita
+
         await supabase
           .from('atendimentos')
-          .update({ servico: edicao.servico.trim() })
+          .update(atualizacao)
           .eq('id', ultimoAtend.id)
       }
     }
@@ -322,6 +332,7 @@ export default function ClientesPage() {
               whatsapp: whatsappNormalizado,
               observacoes: edicao.observacoes.trim() || null,
               ultimo_servico: servicoAlterado ? edicao.servico.trim() : c.ultimo_servico,
+              ultima_visita: dataAlterada ? edicao.ultimaVisita : c.ultima_visita,
               autoriza_contato: edicao.autorizaContato,
             }
           : c,
@@ -477,6 +488,23 @@ export default function ClientesPage() {
                   ))}
                 </datalist>
               </div>
+
+              {/* Data do último atendimento */}
+              {clienteEditando.ultima_visita && (
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="edit-ultima-visita" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Data do último atendimento
+                  </label>
+                  <input
+                    id="edit-ultima-visita"
+                    type="date"
+                    value={edicao.ultimaVisita}
+                    onChange={(e) => setEdicao((prev) => ({ ...prev, ultimaVisita: e.target.value }))}
+                    disabled={salvandoEdicao || excluindo}
+                    className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                  />
+                </div>
+              )}
 
               {/* Observações */}
               <div className="flex flex-col gap-1">
