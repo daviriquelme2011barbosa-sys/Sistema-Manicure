@@ -6,15 +6,6 @@ function normalizarWhatsApp(valor: string): string {
   return valor.replace(/\D/g, '')
 }
 
-function dataHoje(): string {
-  const d = new Date()
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, '0'),
-    String(d.getDate()).padStart(2, '0'),
-  ].join('-')
-}
-
 type Toast = { mensagem: string; tipo: 'sucesso' | 'erro' } | null
 
 type Props = {
@@ -30,8 +21,6 @@ export default function FormularioCadastroPublico({
 }: Props) {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
-  const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
-  const [servico, setServico] = useState('')
   const [observacoes, setObservacoes] = useState('')
   const [autorizaContato, setAutorizaContato] = useState(false)
   const [enviando, setEnviando] = useState(false)
@@ -58,14 +47,6 @@ export default function FormularioCadastroPublico({
       novosErros.whatsapp = 'Número inválido — mínimo 10 dígitos'
     }
 
-    if (!dataAtendimento) {
-      novosErros.dataAtendimento = 'Informe a data do atendimento'
-    }
-
-    if (!servico.trim()) {
-      novosErros.servico = 'Informe o serviço realizado'
-    }
-
     return novosErros
   }
 
@@ -86,8 +67,6 @@ export default function FormularioCadastroPublico({
           salaoId,
           nome: nome.trim(),
           whatsapp,
-          dataAtendimento,
-          servico: servico.trim(),
           observacoes: observacoes.trim() || null,
           autorizaContato,
         }),
@@ -107,8 +86,6 @@ export default function FormularioCadastroPublico({
       setSucesso(true)
       setNome('')
       setWhatsapp('')
-      setDataAtendimento(dataHoje())
-      setServico('')
       setObservacoes('')
       setAutorizaContato(false)
       setErros({})
@@ -158,7 +135,7 @@ export default function FormularioCadastroPublico({
           Bem-vinda ao {nomeSalao}!
         </h1>
         <p className="mt-1 text-sm opacity-90">
-          Preencha seus dados para registrar seu atendimento
+          Preencha seus dados para se cadastrar
         </p>
       </header>
 
@@ -168,152 +145,109 @@ export default function FormularioCadastroPublico({
           noValidate
           className="flex flex-col gap-5"
         >
-            {/* Nome */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="nome" className="text-sm font-medium text-zinc-700">
-                Nome <span aria-hidden="true" className="text-red-500">*</span>
-              </label>
-              <input
-                id="nome"
-                type="text"
-                autoComplete="name"
-                autoCapitalize="words"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                disabled={enviando}
-                placeholder="Seu nome completo"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.nome ? 'border-red-500' : 'border-zinc-300'
-                }`}
-              />
-              {erros.nome && (
-                <span role="alert" className="text-sm text-red-600">
-                  {erros.nome}
-                </span>
-              )}
-            </div>
-
-            {/* WhatsApp */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
-                WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
-              </label>
-              <input
-                id="whatsapp"
-                type="tel"
-                autoComplete="tel"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                disabled={enviando}
-                placeholder="(38) 99999-0000"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.whatsapp ? 'border-red-500' : 'border-zinc-300'
-                }`}
-              />
-              {erros.whatsapp && (
-                <span role="alert" className="text-sm text-red-600">
-                  {erros.whatsapp}
-                </span>
-              )}
-            </div>
-
-            {/* Data do atendimento */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="dataAtendimento" className="text-sm font-medium text-zinc-700">
-                Data do atendimento <span aria-hidden="true" className="text-red-500">*</span>
-              </label>
-              <input
-                id="dataAtendimento"
-                type="date"
-                value={dataAtendimento}
-                onChange={(e) => setDataAtendimento(e.target.value)}
-                disabled={enviando}
-                className="h-12 rounded-lg border border-zinc-300 px-4 text-base text-zinc-900 bg-white outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
-              />
-              {erros.dataAtendimento && (
-                <span role="alert" className="text-sm text-red-600">
-                  {erros.dataAtendimento}
-                </span>
-              )}
-            </div>
-
-            {/* Serviço */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="servico" className="text-sm font-medium text-zinc-700">
-                Serviço realizado <span aria-hidden="true" className="text-red-500">*</span>
-              </label>
-              <input
-                id="servico"
-                type="text"
-                value={servico}
-                onChange={(e) => setServico(e.target.value)}
-                disabled={enviando}
-                placeholder="Ex: manicure, pedicure, gel…"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.servico ? 'border-red-500' : 'border-zinc-300'
-                }`}
-              />
-              {erros.servico && (
-                <span role="alert" className="text-sm text-red-600">
-                  {erros.servico}
-                </span>
-              )}
-            </div>
-
-            {/* Observações */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700">
-                Observações
-                <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
-              </label>
-              <textarea
-                id="observacoes"
-                value={observacoes}
-                onChange={(e) => setObservacoes(e.target.value)}
-                disabled={enviando}
-                placeholder="Alergias, preferências…"
-                rows={3}
-                className="resize-none rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
-              />
-            </div>
-
-            {/* Consentimento LGPD */}
-            <label className="flex cursor-pointer items-start gap-3">
-              <input
-                type="checkbox"
-                checked={autorizaContato}
-                onChange={(e) => setAutorizaContato(e.target.checked)}
-                disabled={enviando}
-                className="mt-0.5 h-5 w-5 flex-shrink-0 accent-pink-500"
-              />
-              <span className="text-sm text-zinc-600">
-                Autorizo o salão a entrar em contato comigo via WhatsApp para
-                agendamentos e reativação
-                <span aria-hidden="true" className="text-red-500"> *</span>
-              </span>
+          {/* Nome */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="nome" className="text-sm font-medium text-zinc-700">
+              Nome <span aria-hidden="true" className="text-red-500">*</span>
             </label>
-
-            {!autorizaContato && (
-              <p role="alert" className="text-center text-xs text-amber-600">
-                Marque o consentimento para habilitar o envio.
-              </p>
+            <input
+              id="nome"
+              type="text"
+              autoComplete="name"
+              autoCapitalize="words"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              disabled={enviando}
+              placeholder="Seu nome completo"
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
+                erros.nome ? 'border-red-500' : 'border-zinc-300'
+              }`}
+            />
+            {erros.nome && (
+              <span role="alert" className="text-sm text-red-600">
+                {erros.nome}
+              </span>
             )}
+          </div>
 
-            <button
-              type="submit"
-              disabled={enviando || !autorizaContato}
-              className="h-12 rounded-lg font-semibold text-white transition hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ backgroundColor: corPrimaria || '#ec4899' }}
-            >
-              {enviando ? 'Enviando…' : 'Enviar'}
-            </button>
+          {/* WhatsApp */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
+              WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
+            </label>
+            <input
+              id="whatsapp"
+              type="tel"
+              autoComplete="tel"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              disabled={enviando}
+              placeholder="(38) 99999-0000"
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
+                erros.whatsapp ? 'border-red-500' : 'border-zinc-300'
+              }`}
+            />
+            {erros.whatsapp && (
+              <span role="alert" className="text-sm text-red-600">
+                {erros.whatsapp}
+              </span>
+            )}
+          </div>
 
-            <p className="text-center text-xs leading-relaxed text-zinc-400">
-              Seus dados são usados exclusivamente para gestão interna do salão,
-              conforme a{' '}
-              <abbr title="Lei Geral de Proteção de Dados">LGPD</abbr>.
+          {/* Observações */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700">
+              Observações
+              <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+            </label>
+            <textarea
+              id="observacoes"
+              value={observacoes}
+              onChange={(e) => setObservacoes(e.target.value)}
+              disabled={enviando}
+              placeholder="Alergias, preferências…"
+              rows={3}
+              className="resize-none rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
+            />
+          </div>
+
+          {/* Consentimento LGPD */}
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={autorizaContato}
+              onChange={(e) => setAutorizaContato(e.target.checked)}
+              disabled={enviando}
+              className="mt-0.5 h-5 w-5 flex-shrink-0 accent-pink-500"
+            />
+            <span className="text-sm text-zinc-600">
+              Autorizo o salão a entrar em contato comigo via WhatsApp para
+              agendamentos e reativação
+              <span aria-hidden="true" className="text-red-500"> *</span>
+            </span>
+          </label>
+
+          {!autorizaContato && (
+            <p role="alert" className="text-center text-xs text-amber-600">
+              Marque o consentimento para habilitar o envio.
             </p>
-          </form>
+          )}
+
+          <button
+            type="submit"
+            disabled={enviando || !autorizaContato}
+            className="h-12 rounded-lg font-semibold text-white transition hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: corPrimaria || '#ec4899' }}
+          >
+            {enviando ? 'Enviando…' : 'Enviar'}
+          </button>
+
+          <p className="text-center text-xs leading-relaxed text-zinc-400">
+            Seus dados são usados exclusivamente para gestão interna do salão,
+            conforme a{' '}
+            <abbr title="Lei Geral de Proteção de Dados">LGPD</abbr>.
+          </p>
+        </form>
       </main>
     </div>
   )

@@ -55,8 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, dataAtendimento, servico, observacoes, autorizaContato } =
-    body
+  const { salaoId, nome, whatsapp, observacoes, autorizaContato } = body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
@@ -74,23 +73,6 @@ export async function POST(request: NextRequest) {
   if (whatsappNormalizado.length < 10) {
     return NextResponse.json(
       { erro: 'WhatsApp inválido — mínimo 10 dígitos.', campo: 'whatsapp' },
-      { status: 400 },
-    )
-  }
-
-  if (
-    typeof dataAtendimento !== 'string' ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(dataAtendimento)
-  ) {
-    return NextResponse.json(
-      { erro: 'Data inválida.', campo: 'dataAtendimento' },
-      { status: 400 },
-    )
-  }
-
-  if (typeof servico !== 'string' || !servico.trim()) {
-    return NextResponse.json(
-      { erro: 'Informe o serviço realizado.', campo: 'servico' },
       { status: 400 },
     )
   }
@@ -128,53 +110,25 @@ export async function POST(request: NextRequest) {
   }
 
   if (clienteExistente) {
-    const { error: erroAtend } = await supabase.from('atendimentos').insert({
-      cliente_id: clienteExistente.id,
-      servico: servico.trim(),
-      data_atendimento: dataAtendimento,
-    })
+    return NextResponse.json({ sucesso: true })
+  }
 
-    if (erroAtend) {
-      return NextResponse.json(
-        { erro: 'Erro interno. Tente novamente.' },
-        { status: 500 },
-      )
-    }
-  } else {
-    const { data: novaCliente, error: erroCliente } = await supabase
-      .from('clientes')
-      .insert({
-        nome: nome.trim(),
-        whatsapp: whatsappNormalizado,
-        observacoes:
-          typeof observacoes === 'string' && observacoes.trim()
-            ? observacoes.trim()
-            : null,
-        autoriza_contato: true,
-        origem: 'formulario',
-      })
-      .select('id')
-      .single()
+  const { error: erroCliente } = await supabase.from('clientes').insert({
+    nome: nome.trim(),
+    whatsapp: whatsappNormalizado,
+    observacoes:
+      typeof observacoes === 'string' && observacoes.trim()
+        ? observacoes.trim()
+        : null,
+    autoriza_contato: true,
+    origem: 'formulario',
+  })
 
-    if (erroCliente || !novaCliente) {
-      return NextResponse.json(
-        { erro: 'Erro interno. Tente novamente.' },
-        { status: 500 },
-      )
-    }
-
-    const { error: erroAtend } = await supabase.from('atendimentos').insert({
-      cliente_id: novaCliente.id,
-      servico: servico.trim(),
-      data_atendimento: dataAtendimento,
-    })
-
-    if (erroAtend) {
-      return NextResponse.json(
-        { erro: 'Erro interno. Tente novamente.' },
-        { status: 500 },
-      )
-    }
+  if (erroCliente) {
+    return NextResponse.json(
+      { erro: 'Erro interno. Tente novamente.' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ sucesso: true })
