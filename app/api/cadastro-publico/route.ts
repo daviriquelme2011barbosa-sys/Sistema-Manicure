@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, servico, dataAtendimento, observacoes, autorizaContato } =
+  const { salaoId, nome, whatsapp, dataAtendimento, observacoes, autorizaContato } =
     body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
@@ -74,13 +74,6 @@ export async function POST(request: NextRequest) {
   if (whatsappNormalizado.length < 10) {
     return NextResponse.json(
       { erro: 'WhatsApp inválido — mínimo 10 dígitos.', campo: 'whatsapp' },
-      { status: 400 },
-    )
-  }
-
-  if (typeof servico !== 'string' || !servico.trim()) {
-    return NextResponse.json(
-      { erro: 'Informe o serviço realizado.', campo: 'servico' },
       { status: 400 },
     )
   }
@@ -130,7 +123,7 @@ export async function POST(request: NextRequest) {
   if (clienteExistente) {
     const { error: erroAtend } = await supabase.from('atendimentos').insert({
       cliente_id: clienteExistente.id,
-      servico: servico.trim(),
+      servico: 'A definir',
       data_atendimento: dataAtendimento,
     })
 
@@ -164,7 +157,7 @@ export async function POST(request: NextRequest) {
 
     const { error: erroAtend } = await supabase.from('atendimentos').insert({
       cliente_id: novaCliente.id,
-      servico: servico.trim(),
+      servico: 'A definir',
       data_atendimento: dataAtendimento,
     })
 

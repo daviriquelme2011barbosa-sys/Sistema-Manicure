@@ -2,17 +2,6 @@
 
 import { useState } from 'react'
 
-const SERVICOS_SUGERIDOS = [
-  'Manicure',
-  'Pedicure',
-  'Manicure e pedicure',
-  'Spa dos pés',
-  'Blindagem',
-  'Alongamento de unhas',
-  'Nail art',
-  'Esmaltação em gel',
-]
-
 function normalizarWhatsApp(valor: string): string {
   return valor.replace(/\D/g, '')
 }
@@ -41,7 +30,6 @@ export default function FormularioCadastroPublico({
 }: Props) {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
-  const [servico, setServico] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
   const [observacoes, setObservacoes] = useState('')
   const [autorizaContato, setAutorizaContato] = useState(false)
@@ -69,10 +57,6 @@ export default function FormularioCadastroPublico({
       novosErros.whatsapp = 'Número inválido — mínimo 10 dígitos'
     }
 
-    if (!servico.trim()) {
-      novosErros.servico = 'Informe o serviço realizado'
-    }
-
     if (!dataAtendimento) {
       novosErros.dataAtendimento = 'Informe a data do atendimento'
     }
@@ -97,7 +81,6 @@ export default function FormularioCadastroPublico({
           salaoId,
           nome: nome.trim(),
           whatsapp,
-          servico: servico.trim(),
           dataAtendimento,
           observacoes: observacoes.trim() || null,
           autorizaContato,
@@ -118,7 +101,6 @@ export default function FormularioCadastroPublico({
       setSucesso(true)
       setNome('')
       setWhatsapp('')
-      setServico('')
       setDataAtendimento(dataHoje())
       setObservacoes('')
       setAutorizaContato(false)
@@ -226,35 +208,6 @@ export default function FormularioCadastroPublico({
               {erros.whatsapp && (
                 <span role="alert" className="text-sm text-red-600">
                   {erros.whatsapp}
-                </span>
-              )}
-            </div>
-
-            {/* Serviço */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="servico" className="text-sm font-medium text-zinc-700">
-                Serviço realizado <span aria-hidden="true" className="text-red-500">*</span>
-              </label>
-              <input
-                id="servico"
-                type="text"
-                list="lista-servicos"
-                value={servico}
-                onChange={(e) => setServico(e.target.value)}
-                disabled={enviando}
-                placeholder="Ex: Manicure, Pedicure…"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.servico ? 'border-red-500' : 'border-zinc-300'
-                }`}
-              />
-              <datalist id="lista-servicos">
-                {SERVICOS_SUGERIDOS.map((s) => (
-                  <option key={s} value={s} />
-                ))}
-              </datalist>
-              {erros.servico && (
-                <span role="alert" className="text-sm text-red-600">
-                  {erros.servico}
                 </span>
               )}
             </div>
