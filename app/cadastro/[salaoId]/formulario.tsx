@@ -151,18 +151,13 @@ export default function FormularioCadastroPublico({
       <main className="flex-1 px-4 pb-12 pt-6">
         {sucesso ? (
           <div className="flex flex-col items-center py-10 text-center">
-            <p className="text-5xl">🎉</p>
+            <p className="text-5xl">💜</p>
             <h2 className="mt-4 text-lg font-semibold text-zinc-800">
-              Cadastro realizado com sucesso!
+              Obrigado pelo seu cadastro! 💜
             </h2>
-            <p className="mt-2 text-sm text-zinc-500">Até logo 💅</p>
-            <button
-              onClick={() => setSucesso(false)}
-              className="mt-8 rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 active:opacity-80"
-              style={{ backgroundColor: corPrimaria || '#ec4899' }}
-            >
-              Registrar outro atendimento
-            </button>
+            <p className="mt-2 text-sm text-zinc-500">
+              Seus dados foram registrados. Até a próxima visita!
+            </p>
           </div>
         ) : (
           <form
