@@ -151,6 +151,7 @@ export async function POST(request: NextRequest) {
             ? observacoes.trim()
             : null,
         autoriza_contato: true,
+        origem: 'formulario',
       })
       .select('id')
       .single()
