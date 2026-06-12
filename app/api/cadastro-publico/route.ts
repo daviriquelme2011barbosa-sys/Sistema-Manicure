@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, dataAtendimento, observacoes, autorizaContato } =
+  const { salaoId, nome, whatsapp, dataAtendimento, servico, observacoes, autorizaContato } =
     body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
@@ -84,6 +84,13 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json(
       { erro: 'Data inválida.', campo: 'dataAtendimento' },
+      { status: 400 },
+    )
+  }
+
+  if (typeof servico !== 'string' || !servico.trim()) {
+    return NextResponse.json(
+      { erro: 'Informe o serviço realizado.', campo: 'servico' },
       { status: 400 },
     )
   }
@@ -123,7 +130,7 @@ export async function POST(request: NextRequest) {
   if (clienteExistente) {
     const { error: erroAtend } = await supabase.from('atendimentos').insert({
       cliente_id: clienteExistente.id,
-      servico: 'A definir',
+      servico: servico.trim(),
       data_atendimento: dataAtendimento,
     })
 
@@ -157,7 +164,7 @@ export async function POST(request: NextRequest) {
 
     const { error: erroAtend } = await supabase.from('atendimentos').insert({
       cliente_id: novaCliente.id,
-      servico: 'A definir',
+      servico: servico.trim(),
       data_atendimento: dataAtendimento,
     })
 

@@ -54,7 +54,7 @@ export default async function CadastroPublicoPage({
     <FormularioCadastroPublico
       salaoId={salao.id}
       nomeSalao={salao.nome_salao}
-      corPrimaria={salao.cor_primaria}
+      corPrimaria={salao.cor_primaria ?? '#ec4899'}
     />
   )
 }

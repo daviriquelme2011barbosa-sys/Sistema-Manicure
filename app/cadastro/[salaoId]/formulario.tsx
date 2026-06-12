@@ -31,6 +31,7 @@ export default function FormularioCadastroPublico({
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
+  const [servico, setServico] = useState('')
   const [observacoes, setObservacoes] = useState('')
   const [autorizaContato, setAutorizaContato] = useState(false)
   const [enviando, setEnviando] = useState(false)
@@ -61,6 +62,10 @@ export default function FormularioCadastroPublico({
       novosErros.dataAtendimento = 'Informe a data do atendimento'
     }
 
+    if (!servico.trim()) {
+      novosErros.servico = 'Informe o serviço realizado'
+    }
+
     return novosErros
   }
 
@@ -82,6 +87,7 @@ export default function FormularioCadastroPublico({
           nome: nome.trim(),
           whatsapp,
           dataAtendimento,
+          servico: servico.trim(),
           observacoes: observacoes.trim() || null,
           autorizaContato,
         }),
@@ -102,6 +108,7 @@ export default function FormularioCadastroPublico({
       setNome('')
       setWhatsapp('')
       setDataAtendimento(dataHoje())
+      setServico('')
       setObservacoes('')
       setAutorizaContato(false)
       setErros({})
@@ -130,7 +137,7 @@ export default function FormularioCadastroPublico({
       {/* Cabeçalho */}
       <header
         className="px-6 py-8 text-center text-white"
-        style={{ backgroundColor: corPrimaria }}
+        style={{ backgroundColor: corPrimaria || '#ec4899' }}
       >
         <p className="text-3xl">💅</p>
         <h1 className="mt-2 text-lg font-semibold">
@@ -152,7 +159,7 @@ export default function FormularioCadastroPublico({
             <button
               onClick={() => setSucesso(false)}
               className="mt-8 rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 active:opacity-80"
-              style={{ backgroundColor: corPrimaria }}
+              style={{ backgroundColor: corPrimaria || '#ec4899' }}
             >
               Registrar outro atendimento
             </button>
@@ -232,6 +239,29 @@ export default function FormularioCadastroPublico({
               )}
             </div>
 
+            {/* Serviço */}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="servico" className="text-sm font-medium text-zinc-700">
+                Serviço realizado <span aria-hidden="true" className="text-red-500">*</span>
+              </label>
+              <input
+                id="servico"
+                type="text"
+                value={servico}
+                onChange={(e) => setServico(e.target.value)}
+                disabled={enviando}
+                placeholder="Ex: manicure, pedicure, gel…"
+                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
+                  erros.servico ? 'border-red-500' : 'border-zinc-300'
+                }`}
+              />
+              {erros.servico && (
+                <span role="alert" className="text-sm text-red-600">
+                  {erros.servico}
+                </span>
+              )}
+            </div>
+
             {/* Observações */}
             <div className="flex flex-col gap-1">
               <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700">
@@ -275,7 +305,7 @@ export default function FormularioCadastroPublico({
               type="submit"
               disabled={enviando || !autorizaContato}
               className="h-12 rounded-lg font-semibold text-white transition hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ backgroundColor: corPrimaria }}
+              style={{ backgroundColor: corPrimaria || '#ec4899' }}
             >
               {enviando ? 'Enviando…' : 'Enviar'}
             </button>
