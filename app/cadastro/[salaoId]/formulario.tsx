@@ -99,9 +99,9 @@ export default function FormularioCadastroPublico({
   if (sucesso) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
-        <p className="text-5xl">💜</p>
+        <p className="text-5xl">💗</p>
         <h2 className="mt-4 text-lg font-semibold text-zinc-800">
-          Obrigado pelo seu cadastro! 💜
+          Obrigado pelo seu cadastro! 💗
         </h2>
         <p className="mt-2 text-sm text-zinc-500">
           Seus dados foram registrados. Até a próxima visita!
