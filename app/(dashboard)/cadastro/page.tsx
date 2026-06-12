@@ -279,13 +279,21 @@ function CadastroAtendimento() {
                 )}
               </div>
 
-              <button
-                type="submit"
-                disabled={salvando}
-                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {salvando ? 'Salvando…' : 'Salvar atendimento'}
-              </button>
+              <div className="flex gap-3">
+                <Link
+                  href="/cadastros"
+                  className="flex h-12 flex-1 items-center justify-center rounded-lg border border-zinc-300 font-semibold text-zinc-700 transition hover:bg-zinc-50 active:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
+                >
+                  Cancelar
+                </Link>
+                <button
+                  type="submit"
+                  disabled={salvando}
+                  className="h-12 flex-1 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {salvando ? 'Salvando…' : 'Salvar'}
+                </button>
+              </div>
             </form>
           </>
         )}
