@@ -127,7 +127,7 @@ export default function FormularioCadastroPublico({
 
       {/* Cabeçalho */}
       <header
-        className="px-6 py-8 text-center text-white"
+        className="px-6 py-8 text-center text-white rounded-b-3xl shadow-md"
         style={{ backgroundColor: corPrimaria || '#ec4899' }}
       >
         <p className="text-3xl">💅</p>
@@ -143,7 +143,7 @@ export default function FormularioCadastroPublico({
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="flex flex-col gap-5"
+          className="flex flex-col gap-6"
         >
           {/* Nome */}
           <div className="flex flex-col gap-1">
@@ -159,7 +159,7 @@ export default function FormularioCadastroPublico({
               onChange={(e) => setNome(e.target.value)}
               disabled={enviando}
               placeholder="Seu nome completo"
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
                 erros.nome ? 'border-red-500' : 'border-zinc-300'
               }`}
             />
@@ -183,7 +183,7 @@ export default function FormularioCadastroPublico({
               onChange={(e) => setWhatsapp(e.target.value)}
               disabled={enviando}
               placeholder="(38) 99999-0000"
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
                 erros.whatsapp ? 'border-red-500' : 'border-zinc-300'
               }`}
             />
@@ -207,7 +207,7 @@ export default function FormularioCadastroPublico({
               disabled={enviando}
               placeholder="Alergias, preferências…"
               rows={3}
-              className="resize-none rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 bg-white placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
+              className="resize-none rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
             />
           </div>
 

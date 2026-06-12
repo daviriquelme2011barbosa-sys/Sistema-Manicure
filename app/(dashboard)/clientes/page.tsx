@@ -26,6 +26,13 @@ const ORDEM_STATUS: Record<ClienteStatus['status'], number> = {
   sem_atendimento: 3,
 }
 
+const BORDA_STATUS: Record<ClienteStatus['status'], string> = {
+  verde: 'border-l-green-500',
+  amarelo: 'border-l-yellow-400',
+  vermelho: 'border-l-red-500',
+  sem_atendimento: 'border-l-zinc-300 dark:border-l-zinc-600',
+}
+
 const SERVICOS_SUGERIDOS = [
   'Manicure',
   'Pedicure',
@@ -52,19 +59,6 @@ function textoElapsado(dias: number): string {
   return `${dias} dias atrás`
 }
 
-function BadgeStatus({ status }: { status: ClienteStatus['status'] }) {
-  const classes: Record<ClienteStatus['status'], string> = {
-    verde: 'bg-green-500',
-    amarelo: 'bg-yellow-400',
-    vermelho: 'bg-red-500',
-    sem_atendimento: 'bg-zinc-300 dark:bg-zinc-600',
-  }
-  return (
-    <span
-      className={`mt-1 inline-block h-3 w-3 flex-shrink-0 rounded-full ${classes[status]}`}
-    />
-  )
-}
 
 function SkeletonLista() {
   return (
@@ -637,9 +631,8 @@ export default function ClientesPage() {
             {clientesFiltrados.map((cliente) => (
               <li
                 key={cliente.id}
-                className="flex gap-3 rounded-xl bg-white dark:bg-zinc-800 p-4 shadow-sm"
+                className={`flex gap-4 rounded-xl bg-white dark:bg-zinc-800 p-5 shadow-sm border-l-4 ${BORDA_STATUS[cliente.status]}`}
               >
-                <BadgeStatus status={cliente.status} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
                   <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
