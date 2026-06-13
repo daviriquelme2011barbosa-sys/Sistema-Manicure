@@ -1,8 +1,8 @@
 # Roadmap — Sistema de Gestão e Reativação de Clientes
 
-**Versão:** 1.0
-**Última atualização:** 10/06/2026
-**Referências:** PRD v1.0 · ERD v1.0 · RBAC-RLS v1.0 · UX-Flow v1.0 · TEST-PLAN v1.0
+**Versão:** 1.1
+**Última atualização:** 12/06/2026
+**Referências:** PRD v1.0 · ERD v1.1 · RBAC-RLS v1.1 · UX-Flow v1.0 · TEST-PLAN v1.0
 
 ---
 
@@ -19,9 +19,9 @@ Nenhuma fase começa apenas porque o tempo passou. A progressão é puxada por e
 ## 2. Visão das fases
 
 ```
-[Fase 0]  Fundação e entrega
+[Fase 0]  Fundação e entrega             ✅ concluída
     ↓  gatilho: dona usa 2x/semana por conta própria
-[Fase 1]  Consolidação do produto (serviço replicável)
+[Fase 1]  Consolidação do produto        🔄 em andamento
     ↓  gatilho: 5–8 salões pagando mensalidade
 [Fase 2]  Plataforma (transição para SaaS)
     ↓  gatilho: custo de implantação manual vira gargalo
@@ -32,22 +32,23 @@ Nenhuma fase começa apenas porque o tempo passou. A progressão é puxada por e
 
 ## 3. Fase 0 — Fundação e entrega do MVP
 
-**Status:** em construção
+**Status:** ✅ Concluída
 **Modelo de negócio:** serviço replicável (implantação manual por salão)
 
 ### O que é
 
 O menor sistema que prova valor: 3 telas, 2 tabelas, 1 usuário. Documentado inteiramente no conjunto PRD + ERD + RBAC-RLS + UX-Flow + TEST-PLAN.
 
-### Escopo (já definido)
+### Escopo entregue
 
-- Tela 1 — cadastro de atendimento com deduplicação por WhatsApp
-- Tela 2 — lista de clientes com status verde/amarelo/vermelho
-- Tela 3 — painel de reativação com link `wa.me` e mensagem pronta
-- Autenticação via Supabase Auth (e-mail + senha, conta criada pelo implantador)
-- RLS com papel único `owner`
-- Deploy por projeto Supabase dedicado por salão
-- Nome e cor do salão via `salao_config`
+- ✅ Tela 1 — cadastro de atendimento com deduplicação por WhatsApp
+- ✅ Tela 2 — lista de clientes com status verde/amarelo/vermelho
+- ✅ Tela 3 — painel de reativação com link `wa.me` e mensagem pronta
+- ✅ Autenticação via Supabase Auth (e-mail + senha, conta criada pelo implantador)
+- ✅ RLS com papel único `owner`
+- ✅ Deploy por projeto Supabase dedicado por salão
+- ✅ Nome e cor do salão via `salao_config`
+- ✅ Tema escuro / claro
 
 ### Gatilho de saída
 
@@ -57,56 +58,71 @@ A dona abre o sistema pelo menos **2x por semana sem ninguém pedir** — e rela
 
 ## 4. Fase 1 — Consolidação do produto
 
+**Status:** 🔄 Em andamento
 **Pré-requisito:** critério de saída da Fase 0 confirmado com pelo menos 1 salão
 **Modelo de negócio:** ainda serviço replicável — implantação manual, mensalidade por salão
 
 Esta fase não muda a arquitetura. Ela aprofunda o valor do produto nos mesmos salões e reduz o atrito de implantação para novos clientes. O objetivo é chegar a **5–8 salões pagando mensalidade** — o gatilho definido no PRD para avaliar a migração para SaaS.
 
-### 4.1 Edição e exclusão de registros
+### 4.1 Edição de registros ✅
 
-**Por que agora:** o UX-Flow deixou explícito que editar clientes e excluir atendimentos estão fora do MVP. Mas na prática, depois de algumas semanas de uso, a dona vai querer corrigir um nome digitado errado ou apagar um atendimento lançado na data errada. Sem isso, o sistema perde confiabilidade.
+**Status:** implementado
 
-**O que entra:**
+**O que foi entregue:**
 - Editar nome, WhatsApp e observações de uma cliente existente
-- Excluir um atendimento específico (com confirmação)
-- Regra de integridade: excluir o último atendimento de uma cliente não apaga a cliente — ela passa para `sem_atendimento`
+- Regra de integridade: editar não duplica — deduplicação por `(whatsapp, salao_id)` mantida
 
-**Impacto no banco:** nenhuma mudança de schema. São operações UPDATE e DELETE já cobertas pelas policies do RBAC-RLS.
+**Impacto no banco:** nenhuma mudança de schema. Operação UPDATE coberta pelas policies do RBAC-RLS.
 
-### 4.2 Recuperação de senha pela interface
+### 4.2 Recuperação de senha pela interface ✅
 
-**Por que agora:** no MVP a recuperação é feita manualmente pelo implantador via painel Supabase (documentado no UX-Flow). Com mais salões ativos isso vira suporte constante e desnecessário.
+**Status:** implementado
 
-**O que entra:**
-- Fluxo "esqueci minha senha" na tela de login usando o Supabase Auth (magic link por e-mail)
-- Nenhuma tela nova no sistema — o Supabase gerencia o e-mail de recuperação
+**O que foi entregue:**
+- Fluxo "Esqueci minha senha" na tela de login com três estados: formulário de e-mail → link enviado → redefinição de nova senha
+- Usa `supabase.auth.resetPasswordForEmail()` com redirect para `/login`
+- Evento `PASSWORD_RECOVERY` detectado via `onAuthStateChange` — exibe formulário de nova senha automaticamente
+- Sempre exibe mensagem de sucesso independente do e-mail existir (não vaza informação)
 
-### 4.3 Templates de mensagem variados
+### 4.3 Formulário público de cadastro ✅
 
-**Por que agora:** o template atual é genérico ("Senti sua falta"). Com o tempo a dona vai querer variar — uma mensagem para aniversário, outra para promoção, outra para cliente que sumiu há muito tempo.
+**Status:** implementado (adiantado da Fase 2)
+
+**O que foi entregue:**
+- Página pública `/cadastro/[salaoId]` acessível sem autenticação
+- A cliente preenche nome, WhatsApp, observações e consentimento LGPD
+- API Route `/api/cadastro-publico` valida e insere com `service_role` no servidor
+- Deduplicação por `(whatsapp, salao_id)` — cliente já cadastrada não duplica
+- Rate limiting por IP (5 tentativas/minuto)
+- Campo `origem = 'formulario'` marca clientes que se cadastraram sozinhas
+
+**Nota técnica:** o `salao_id` foi adicionado em `clientes` e `atendimentos` como parte desta feature, adiantando o isolamento de dados previsto para a Fase 2. As policies de RLS foram reescritas para filtrar por `salao_id` em vez de apenas verificar autenticação.
+
+### 4.4 Templates de mensagem variados
+
+**Status:** pendente
 
 **O que entra:**
 - 3 a 5 templates predefinidos com diferentes tons (reativação, aniversário, promoção relâmpago)
 - Seleção do template no painel de reativação antes de abrir o WhatsApp
 - O `{nome}` continua sendo substituído automaticamente em todos os templates
-- Templates não são editáveis pela dona nesta fase (isso vem na Fase 2)
+- Templates não são editáveis pela dona nesta fase (isso vem na Fase 3)
 
 **Impacto no banco:** nenhuma mudança de schema. Templates vivem no frontend como constantes configuráveis.
 
-### 4.4 Histórico de atendimentos por cliente
+### 4.5 Histórico de atendimentos por cliente
 
-**Por que agora:** o UX-Flow deixou a tela de histórico fora do MVP. Mas com o banco já separando `clientes` de `atendimentos`, os dados já existem — só falta uma tela que os mostre.
+**Status:** pendente
 
 **O que entra:**
-- Página de detalhe da cliente: lista cronológica de todos os atendimentos
-- Cada linha mostra data, serviço e dias desde o atendimento anterior
+- Página de detalhe da cliente: lista cronológica de todos os atendimentos com data, serviço, horário e preço
 - Botão "Novo atendimento" já pré-preenchido com o nome da cliente
 
 **Impacto no banco:** nenhuma mudança de schema. É uma query `SELECT WHERE cliente_id = X ORDER BY data_atendimento DESC`.
 
-### 4.5 Lembretes semanais para a dona
+### 4.6 Lembretes semanais para a dona
 
-**Por que agora:** o risco principal do MVP (PRD, seção 11) é a dona não criar o hábito de abrir o sistema. Um lembrete semanal resolve isso de forma passiva.
+**Status:** pendente
 
 **O que entra:**
 - E-mail automático toda segunda-feira com o resumo: "Você tem X clientes sumidas"
@@ -126,29 +142,25 @@ Esta fase não muda a arquitetura. Ela aprofunda o valor do produto nos mesmos s
 **Pré-requisito:** 5–8 salões pagando mensalidade (critério de saída da Fase 1)
 **Modelo de negócio:** início da transição de serviço replicável para SaaS multi-tenant
 
-Esta é a fase de maior risco técnico. A arquitetura muda de "um projeto Supabase por salão" para "todos os salões no mesmo projeto". Documentada no RBAC-RLS (seção 8) como preparação para multi-tenant.
+Esta é a fase de maior risco técnico. A arquitetura muda de "um projeto Supabase por salão" para "todos os salões no mesmo projeto".
 
 ### 5.1 Migração para multi-tenant
 
-**Por que agora:** com 5–8 salões, implantar manualmente cada novo cliente (criar projeto Supabase, rodar SQL, configurar Vercel) virou gargalo. A plataforma precisa ser capaz de onboarding sem intervenção manual.
-
-**O que muda no banco** (conforme RBAC-RLS, seção 8):
+**Nota:** `salao_id` já foi adicionado em `clientes` e `atendimentos` na Fase 1. As policies já filtram por `salao_id`. O que resta na Fase 2:
 
 ```
-Adicionar coluna salao_id em clientes e atendimentos
-  → backfill com os dados existentes
-  → adicionar tabela saloes (id, owner_id, nome, cor_primaria)
-  → trocar policies de "existe salao_config" para "salao_id IN (saloes do owner)"
+Criar tabela saloes (substitui salao_config)
+  → migrar dados de salao_config para saloes
+  → trocar FK de salao_id para referenciar saloes em vez de salao_config
+  → reescrever policies trocando a subquery de salao_config para saloes
   → desativar projetos individuais e migrar dados para projeto central
 ```
 
-**Estratégia de migração:** incremental e reversível. A coluna `salao_id` é adicionada com `DEFAULT` antes de remover os projetos individuais — nunca migração big-bang.
+**Estratégia de migração:** incremental e reversível. Nunca migração big-bang.
 
-**O que não muda:** lógica de autenticação (Supabase Auth + JWT), estrutura das tabelas `clientes` e `atendimentos`, mecanismo de `auth.uid()`.
+**O que não muda:** lógica de autenticação (Supabase Auth + JWT), estrutura das tabelas `clientes` e `atendimentos`, mecanismo de `auth.uid()`, padrão das policies.
 
 ### 5.2 Onboarding self-service
-
-**Por que agora:** sem self-service, cada novo salão ainda exige intervenção manual do implantador (criar conta, rodar SQL de implantação). Isso não escala.
 
 **O que entra:**
 - Tela de cadastro de novo salão (nome, cor primária, e-mail, senha)
@@ -156,22 +168,13 @@ Adicionar coluna salao_id em clientes e atendimentos
 - Tela de boas-vindas com orientação de primeiros passos
 - Cobrança integrada (link para pagamento recorrente — Stripe ou similar)
 
-**O que não entra ainda:** trial gratuito automatizado, onboarding guiado em múltiplos passos, suporte via chat integrado.
-
 ### 5.3 Configuração visual self-service
 
-**Por que agora:** no MVP a dona não pode alterar o nome ou a cor do salão pela interface — isso é feito pelo implantador via `salao_config`. Com self-service, ela precisa fazer isso sozinha.
-
 **O que entra:**
-- Tela de configurações do salão: alterar nome e cor primária
+- Tela de configurações do salão: alterar nome e cor primária pela interface (sem implantador)
 - Preview em tempo real da cor antes de salvar
-- Operação UPDATE em `saloes` com as policies corretas
-
-**Impacto no banco:** nenhuma mudança de schema além da migração multi-tenant já feita na Fase 2.1.
 
 ### 5.4 Múltiplos usuários por salão (papéis básicos)
-
-**Por que agora:** salões maiores têm funcionárias que também atendem. No MVP só a dona (`owner`) acessa. Com a plataforma, faz sentido permitir que funcionárias cadastrem atendimentos sem ter acesso às configurações ou à reativação.
 
 **O que entra:**
 - Papel `staff` (funcionária): pode cadastrar atendimentos (Tela 1), mas não acessa reativação (Tela 3) nem configurações
@@ -193,16 +196,11 @@ Novo salão consegue se cadastrar, configurar e fazer o primeiro cadastro de cli
 **Pré-requisito:** onboarding self-service funcionando (critério de saída da Fase 2)
 **Modelo de negócio:** SaaS maduro com planos diferenciados
 
-Com a plataforma estabilizada, esta fase foca em expandir o valor entregue por salão — aumentando retenção e potencial de upgrade de plano.
-
 ### 6.1 Insights e relatórios básicos
 
 **O que entra:**
-- Painel com métricas simples: total de clientes ativas/atenção/sumidas, serviço mais realizado no mês, taxa de retorno após reativação (quantas clientes voltaram)
-- Evolução do status ao longo do tempo (gráfico de linha: semana a semana, quantas vermelhas)
+- Painel com métricas simples: total de clientes ativas/atenção/sumidas, serviço mais realizado no mês, taxa de retorno após reativação
 - Exportação da lista de clientes em CSV
-
-**Impacto no banco:** nenhuma mudança de schema. Todos os dados já existem — é questão de agregar e apresentar.
 
 ### 6.2 Templates de mensagem editáveis pela dona
 
@@ -220,11 +218,7 @@ Com a plataforma estabilizada, esta fase foca em expandir o valor entregue por s
 - Alerta na lista quando o agendamento está chegando (3 dias antes)
 - Não é um calendário completo — é só um lembrete de data futura vinculado à cliente
 
-**Impacto no banco:** nova coluna `proximo_agendamento date` em `atendimentos` ou tabela separada `agendamentos`.
-
 ### 6.4 Planos diferenciados
-
-Com múltiplas features entregues, faz sentido estruturar planos:
 
 | Plano | Público | Diferenciais |
 |-------|---------|-------------|
@@ -250,40 +244,44 @@ Os itens abaixo foram considerados e deliberadamente excluídos de todas as fase
 
 ## 8. Dependências técnicas entre fases
 
-Algumas decisões tomadas na Fase 0 foram feitas conscientemente para não travar as fases seguintes:
+Algumas decisões tomadas na Fase 0/1 foram feitas conscientemente para não travar as fases seguintes:
 
-| Decisão na Fase 0 | Por que facilita as fases seguintes |
-|-------------------|-------------------------------------|
+| Decisão | Por que facilita as fases seguintes |
+|---------|-------------------------------------|
 | Status calculado como view (não coluna) | Sem migração de dados ao mudar regra de negócio de status |
 | `whatsapp` normalizado só dígitos | Deduplicação robusta que não quebra ao adicionar campo de país |
 | `salao_config` com `user_id` FK | Estrutura análoga à tabela `saloes` do multi-tenant — migração incremental |
-| RLS via `exists (salao_config)` | A policy muda de `salao_config` para `saloes` sem alterar o padrão |
+| `salao_id` em `clientes` e `atendimentos` (adiantado da Fase 2) | Policies já no padrão multi-tenant; migração será só trocar FK de `salao_config` para `saloes` |
+| Policies filtram por `salao_id` diretamente | Isolamento correto desde agora; nenhuma reescrita de lógica na Fase 2 |
 | Chave `anon` no frontend | Política de segurança já correta para ambiente multi-tenant |
+| `origem` em `clientes` | Dados de canal já coletados; permite segmentação futura sem migração |
 
 ---
 
 ## 9. Resumo visual das fases
 
 ```
-FASE 0 — MVP (agora)
+FASE 0 — MVP ✅ concluída
 ├── 3 telas: cadastro · lista · reativação
+├── Tema escuro / claro
 ├── 1 usuário por salão
 ├── 1 projeto Supabase por salão
 └── Implantação manual
 
     ↓ gatilho: hábito de uso + cliente voltou
 
-FASE 1 — Consolidação (serviço replicável)
-├── Edição e exclusão de registros
-├── Recuperação de senha
-├── Templates variados de mensagem
-├── Histórico de atendimentos por cliente
-└── Lembrete semanal por e-mail
+FASE 1 — Consolidação (serviço replicável) 🔄 em andamento
+├── ✅ Edição de clientes
+├── ✅ Recuperação de senha pela interface
+├── ✅ Formulário público de cadastro (QR code)
+├── ⏳ Templates variados de mensagem
+├── ⏳ Histórico de atendimentos por cliente
+└── ⏳ Lembrete semanal por e-mail
 
     ↓ gatilho: 5–8 salões pagando mensalidade
 
 FASE 2 — Plataforma (SaaS)
-├── Migração multi-tenant (salao_id nas tabelas)
+├── Migração multi-tenant (salao_id já pronto — só trocar FK)
 ├── Onboarding self-service
 ├── Configuração visual pela dona
 └── Múltiplos usuários por salão (owner + staff)

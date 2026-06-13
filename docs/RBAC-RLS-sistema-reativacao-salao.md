@@ -1,8 +1,8 @@
 # RBAC/RLS — Permissões e Regras de Acesso
 
-**Versão:** 1.0 (MVP)
+**Versão:** 1.1
 **Banco:** Supabase (PostgreSQL)
-**Última atualização:** 10/06/2026
+**Última atualização:** 12/06/2026
 
 ---
 
@@ -10,9 +10,12 @@
 
 ### Modelo de implantação do MVP
 
-Cada salão recebe sua **própria instância do sistema** — um projeto Supabase dedicado com banco de dados isolado. Não existe compartilhamento de dados entre salões nesta fase (isso vem com o SaaS multi-tenant, seção 7).
+Cada salão recebe sua **própria instância do sistema** — um projeto Supabase dedicado com banco de dados isolado. Não existe compartilhamento de dados entre salões nesta fase (isso vem com o SaaS multi-tenant, seção 8).
 
-Consequência direta: o problema de isolamento entre salões já está resolvido pela arquitetura (projetos separados), não pelo RLS. O RLS neste MVP tem uma responsabilidade mais simples: **garantir que só a dona autenticada acesse e modifique os dados do seu próprio salão**.
+O RLS tem duas responsabilidades neste MVP:
+
+1. **Garantir que só a dona autenticada acesse e modifique os dados** — policies por `auth.uid()`
+2. **Filtrar por `salao_id`** — preparação para o multi-tenant; garante isolamento correto mesmo que, no futuro, múltiplos salões coexistam no mesmo banco
 
 ### Único papel no MVP
 
@@ -34,7 +37,7 @@ O sistema usa o **Supabase Auth** com login por e-mail e senha. O fluxo é:
 3. Supabase Auth valida e gera um JWT com o user_id da dona
 4. O frontend armazena o token de sessão
 5. Cada requisição ao banco inclui o JWT no header
-6. O RLS usa auth.uid() para validar se o usuário tem acesso à linha
+6. O RLS usa auth.uid() para resolver o salao_id e validar o acesso à linha
 ```
 
 O cadastro da conta da dona é feito **por você (implantador)** no momento da entrega do sistema — ela não se auto-cadastra. Isso mantém controle sobre quem tem acesso.
@@ -45,34 +48,29 @@ O cadastro da conta da dona é feito **por você (implantador)** no momento da e
 
 ### 3.1 Por operação e tabela
 
-| Operação | `clientes` | `atendimentos` | `clientes_status` (view) |
-|----------|:----------:|:--------------:|:------------------------:|
-| SELECT | ✅ owner | ✅ owner | ✅ owner |
-| INSERT | ✅ owner | ✅ owner | ❌ (view somente leitura) |
-| UPDATE | ✅ owner | ✅ owner | ❌ (view somente leitura) |
-| DELETE | ✅ owner | ✅ owner | ❌ (view somente leitura) |
-| Acesso anônimo | ❌ bloqueado | ❌ bloqueado | ❌ bloqueado |
+| Operação | `clientes` | `atendimentos` | `salao_config` | `clientes_status` (view) |
+|----------|:----------:|:--------------:|:--------------:|:------------------------:|
+| SELECT | ✅ owner | ✅ owner | ✅ owner | ✅ owner |
+| INSERT | ✅ owner | ✅ owner | ❌ bloqueado | ❌ (view somente leitura) |
+| UPDATE | ✅ owner | ✅ owner | ✅ owner | ❌ (view somente leitura) |
+| DELETE | ✅ owner | ✅ owner | ❌ bloqueado | ❌ (view somente leitura) |
+| Acesso anônimo | ❌ bloqueado | ❌ bloqueado | ❌ bloqueado | ❌ bloqueado |
 
 ### 3.2 Regra principal de cada tabela
 
-Toda operação exige que `auth.uid()` seja igual ao `user_id` da dona — armazenado em uma tabela de configuração do salão (ver seção 4). Usuário não autenticado nunca passa.
+Toda operação exige que `auth.uid()` corresponda ao `user_id` do `salao_config` cujo `id` é o `salao_id` da linha. Usuário não autenticado nunca passa.
 
 ---
 
 ## 4. Tabela de configuração do salão
 
-Para que o RLS funcione com `auth.uid()`, é necessária uma tabela que vincule o projeto ao usuário dono. Ela também guarda as configurações visuais do salão (nome, cor).
-
 ```sql
--- =========================
--- Tabela: salao_config
--- =========================
 create table if not exists public.salao_config (
-  id          uuid primary key default gen_random_uuid(),
-  user_id     uuid not null unique references auth.users(id) on delete cascade,
-  nome_salao  text not null,
-  cor_primaria text not null default '#ec4899',  -- rosa padrão
-  criado_em   timestamptz not null default now()
+  id           uuid        primary key default gen_random_uuid(),
+  user_id      uuid        not null unique references auth.users(id) on delete cascade,
+  nome_salao   text        not null,
+  cor_primaria text        not null default '#ec4899',
+  criado_em    timestamptz not null default now()
 );
 ```
 
@@ -87,7 +85,6 @@ Cole este bloco completo no **SQL Editor** do Supabase após criar as tabelas do
 ### 5.1 Habilitar RLS em todas as tabelas
 
 ```sql
--- Habilita RLS (nenhum acesso liberado por padrão após este comando)
 alter table public.clientes      enable row level security;
 alter table public.atendimentos  enable row level security;
 alter table public.salao_config  enable row level security;
@@ -99,6 +96,8 @@ alter table public.salao_config  enable row level security;
 
 ### 5.2 Policies — tabela `clientes`
 
+O filtro `salao_id = (SELECT id FROM public.salao_config WHERE user_id = auth.uid())` garante que a dona só enxerga e modifica as clientes do próprio salão.
+
 ```sql
 -- SELECT: dona lê todas as suas clientes
 create policy "owner pode ler clientes"
@@ -106,10 +105,7 @@ create policy "owner pode ler clientes"
   for select
   to authenticated
   using (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 
 -- INSERT: dona cadastra novas clientes
@@ -118,10 +114,7 @@ create policy "owner pode inserir clientes"
   for insert
   to authenticated
   with check (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 
 -- UPDATE: dona edita dados de clientes existentes
@@ -130,16 +123,10 @@ create policy "owner pode atualizar clientes"
   for update
   to authenticated
   using (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   )
   with check (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 
 -- DELETE: dona pode remover uma cliente
@@ -148,10 +135,7 @@ create policy "owner pode deletar clientes"
   for delete
   to authenticated
   using (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 ```
 
@@ -166,10 +150,7 @@ create policy "owner pode ler atendimentos"
   for select
   to authenticated
   using (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 
 -- INSERT: dona registra novo atendimento
@@ -178,10 +159,7 @@ create policy "owner pode inserir atendimentos"
   for insert
   to authenticated
   with check (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 
 -- UPDATE: dona corrige um atendimento (ex.: data errada)
@@ -190,16 +168,10 @@ create policy "owner pode atualizar atendimentos"
   for update
   to authenticated
   using (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   )
   with check (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 
 -- DELETE: dona remove um atendimento lançado por engano
@@ -208,10 +180,7 @@ create policy "owner pode deletar atendimentos"
   for delete
   to authenticated
   using (
-    exists (
-      select 1 from public.salao_config
-      where user_id = auth.uid()
-    )
+    salao_id = (select id from public.salao_config where user_id = auth.uid())
   );
 ```
 
@@ -243,34 +212,42 @@ create policy "owner pode atualizar sua config"
 
 ### 5.5 Policy — view `clientes_status`
 
-A view herda as policies das tabelas base (`clientes` e `atendimentos`). Nenhuma policy extra é necessária. O Supabase avalia o RLS nas tabelas subjacentes quando a view é consultada — se o usuário não tiver acesso às tabelas, não terá acesso à view.
-
-> Confirme que a view foi criada com `security_invoker = true` (padrão no Supabase). Isso garante que o RLS das tabelas base seja aplicado ao contexto de quem consulta, não ao contexto de quem criou a view.
+A view usa `security_invoker = true`, então o RLS das tabelas base (`clientes` e `atendimentos`) é avaliado no contexto de quem consulta — não do criador da view. Nenhuma policy extra é necessária.
 
 ```sql
--- Opcional mas recomendado: declarar explicitamente security_invoker
+-- Já declarado na criação da view (ver ERD.md seção 5):
 create or replace view public.clientes_status
   with (security_invoker = true)
 as
--- ... (mesmo SQL do ERD)
+-- ...
 ```
+
+---
+
+### 5.6 Policy — formulário público (`/api/cadastro-publico`)
+
+O formulário público usa a **chave `service_role`** no servidor (API Route do Next.js) para bypassar o RLS e inserir clientes sem autenticação. O isolamento é garantido pelo código da API:
+
+1. Valida o `salaoId` recebido contra `salao_config` — garante que só salões existentes recebam cadastros
+2. Insere `salao_id` explicitamente — sem defaultar ao primeiro salão
+3. Deduplica por `(whatsapp, salao_id)` antes de inserir
+
+> A `service_role` key **nunca vai para o frontend** — fica apenas em `process.env.SUPABASE_SERVICE_ROLE_KEY` (sem prefixo `NEXT_PUBLIC_`), acessível somente pelas API Routes no servidor.
 
 ---
 
 ## 6. Chaves de API — o que usar onde
 
-O Supabase gera duas chaves para cada projeto. Usá-las errado é a vulnerabilidade mais comum.
-
 | Chave | Nome no painel | Onde usar | O que pode fazer |
 |-------|---------------|-----------|-----------------|
 | `anon` | `anon public` | **Frontend** (código público) | Só o que as policies permitem para `authenticated` ou `anon` |
-| `service_role` | `service_role secret` | **Nunca no frontend** — só em scripts de implantação ou funções server-side | Bypassa o RLS completamente — acesso irrestrito |
+| `service_role` | `service_role secret` | **Servidor** — API Routes do Next.js | Bypassa o RLS completamente — acesso irrestrito |
 
 ### Regras obrigatórias
 
-- A `service_role` key **jamais** deve aparecer no código do frontend, em variáveis de ambiente públicas (`NEXT_PUBLIC_*`, `VITE_*`) ou no repositório GitHub.
+- A `service_role` key **jamais** deve aparecer em variáveis de ambiente públicas (`NEXT_PUBLIC_*`) ou no repositório GitHub.
 - O frontend usa **exclusivamente a chave `anon`** combinada com o token de sessão do usuário autenticado.
-- A `service_role` é usada apenas no momento da implantação para criar o registro inicial em `salao_config` (vincular o `user_id` da dona ao salão).
+- A `service_role` é usada nos API Routes do servidor (ex.: `/api/cadastro-publico`) e no script de implantação.
 
 ---
 
@@ -291,35 +268,28 @@ values (
   '<Nome do Salão>',
   '<#hexcor-primaria>'   -- ex.: '#ec4899' para rosa
 );
+
+-- O id gerado automaticamente é o salao_id que será usado em
+-- todas as policies e no formulário público (URL: /cadastro/<salao_id>)
 ```
 
 ---
 
 ## 8. Preparação para multi-tenant (pós-MVP)
 
-Quando o sistema evoluir para SaaS, o modelo de RLS precisará mudar. Esta seção documenta a direção para facilitar a migração futura — não é necessário implementar agora.
+> **Nota:** a coluna `salao_id` já foi adicionada em `clientes` e `atendimentos` durante a Fase 1 como parte do hardening de segurança do RLS. Isso adianta parte do trabalho da Fase 2.
 
-### O que muda no banco
+Quando o sistema evoluir para SaaS, as policies já estão no padrão correto. O que muda na Fase 2:
 
-As tabelas `clientes` e `atendimentos` precisarão de uma coluna `salao_id` (FK para uma tabela `saloes`), e as policies passam a filtrar por ela:
-
-```sql
--- Exemplo de policy futura (não implementar agora)
-create policy "owner lê clientes do próprio salão"
-  on public.clientes
-  for select
-  to authenticated
-  using (
-    salao_id in (
-      select id from public.saloes
-      where owner_id = auth.uid()
-    )
-  );
+```
+Adicionar tabela saloes (substitui salao_config)
+  → migrar dados de salao_config para saloes
+  → trocar FK de salao_id de salao_config para saloes
+  → adicionar onboarding self-service (criar salão sem implantador)
+  → desativar projetos individuais e migrar dados para projeto central
 ```
 
-### O que não muda
-
-A lógica de autenticação (Supabase Auth + JWT), a estrutura de `clientes` e `atendimentos` e o mecanismo de `auth.uid()` são os mesmos. A migração é incremental: adicionar coluna → backfill → trocar policies.
+As policies **não precisam mudar de padrão** — já usam `salao_id` como filtro. Apenas a subquery muda de `salao_config` para `saloes`.
 
 ---
 
@@ -330,11 +300,12 @@ Use esta lista antes de entregar cada implantação para um salão.
 - [ ] RLS habilitado nas três tabelas (`clientes`, `atendimentos`, `salao_config`)
 - [ ] Todas as policies criadas e testadas com o usuário da dona
 - [ ] Registro em `salao_config` inserido com o `user_id` correto
-- [ ] Chave `anon` usada no frontend; chave `service_role` ausente do código
-- [ ] Variáveis de ambiente do Vercel configuradas (`SUPABASE_URL` e `SUPABASE_ANON_KEY`)
-- [ ] Nenhuma variável de ambiente prefixada com `NEXT_PUBLIC_` ou `VITE_` contém a `service_role`
+- [ ] Chave `anon` usada no frontend; chave `service_role` ausente de variáveis `NEXT_PUBLIC_*`
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` configurada no Vercel (sem prefixo `NEXT_PUBLIC_`) para o `/api/cadastro-publico`
+- [ ] Variáveis de ambiente do Vercel configuradas (`NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
 - [ ] Testado: usuário não autenticado não consegue ler nenhuma tabela
 - [ ] Testado: usuário autenticado (a dona) consegue criar cliente, registrar atendimento e ver a lista com status
+- [ ] Testado: formulário público (`/cadastro/<salao_id>`) insere cliente com `salao_id` correto
 
 ---
 
@@ -342,9 +313,11 @@ Use esta lista antes de entregar cada implantação para um salão.
 
 | Decisão | Escolha | Motivo |
 |---------|---------|--------|
-| Isolamento entre salões | Projetos Supabase separados | MVP sem complexidade de multi-tenant; mais simples de implantar e manter |
+| Isolamento entre salões | Projetos Supabase separados + `salao_id` nas tabelas | Deploy isolado no MVP; `salao_id` prepara multi-tenant sem big-bang |
+| Padrão das policies | `salao_id = (SELECT id FROM salao_config WHERE user_id = auth.uid())` | Filtra a linha diretamente, sem JOIN — mais performático e correto |
 | Número de papéis | 1 (`owner`) | MVP tem apenas um usuário por salão; múltiplos papéis fora de escopo |
 | Mecanismo de auth | Supabase Auth e-mail + senha | Já integrado ao Supabase; sem dependência externa |
 | Quem cria a conta da dona | Implantador (você) | Controle sobre quem tem acesso; dona não precisa entender o processo |
-| Acesso à view `clientes_status` | Herança das policies das tabelas base | Sem duplicação de policies; `security_invoker = true` garante a herança |
-| Proteção da `service_role` | Nunca no frontend | Chave bypassa RLS — exposição seria vulnerabilidade crítica |
+| Acesso à view `clientes_status` | Herança via `security_invoker = true` | Sem duplicação de policies; RLS das tabelas base aplicado automaticamente |
+| Proteção da `service_role` | Nunca em variáveis `NEXT_PUBLIC_*` | Chave bypassa RLS — exposição seria vulnerabilidade crítica |
+| Formulário público | API Route com `service_role` no servidor | Clientes se cadastram sem conta; segurança garantida pela validação do `salaoId` no servidor |

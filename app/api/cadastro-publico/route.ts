@@ -57,8 +57,6 @@ export async function POST(request: NextRequest) {
 
   const { salaoId, nome, whatsapp, observacoes, autorizaContato } = body
 
-  console.log('[cadastro-publico] body recebido:', { salaoId, nome, whatsapp: typeof whatsapp, autorizaContato })
-
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
@@ -106,9 +104,8 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
 
   if (erroConsulta) {
-    console.error('[cadastro-publico] erroConsulta:', JSON.stringify(erroConsulta))
     return NextResponse.json(
-      { erro: 'Erro interno. Tente novamente.', debug_consulta: erroConsulta.message },
+      { erro: 'Erro interno. Tente novamente.' },
       { status: 500 },
     )
   }
@@ -130,9 +127,8 @@ export async function POST(request: NextRequest) {
   })
 
   if (erroCliente) {
-    console.error('[cadastro-publico] erroCliente:', JSON.stringify(erroCliente))
     return NextResponse.json(
-      { erro: 'Erro interno. Tente novamente.', debug_insert: erroCliente.message },
+      { erro: 'Erro interno. Tente novamente.' },
       { status: 500 },
     )
   }
