@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
     .from('clientes')
     .select('id')
     .eq('whatsapp', whatsappNormalizado)
+    .eq('salao_id', salaoId)
     .maybeSingle()
 
   if (erroConsulta) {
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
         : null,
     autoriza_contato: true,
     origem: 'formulario',
+    salao_id: salaoId,
   })
 
   if (erroCliente) {

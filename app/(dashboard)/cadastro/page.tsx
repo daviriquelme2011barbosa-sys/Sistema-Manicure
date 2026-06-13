@@ -34,6 +34,7 @@ function CadastroAtendimento() {
 
   const [nomeCliente, setNomeCliente] = useState<string | null>(null)
   const [carregandoCliente, setCarregandoCliente] = useState(!!clienteId)
+  const [salaoId, setSalaoId] = useState<string | null>(null)
   const [servico, setServico] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
   const [horario, setHorario] = useState('')
@@ -41,6 +42,16 @@ function CadastroAtendimento() {
   const [salvando, setSalvando] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<Toast>(null)
+
+  useEffect(() => {
+    supabase
+      .from('salao_config')
+      .select('id')
+      .single()
+      .then(({ data }) => {
+        if (data) setSalaoId(data.id)
+      })
+  }, [])
 
   useEffect(() => {
     if (!clienteId) return
@@ -81,6 +92,7 @@ function CadastroAtendimento() {
       data_atendimento: dataAtendimento,
       horario,
       preco: precoNum,
+      salao_id: salaoId,
     })
 
     if (error) {
