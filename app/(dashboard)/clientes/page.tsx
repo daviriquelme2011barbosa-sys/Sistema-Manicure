@@ -48,6 +48,13 @@ function normalizarWhatsApp(valor: string): string {
   return valor.replace(/\D/g, '')
 }
 
+function parsarPreco(valor: string): number | null {
+  const limpo = valor.trim().replace(',', '.')
+  if (!limpo) return null
+  const num = parseFloat(limpo)
+  return isNaN(num) ? null : num
+}
+
 function formatarData(dataISO: string): string {
   const [ano, mes, dia] = dataISO.split('-')
   return `${dia}/${mes}/${ano}`
@@ -152,11 +159,15 @@ export default function ClientesPage() {
     ultimaVisita: '',
     observacoes: '',
     autorizaContato: true,
+    preco: '',
   })
   const [salvandoEdicao, setSalvandoEdicao] = useState(false)
   const [errosEdicao, setErrosEdicao] = useState<Record<string, string>>({})
   const [confirmarExclusao, setConfirmarExclusao] = useState(false)
   const [excluindo, setExcluindo] = useState(false)
+  const [ultimoAtendimentoId, setUltimoAtendimentoId] = useState<string | null>(null)
+  const [precoOriginal, setPrecoOriginal] = useState<number | null>(null)
+  const [carregandoPreco, setCarregandoPreco] = useState(false)
 
   useEffect(() => {
     async function carregar() {
@@ -216,7 +227,7 @@ export default function ClientesPage() {
     setTimeout(() => setToast(null), 3000)
   }
 
-  function abrirEdicao(cliente: ClienteStatus) {
+  async function abrirEdicao(cliente: ClienteStatus) {
     setClienteEditando(cliente)
     setEdicao({
       nome: cliente.nome,
@@ -225,9 +236,35 @@ export default function ClientesPage() {
       ultimaVisita: cliente.ultima_visita ?? '',
       observacoes: cliente.observacoes ?? '',
       autorizaContato: cliente.autoriza_contato ?? true,
+      preco: '',
     })
     setErrosEdicao({})
     setConfirmarExclusao(false)
+    setUltimoAtendimentoId(null)
+    setPrecoOriginal(null)
+
+    if (cliente.ultima_visita) {
+      setCarregandoPreco(true)
+      const { data } = await supabase
+        .from('atendimentos')
+        .select('id, preco')
+        .eq('cliente_id', cliente.id)
+        .order('data_atendimento', { ascending: false })
+        .order('criado_em', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (data) {
+        const atend = data as { id: string; preco: number | null }
+        setUltimoAtendimentoId(atend.id)
+        setPrecoOriginal(atend.preco)
+        setEdicao((prev) => ({
+          ...prev,
+          preco: atend.preco != null ? String(atend.preco).replace('.', ',') : '',
+        }))
+      }
+      setCarregandoPreco(false)
+    }
   }
 
   function fecharEdicao() {
@@ -296,24 +333,32 @@ export default function ClientesPage() {
       !!clienteEditando.ultima_visita &&
       edicao.ultimaVisita !== clienteEditando.ultima_visita
 
-    if (servicoAlterado || dataAlterada) {
-      const { data: ultimoAtend } = await supabase
-        .from('atendimentos')
-        .select('id')
-        .eq('cliente_id', clienteEditando.id)
-        .order('data_atendimento', { ascending: false })
-        .limit(1)
-        .maybeSingle()
+    const precoAtual = parsarPreco(edicao.preco)
+    const precoAlterado = ultimoAtendimentoId !== null && precoAtual !== precoOriginal
 
-      if (ultimoAtend) {
+    if (servicoAlterado || dataAlterada || precoAlterado) {
+      let atendId: string | null = ultimoAtendimentoId
+      if (!atendId) {
+        const { data: ultimoAtend } = await supabase
+          .from('atendimentos')
+          .select('id')
+          .eq('cliente_id', clienteEditando.id)
+          .order('data_atendimento', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        atendId = (ultimoAtend as { id: string } | null)?.id ?? null
+      }
+
+      if (atendId) {
         const atualizacao: Record<string, unknown> = {}
         if (servicoAlterado) atualizacao.servico = edicao.servico.trim()
         if (dataAlterada) atualizacao.data_atendimento = edicao.ultimaVisita
+        if (precoAlterado) atualizacao.preco = precoAtual
 
         await supabase
           .from('atendimentos')
           .update(atualizacao)
-          .eq('id', ultimoAtend.id)
+          .eq('id', atendId)
       }
     }
 
@@ -499,6 +544,41 @@ export default function ClientesPage() {
                   />
                 </div>
               )}
+
+              {/* Preço do último atendimento */}
+              <div className="flex flex-col gap-1">
+                <label htmlFor="edit-preco" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Preço do último atendimento
+                  <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
+                </label>
+                {carregandoPreco ? (
+                  <div className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-zinc-100 dark:bg-zinc-700/50 animate-pulse" />
+                ) : clienteEditando.ultima_visita ? (
+                  <div className={`flex h-12 items-center overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-pink-500 border-zinc-300 dark:border-zinc-600 ${salvandoEdicao || excluindo ? 'bg-zinc-100 dark:bg-zinc-700/50' : 'bg-white dark:bg-zinc-800'}`}>
+                    <span className="flex-shrink-0 pl-4 pr-2 text-sm select-none text-zinc-500 dark:text-zinc-400">
+                      R$
+                    </span>
+                    <input
+                      id="edit-preco"
+                      type="text"
+                      inputMode="decimal"
+                      value={edicao.preco}
+                      onChange={(e) => setEdicao((prev) => ({ ...prev, preco: e.target.value }))}
+                      disabled={salvandoEdicao || excluindo}
+                      placeholder="0,00"
+                      className="h-full flex-1 bg-transparent pr-4 text-base text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none disabled:cursor-not-allowed"
+                    />
+                  </div>
+                ) : (
+                  <input
+                    id="edit-preco"
+                    type="text"
+                    disabled
+                    placeholder="Sem atendimento registrado"
+                    className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base bg-zinc-100 dark:bg-zinc-700/50 text-zinc-400 dark:text-zinc-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 cursor-not-allowed"
+                  />
+                )}
+              </div>
 
               {/* Observações */}
               <div className="flex flex-col gap-1">
