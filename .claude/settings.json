@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls lib *)",
+      "Bash(ls components *)",
+      "Bash(ls hooks *)",
+      "Bash(ls types *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

@@ -3,20 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-
-type ClienteFormulario = {
-  id: string
-  nome: string
-  whatsapp: string
-  autoriza_contato: boolean
-}
-
-function formatarWhatsApp(numero: string): string {
-  const n = numero.replace(/\D/g, '')
-  if (n.length === 11) return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`
-  if (n.length === 10) return `(${n.slice(0, 2)}) ${n.slice(2, 6)}-${n.slice(6)}`
-  return numero
-}
+import { formatarWhatsApp, normalizarWhatsApp } from '@/lib/formatters'
+import { IconeChevronDireita } from '@/components/icons'
+import type { ClienteFormulario } from '@/types'
 
 export default function CadastrosPage() {
   const [clientes, setClientes] = useState<ClienteFormulario[]>([])
@@ -31,7 +20,7 @@ export default function CadastrosPage() {
         .eq('origem', 'formulario')
         .order('nome')
 
-      setClientes(data ?? [])
+      setClientes((data ?? []) as ClienteFormulario[])
       setCarregando(false)
     }
     buscar()
@@ -42,7 +31,7 @@ export default function CadastrosPage() {
         const termo = busca.trim().toLowerCase()
         return (
           c.nome.toLowerCase().includes(termo) ||
-          c.whatsapp.replace(/\D/g, '').includes(termo.replace(/\D/g, ''))
+          normalizarWhatsApp(c.whatsapp).includes(normalizarWhatsApp(termo))
         )
       })
     : clientes
@@ -109,20 +98,7 @@ export default function CadastrosPage() {
                     >
                       {cliente.autoriza_contato ? '✅' : '❌'}
                     </span>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-zinc-300 dark:text-zinc-600"
-                      aria-hidden="true"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
+                    <IconeChevronDireita className="text-zinc-300 dark:text-zinc-600" />
                   </div>
                 </Link>
               </li>

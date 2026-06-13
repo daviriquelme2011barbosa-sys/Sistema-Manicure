@@ -4,28 +4,11 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-
-const SERVICOS_SUGERIDOS = [
-  'Manicure',
-  'Pedicure',
-  'Manicure e pedicure',
-  'Spa dos pés',
-  'Blindagem',
-  'Alongamento de unhas',
-  'Nail art',
-  'Esmaltação em gel',
-]
-
-function dataHoje(): string {
-  const d = new Date()
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, '0'),
-    String(d.getDate()).padStart(2, '0'),
-  ].join('-')
-}
-
-type Toast = { mensagem: string; tipo: 'sucesso' | 'erro' } | null
+import { dataHoje, parsearPreco } from '@/lib/formatters'
+import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
+import { useToast } from '@/hooks/useToast'
+import { ToastView } from '@/components/Toast'
+import { IconeVoltar } from '@/components/icons'
 
 function CadastroAtendimento() {
   const router = useRouter()
@@ -41,7 +24,7 @@ function CadastroAtendimento() {
   const [preco, setPreco] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
-  const [toast, setToast] = useState<Toast>(null)
+  const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
     supabase
@@ -66,19 +49,14 @@ function CadastroAtendimento() {
       })
   }, [clienteId])
 
-  function mostrarToast(mensagem: string, tipo: 'sucesso' | 'erro') {
-    setToast({ mensagem, tipo })
-    setTimeout(() => setToast(null), 3000)
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
     const novosErros: Record<string, string> = {}
     if (!servico.trim()) novosErros.servico = 'Selecione ou descreva o serviço'
     if (!horario) novosErros.horario = 'Informe o horário'
-    const precoNum = parseFloat(preco.replace(',', '.'))
-    if (!preco.trim() || isNaN(precoNum) || precoNum < 0) {
+    const precoNum = parsearPreco(preco)
+    if (!preco.trim() || precoNum === null || precoNum < 0) {
       novosErros.preco = 'Informe um valor válido'
     }
     setErros(novosErros)
@@ -110,18 +88,7 @@ function CadastroAtendimento() {
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      {/* Toast */}
-      {toast && (
-        <div
-          role="status"
-          aria-live="polite"
-          className={`fixed left-4 right-4 top-4 z-50 rounded-xl px-4 py-3 text-sm font-medium shadow-lg sm:left-auto sm:right-4 sm:w-80 ${
-            toast.tipo === 'sucesso' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-          }`}
-        >
-          {toast.mensagem}
-        </div>
-      )}
+      <ToastView toast={toast} />
 
       {/* Cabeçalho */}
       <header className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4">
@@ -130,19 +97,7 @@ function CadastroAtendimento() {
           className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
           aria-label="Voltar para lista de clientes"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <IconeVoltar />
         </Link>
         <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
           Novo atendimento
