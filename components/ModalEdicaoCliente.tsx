@@ -210,7 +210,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       className="fixed inset-0 z-40 flex flex-col justify-end sm:items-center sm:justify-center"
     >
       <div className="absolute inset-0 bg-black/40" onClick={fecharEdicao} />
-      <div className="relative w-full rounded-t-2xl bg-white dark:bg-zinc-900 px-4 pb-8 pt-5 shadow-xl sm:max-w-md sm:rounded-2xl">
+      <div className="relative w-full overflow-y-auto max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-zinc-900 px-4 pb-8 pt-5 shadow-xl sm:max-w-md sm:rounded-2xl">
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
 
         <div className="mb-5 flex items-center justify-between">
