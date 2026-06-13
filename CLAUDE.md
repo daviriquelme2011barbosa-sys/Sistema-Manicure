@@ -133,7 +133,6 @@ const link = `https://wa.me/55${cliente.whatsapp}?text=${encodeURIComponent(mens
 Se alguma dessas features for solicitada, recuse e mencione que está documentada no `docs/PRD.md` seção 10:
 
 - Editar ou excluir clientes/atendimentos
-- Recuperar senha pela interface
 - Agendamento ou calendário
 - Controle financeiro
 - Disparo automático de mensagens
