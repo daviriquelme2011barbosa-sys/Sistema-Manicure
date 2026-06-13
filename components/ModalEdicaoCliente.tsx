@@ -207,10 +207,19 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       role="dialog"
       aria-modal="true"
       aria-label="Editar cliente"
-      className="fixed inset-0 z-40 flex flex-col justify-end sm:items-center sm:justify-center"
+      className="fixed inset-0 z-40 flex flex-col justify-end overflow-hidden sm:items-center sm:justify-center"
     >
       <div className="absolute inset-0 bg-black/40" onClick={fecharEdicao} />
-      <div className="relative w-full overflow-y-auto max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-zinc-900 px-4 pb-8 pt-5 shadow-xl sm:max-w-md sm:rounded-2xl">
+      <div className="relative flex flex-col w-full max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-zinc-900 shadow-xl sm:max-w-md sm:rounded-2xl">
+        <button
+          onClick={fecharEdicao}
+          disabled={salvandoEdicao || excluindo}
+          className="absolute right-3 top-3 hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+          aria-label="Fechar"
+        >
+          <IconeFechar />
+        </button>
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-8 pt-5">
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
 
         <div className="mb-5 flex items-center justify-between">
@@ -414,6 +423,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               </button>
             </>
           )}
+        </div>
         </div>
       </div>
     </div>
