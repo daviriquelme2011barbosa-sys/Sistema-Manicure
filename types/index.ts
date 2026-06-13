@@ -58,4 +58,16 @@ export type ClienteFormulario = {
   autoriza_contato: boolean
 }
 
+export type AtendimentoHistorico = {
+  id: string
+  data_atendimento: string
+  servico: string
+  preco: number | null
+  horario: string | null
+  clientes: {
+    nome: string
+    whatsapp: string
+  }
+}
+
 export type Toast = { mensagem: string; tipo: 'sucesso' | 'erro' } | null

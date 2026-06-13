@@ -39,6 +39,11 @@ export function textoSemAparecer(dias: number): string {
   return `${dias} dias sem aparecer`
 }
 
+// Formata um número como valor monetário em reais: R$ 45,00.
+export function formatarPreco(preco: number): string {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco)
+}
+
 // Data de hoje no formato yyyy-mm-dd (fuso local), para inputs type="date".
 export function dataHoje(): string {
   const d = new Date()

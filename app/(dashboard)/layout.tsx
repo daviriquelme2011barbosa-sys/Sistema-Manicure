@@ -16,6 +16,7 @@ import {
   IconePessoa,
   IconeMais,
   IconeCoracao,
+  IconeRelogio,
 } from '@/components/icons'
 
 type Tema = 'claro' | 'escuro'
@@ -265,6 +266,9 @@ function BarraNavegacao() {
       </NavItem>
       <NavItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'}>
         <IconeCoracao />
+      </NavItem>
+      <NavItem href="/historico" label="Histórico" ativo={pathname === '/historico'}>
+        <IconeRelogio />
       </NavItem>
     </nav>
   )
