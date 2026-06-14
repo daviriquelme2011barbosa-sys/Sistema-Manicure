@@ -104,8 +104,8 @@ export default function FormularioCadastroPublico({
   if (sucesso) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
-        <p className="text-5xl">💗</p>
-        <h2 className="mt-4 text-lg font-semibold text-zinc-800">
+        <p className="text-5xl" style={{ color: corPrimaria }}>💗</p>
+        <h2 className="mt-4 text-lg font-semibold" style={{ color: corPrimaria }}>
           Obrigado pelo seu cadastro! 💗
         </h2>
         <p className="mt-2 text-sm text-zinc-500">
@@ -132,8 +132,8 @@ export default function FormularioCadastroPublico({
 
       {/* Cabeçalho */}
       <header
-        className="px-6 py-8 text-center text-white rounded-b-3xl shadow-md"
-        style={{ backgroundColor: corPrimaria || '#ec4899' }}
+        className="px-6 py-8 text-center rounded-b-3xl shadow-sm"
+        style={{ backgroundColor: '#fdf2f8' }}
       >
         <div className="flex justify-center mb-4">
           {fotoUrl ? (
@@ -142,15 +142,19 @@ export default function FormularioCadastroPublico({
               alt={nomeManicure ?? nomeSalao}
               width={96}
               height={96}
-              className="rounded-full object-cover border-4 border-white/40 shadow-md"
+              className="rounded-full object-cover shadow-md"
+              style={{ border: `4px solid ${corPrimaria}` }}
             />
           ) : (
-            <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/40 bg-white/20 text-3xl font-bold shadow-md">
+            <div
+              className="flex h-24 w-24 items-center justify-center rounded-full text-3xl font-bold shadow-md bg-white"
+              style={{ border: `4px solid ${corPrimaria}`, color: corPrimaria }}
+            >
               {(nomeManicure ?? nomeSalao).charAt(0).toUpperCase()}
             </div>
           )}
         </div>
-        <h1 className="text-lg font-semibold">
+        <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
           Faça seu cadastro para ser atendida pela {nomeManicure ?? nomeSalao}
         </h1>
       </header>
@@ -252,7 +256,8 @@ export default function FormularioCadastroPublico({
           <button
             type="submit"
             disabled={enviando || !autorizaContato}
-            className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-12 rounded-lg font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}` }}
           >
             {enviando ? 'Enviando…' : 'Enviar'}
           </button>
