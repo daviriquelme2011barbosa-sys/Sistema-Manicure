@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 
 function normalizarWhatsApp(valor: string): string {
@@ -12,12 +13,16 @@ type Props = {
   salaoId: string
   nomeSalao: string
   corPrimaria: string
+  fotoUrl?: string | null
+  nomeManicure?: string | null
 }
 
 export default function FormularioCadastroPublico({
   salaoId,
   nomeSalao,
   corPrimaria,
+  fotoUrl,
+  nomeManicure,
 }: Props) {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
@@ -130,13 +135,24 @@ export default function FormularioCadastroPublico({
         className="px-6 py-8 text-center text-white rounded-b-3xl shadow-md"
         style={{ backgroundColor: corPrimaria || '#ec4899' }}
       >
-        <p className="text-3xl">💅</p>
-        <h1 className="mt-2 text-lg font-semibold">
-          Bem-vinda ao {nomeSalao}!
+        <div className="flex justify-center mb-4">
+          {fotoUrl ? (
+            <Image
+              src={fotoUrl}
+              alt={nomeManicure ?? nomeSalao}
+              width={96}
+              height={96}
+              className="rounded-full object-cover border-4 border-white/40 shadow-md"
+            />
+          ) : (
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/40 bg-white/20 text-3xl font-bold shadow-md">
+              {(nomeManicure ?? nomeSalao).charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <h1 className="text-lg font-semibold">
+          Faça seu cadastro para ser atendida pela {nomeManicure ?? nomeSalao}
         </h1>
-        <p className="mt-1 text-sm opacity-90">
-          Preencha seus dados para se cadastrar
-        </p>
       </header>
 
       <main className="flex-1 px-4 pb-12 pt-6">

@@ -5,6 +5,8 @@ type SalaoConfig = {
   id: string
   nome_salao: string
   cor_primaria: string
+  foto_url: string | null
+  nome_manicure: string | null
 }
 
 const UUID_REGEX =
@@ -20,7 +22,7 @@ async function buscarSalao(salaoId: string): Promise<SalaoConfig | null> {
 
   const { data, error } = await supabase
     .from('salao_config')
-    .select('id, nome_salao, cor_primaria')
+    .select('id, nome_salao, cor_primaria, foto_url, nome_manicure')
     .eq('id', salaoId)
     .maybeSingle()
 
@@ -55,6 +57,8 @@ export default async function CadastroPublicoPage({
       salaoId={salao.id}
       nomeSalao={salao.nome_salao}
       corPrimaria={salao.cor_primaria ?? '#ec4899'}
+      fotoUrl={salao.foto_url}
+      nomeManicure={salao.nome_manicure}
     />
   )
 }
