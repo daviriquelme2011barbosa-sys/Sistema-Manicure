@@ -20,10 +20,20 @@ import {
   IconeHamburguer,
   IconeVoltar,
 } from '@/components/icons'
+import { HeaderProvider, useHeader } from '@/lib/header-context'
 
 type Tema = 'claro' | 'escuro'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <HeaderProvider>
+      <DashboardLayoutInner>{children}</DashboardLayoutInner>
+    </HeaderProvider>
+  )
+}
+
+function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
+  const { acaoVoltar } = useHeader()
   const router = useRouter()
   const pathname = usePathname()
   const [verificando, setVerificando] = useState(true)
@@ -125,8 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <ToastView toast={toast} />
 
       {/* Header fixo: hamburguer+voltar | nome do salão | tema */}
-      <header className="fixed left-0 right-0 top-0 z-30 flex h-20 items-center border-b border-zinc-100 bg-white/90 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90">
-        <div className="ml-2 flex flex-shrink-0 flex-col items-center gap-1">
+      <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-zinc-100 bg-white/90 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+        <div className="ml-2 flex flex-shrink-0 items-center gap-1">
           <button
             onClick={() => setMenuAberto(true)}
             className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
@@ -135,13 +145,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <IconeHamburguer />
           </button>
-          <button
-            onClick={() => router.back()}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
-            aria-label="Voltar"
-          >
-            <IconeVoltar />
-          </button>
+          {acaoVoltar && (
+            <button
+              onClick={acaoVoltar}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+              aria-label="Voltar"
+            >
+              <IconeVoltar />
+            </button>
+          )}
         </div>
 
         <p className="flex-1 truncate text-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -319,7 +331,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      <div className="pt-20">{children}</div>
+      <div className="pt-14">{children}</div>
     </>
   )
 }

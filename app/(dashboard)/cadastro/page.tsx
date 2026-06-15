@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { dataHoje, parsearPreco } from '@/lib/formatters'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
 import { useToast } from '@/hooks/useToast'
 import { ToastView } from '@/components/Toast'
 import { IconeFechar } from '@/components/icons'
+import { useHeader } from '@/lib/header-context'
 
 type ClienteBusca = {
   id: string
@@ -95,6 +96,7 @@ export default function CadastroPage() {
   const [salvando, setSalvando] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
   const { toast, mostrarToast } = useToast()
+  const { definirAcaoVoltar } = useHeader()
 
   useEffect(() => {
     async function inicializar() {
@@ -111,14 +113,22 @@ export default function CadastroPage() {
     inicializar()
   }, [])
 
-  function limpar() {
+  const limpar = useCallback(() => {
     setClienteSelecionado(null)
     setServico('')
     setDataAtendimento(dataHoje)
     setHorario('')
     setPreco('')
     setErros({})
-  }
+  }, [])
+
+  useEffect(() => {
+    definirAcaoVoltar(clienteSelecionado ? limpar : null)
+  }, [clienteSelecionado, limpar, definirAcaoVoltar])
+
+  useEffect(() => {
+    return () => { definirAcaoVoltar(null) }
+  }, [definirAcaoVoltar])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
