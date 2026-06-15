@@ -40,6 +40,14 @@ export type ClienteStatus = {
   ultimo_servico: string | null
   status: StatusCliente
   autoriza_contato: boolean | null
+  data_nascimento?: string | null
+}
+
+export type Aniversariante = {
+  id: string
+  nome: string
+  whatsapp: string
+  data_nascimento: string
 }
 
 export type ClienteReativar = {

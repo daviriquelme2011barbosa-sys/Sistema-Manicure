@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { textoSemAparecer } from '@/lib/formatters'
+import { textoSemAparecer, formatarDiaMes } from '@/lib/formatters'
 import { SkeletonLista } from '@/components/SkeletonLista'
 import { IconeVoltar, IconeWhatsApp } from '@/components/icons'
-import type { ClienteReativar } from '@/types'
+import type { ClienteReativar, Aniversariante } from '@/types'
 
 function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
   return (
@@ -18,6 +18,12 @@ function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
   )
 }
 
+function montarLinkWhatsAppAniversario(cliente: Aniversariante): string {
+  const primeiroNome = cliente.nome.split(' ')[0]
+  const mensagem = `Oi ${primeiroNome}! 🎂 Hoje é um dia especial — feliz aniversário! Que tal comemorar com as unhas em dia? Adoraria te ver aqui no salão! 💅😊`
+  return `https://wa.me/55${cliente.whatsapp}?text=${encodeURIComponent(mensagem)}`
+}
+
 function montarLinkWhatsApp(cliente: ClienteReativar): string {
   const primeiroNome = cliente.nome.split(' ')[0]
   const mensagem = `Oi ${primeiroNome}! 💅 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊`
@@ -26,24 +32,46 @@ function montarLinkWhatsApp(cliente: ClienteReativar): string {
 
 export default function ReativarPage() {
   const [clientes, setClientes] = useState<ClienteReativar[]>([])
+  const [aniversariantes, setAniversariantes] = useState<Aniversariante[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
 
   useEffect(() => {
     async function carregar() {
-      const { data, error } = await supabase
-        .from('clientes_status')
-        .select('id, nome, whatsapp, dias_desde_ultima_visita, ultimo_servico, status')
-        .in('status', ['vermelho', 'amarelo'])
+      const mesAtual = new Date().getMonth() + 1
 
-      if (error) {
+      const [
+        { data: clientesData, error: clientesError },
+        { data: anivData },
+      ] = await Promise.all([
+        supabase
+          .from('clientes_status')
+          .select('id, nome, whatsapp, dias_desde_ultima_visita, ultimo_servico, status')
+          .in('status', ['vermelho', 'amarelo']),
+        supabase
+          .from('clientes')
+          .select('id, nome, whatsapp, data_nascimento')
+          .not('data_nascimento', 'is', null),
+      ])
+
+      if (clientesError) {
         setErro('Não foi possível carregar. Tente novamente.')
       } else {
-        const ordenados = ((data ?? []) as ClienteReativar[]).sort((a, b) => {
+        const ordenados = ((clientesData ?? []) as ClienteReativar[]).sort((a, b) => {
           if (a.status !== b.status) return a.status === 'vermelho' ? -1 : 1
           return b.dias_desde_ultima_visita - a.dias_desde_ultima_visita
         })
         setClientes(ordenados)
+      }
+
+      if (anivData) {
+        const doMes = (anivData as Aniversariante[])
+          .filter(c => parseInt(c.data_nascimento.split('-')[1], 10) === mesAtual)
+          .sort((a, b) =>
+            parseInt(a.data_nascimento.split('-')[2], 10) -
+            parseInt(b.data_nascimento.split('-')[2], 10)
+          )
+        setAniversariantes(doMes)
       }
 
       setCarregando(false)
@@ -90,38 +118,74 @@ export default function ReativarPage() {
           <p role="alert" className="mt-8 text-center text-sm text-red-600">
             {erro}
           </p>
-        ) : clientes.length === 0 ? (
-          <div className="mt-16 flex flex-col items-center gap-2 text-center">
-            <span className="text-4xl" aria-hidden="true">🎉</span>
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">Nenhuma cliente sumida no momento</p>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">Todas as suas clientes estão em dia!</p>
-          </div>
         ) : (
-          <ul className="flex flex-col gap-3">
-            {clientes.map((cliente) => (
-              <li key={cliente.id} className="rounded-xl bg-white dark:bg-zinc-800 p-4 shadow-sm">
-                <div className="flex gap-3">
-                  <BadgeStatus status={cliente.status} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
-                    <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-                      {textoSemAparecer(cliente.dias_desde_ultima_visita)}
-                      {cliente.ultimo_servico && ` · ${cliente.ultimo_servico}`}
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href={montarLinkWhatsApp(cliente)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700"
-                >
-                  <IconeWhatsApp />
-                  Mandar mensagem
-                </a>
-              </li>
-            ))}
-          </ul>
+          <>
+            {aniversariantes.length > 0 && (
+              <section className="mb-6">
+                <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  🎂 Aniversariantes do mês
+                </h2>
+                <ul className="flex flex-col gap-3">
+                  {aniversariantes.map((cliente) => (
+                    <li key={cliente.id} className="rounded-xl bg-white dark:bg-zinc-800 p-4 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <span className="flex-shrink-0 text-xl" aria-hidden="true">🎂</span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+                          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                            {formatarDiaMes(cliente.data_nascimento)}
+                          </p>
+                        </div>
+                      </div>
+                      <a
+                        href={montarLinkWhatsAppAniversario(cliente)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700"
+                      >
+                        <IconeWhatsApp />
+                        Mandar mensagem
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {clientes.length === 0 ? (
+              <div className="mt-16 flex flex-col items-center gap-2 text-center">
+                <span className="text-4xl" aria-hidden="true">🎉</span>
+                <p className="font-medium text-zinc-700 dark:text-zinc-300">Nenhuma cliente sumida no momento</p>
+                <p className="text-sm text-zinc-400 dark:text-zinc-500">Todas as suas clientes estão em dia!</p>
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {clientes.map((cliente) => (
+                  <li key={cliente.id} className="rounded-xl bg-white dark:bg-zinc-800 p-4 shadow-sm">
+                    <div className="flex gap-3">
+                      <BadgeStatus status={cliente.status} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+                        <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                          {textoSemAparecer(cliente.dias_desde_ultima_visita)}
+                          {cliente.ultimo_servico && ` · ${cliente.ultimo_servico}`}
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href={montarLinkWhatsApp(cliente)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700"
+                    >
+                      <IconeWhatsApp />
+                      Mandar mensagem
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </main>
     </div>

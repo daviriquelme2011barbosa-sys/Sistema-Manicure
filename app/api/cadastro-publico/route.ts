@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, observacoes, autorizaContato } = body
+  const { salaoId, nome, whatsapp, dataNascimento, observacoes, autorizaContato } = body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
@@ -114,9 +114,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sucesso: true })
   }
 
+  const dataNascimentoValida =
+    typeof dataNascimento === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dataNascimento)
+      ? dataNascimento
+      : null
+
   const { error: erroCliente } = await supabase.from('clientes').insert({
     nome: nome.trim(),
     whatsapp: whatsappNormalizado,
+    data_nascimento: dataNascimentoValida,
     observacoes:
       typeof observacoes === 'string' && observacoes.trim()
         ? observacoes.trim()

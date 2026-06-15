@@ -34,6 +34,11 @@ export function ClienteCard({
             'Sem atendimentos registrados'
           )}
         </p>
+        {cliente.data_nascimento && (
+          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+            🎂 {formatarData(cliente.data_nascimento)}
+          </p>
+        )}
         {cliente.observacoes && (
           <p className="mt-1 flex items-start gap-1 text-xs text-zinc-400 dark:text-zinc-500">
             <IconeNota className="mt-px flex-shrink-0" />

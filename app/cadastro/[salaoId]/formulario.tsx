@@ -26,6 +26,7 @@ export default function FormularioCadastroPublico({
 }: Props) {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [dataNascimento, setDataNascimento] = useState('')
   const [observacoes, setObservacoes] = useState('')
   const [autorizaContato, setAutorizaContato] = useState(false)
   const [enviando, setEnviando] = useState(false)
@@ -72,6 +73,7 @@ export default function FormularioCadastroPublico({
           salaoId,
           nome: nome.trim(),
           whatsapp,
+          dataNascimento: dataNascimento || null,
           observacoes: observacoes.trim() || null,
           autorizaContato,
         }),
@@ -91,6 +93,7 @@ export default function FormularioCadastroPublico({
       setSucesso(true)
       setNome('')
       setWhatsapp('')
+      setDataNascimento('')
       setObservacoes('')
       setAutorizaContato(false)
       setErros({})
@@ -212,6 +215,22 @@ export default function FormularioCadastroPublico({
                 {erros.whatsapp}
               </span>
             )}
+          </div>
+
+          {/* Data de nascimento */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="data_nascimento" className="text-sm font-medium text-zinc-700">
+              Data de nascimento
+              <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+            </label>
+            <input
+              id="data_nascimento"
+              type="date"
+              value={dataNascimento}
+              onChange={(e) => setDataNascimento(e.target.value)}
+              disabled={enviando}
+              className="h-12 rounded-lg border border-zinc-300 px-4 text-base text-zinc-900 bg-white shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
+            />
           </div>
 
           {/* Observações */}

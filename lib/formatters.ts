@@ -44,6 +44,12 @@ export function formatarPreco(preco: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco)
 }
 
+// Formata data ISO (yyyy-mm-dd) para exibição de dia e mês: DD/MM.
+export function formatarDiaMes(dataISO: string): string {
+  const [, mes, dia] = dataISO.split('-')
+  return `${dia}/${mes}`
+}
+
 // Data de hoje no formato yyyy-mm-dd (fuso local), para inputs type="date".
 export function dataHoje(): string {
   const d = new Date()
