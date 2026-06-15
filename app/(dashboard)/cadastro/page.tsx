@@ -310,6 +310,15 @@ export default function CadastroPage() {
               >
                 {salvando ? 'Salvando…' : 'Registrar atendimento'}
               </button>
+
+              <button
+                type="button"
+                onClick={limpar}
+                disabled={salvando}
+                className="h-12 rounded-lg border border-zinc-300 bg-white font-semibold text-zinc-700 transition hover:bg-zinc-50 active:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                Cancelar registro
+              </button>
             </form>
           </>
         )}
