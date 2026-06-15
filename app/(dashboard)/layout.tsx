@@ -17,14 +17,17 @@ import {
   IconeMais,
   IconeCoracao,
   IconeRelogio,
+  IconeHamburguer,
 } from '@/components/icons'
 
 type Tema = 'claro' | 'escuro'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [verificando, setVerificando] = useState(true)
   const [tema, setTema] = useState<Tema>('claro')
+  const [menuAberto, setMenuAberto] = useState(false)
   const [painelAberto, setPainelAberto] = useState(false)
   const [email, setEmail] = useState('')
   const [nomeSalao, setNomeSalao] = useState('')
@@ -32,6 +35,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [idSalao, setIdSalao] = useState<string | null>(null)
   const [salvandoNome, setSalvandoNome] = useState(false)
   const { toast, mostrarToast } = useToast()
+
+  useEffect(() => {
+    setMenuAberto(false)
+  }, [pathname])
 
   useEffect(() => {
     const temaSalvo = localStorage.getItem('tema')
@@ -116,14 +123,76 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <>
       <ToastView toast={toast} />
 
-      {/* Botão de configurações */}
+      {/* Botão hamburguer */}
       <button
-        onClick={() => setPainelAberto(true)}
-        className="fixed right-4 top-3.5 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-zinc-500 shadow-sm backdrop-blur-sm transition hover:bg-zinc-100 hover:text-zinc-700 dark:bg-zinc-800/90 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
-        aria-label="Abrir configurações"
+        onClick={() => setMenuAberto(true)}
+        className="fixed left-4 top-3.5 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-zinc-500 shadow-sm backdrop-blur-sm transition hover:bg-zinc-100 hover:text-zinc-700 dark:bg-zinc-800/90 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+        aria-label="Abrir menu"
+        aria-expanded={menuAberto}
       >
-        <IconeEngrenagem />
+        <IconeHamburguer />
       </button>
+
+      {/* Menu lateral */}
+      {menuAberto && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu de navegação"
+          className="fixed inset-0 z-40 flex"
+        >
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMenuAberto(false)}
+          />
+
+          <div className="relative flex w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
+            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
+              <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Menu</span>
+              <button
+                onClick={() => setMenuAberto(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                aria-label="Fechar menu"
+              >
+                <IconeFechar />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-1 px-3 py-3">
+              <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
+                <IconeLista />
+              </MenuItem>
+              <MenuItem href="/cadastros" label="Cadastros" ativo={pathname === '/cadastros'}>
+                <IconePessoa />
+              </MenuItem>
+              <MenuItem href="/cadastro" label="Cadastrar" ativo={pathname === '/cadastro'}>
+                <IconeMais />
+              </MenuItem>
+              <MenuItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'}>
+                <IconeCoracao />
+              </MenuItem>
+              <MenuItem href="/historico" label="Histórico" ativo={pathname === '/historico'}>
+                <IconeRelogio />
+              </MenuItem>
+
+              <hr className="my-2 border-zinc-100 dark:border-zinc-800" />
+
+              <button
+                onClick={() => {
+                  setMenuAberto(false)
+                  setPainelAberto(true)
+                }}
+                className="flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
+                  <IconeEngrenagem />
+                </span>
+                Configurações
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
 
       {/* Painel de configurações */}
       {painelAberto && (
@@ -155,7 +224,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             </div>
 
-            {/* E-mail da conta */}
             {email && (
               <div className="mb-5 rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-800">
                 <p className="text-xs font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
@@ -168,7 +236,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
 
             <div className="flex flex-col gap-5">
-              {/* Toggle de tema */}
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Tema</p>
@@ -197,7 +264,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
               <hr className="border-zinc-100 dark:border-zinc-800" />
 
-              {/* Nome do salão */}
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="config-nome-salao"
@@ -231,7 +297,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
               <hr className="border-zinc-100 dark:border-zinc-800" />
 
-              {/* Logout */}
               <button
                 onClick={fazerLogout}
                 className="flex h-11 items-center justify-center gap-2 rounded-lg border border-red-200 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/50"
@@ -245,36 +310,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {children}
-      <BarraNavegacao />
     </>
   )
 }
 
-function BarraNavegacao() {
-  const pathname = usePathname()
-
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 z-20 flex border-t border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-      <NavItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
-        <IconeLista />
-      </NavItem>
-      <NavItem href="/cadastros" label="Cadastros" ativo={pathname === '/cadastros'}>
-        <IconePessoa />
-      </NavItem>
-      <NavItem href="/cadastro" label="Cadastrar" ativo={pathname === '/cadastro'}>
-        <IconeMais />
-      </NavItem>
-      <NavItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'}>
-        <IconeCoracao />
-      </NavItem>
-      <NavItem href="/historico" label="Histórico" ativo={pathname === '/historico'}>
-        <IconeRelogio />
-      </NavItem>
-    </nav>
-  )
-}
-
-function NavItem({
+function MenuItem({
   href,
   label,
   ativo,
@@ -288,13 +328,19 @@ function NavItem({
   return (
     <Link
       href={href}
-      className={`flex flex-1 flex-col items-center justify-center gap-1 py-3 text-xs font-medium transition ${
+      className={`flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${
         ativo
-          ? 'text-pink-500'
-          : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+          ? 'bg-pink-50 text-pink-600 dark:bg-pink-950/30 dark:text-pink-400'
+          : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
       }`}
     >
-      {children}
+      <span
+        className={`flex-shrink-0 ${
+          ativo ? 'text-pink-500' : 'text-zinc-400 dark:text-zinc-500'
+        }`}
+      >
+        {children}
+      </span>
       {label}
     </Link>
   )
