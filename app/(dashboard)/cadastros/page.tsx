@@ -1,14 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { formatarWhatsApp, normalizarWhatsApp } from '@/lib/formatters'
-import { IconeChevronDireita } from '@/components/icons'
-import type { ClienteFormulario } from '@/types'
+
+type ClienteCadastrado = {
+  id: string
+  nome: string
+  whatsapp: string
+  data_nascimento: string | null
+  observacoes: string | null
+  autoriza_contato: boolean
+}
+
+function formatarData(data: string): string {
+  const [ano, mes, dia] = data.split('-')
+  return `${dia}/${mes}/${ano}`
+}
 
 export default function CadastrosPage() {
-  const [clientes, setClientes] = useState<ClienteFormulario[]>([])
+  const [clientes, setClientes] = useState<ClienteCadastrado[]>([])
   const [busca, setBusca] = useState('')
   const [carregando, setCarregando] = useState(true)
 
@@ -16,11 +27,11 @@ export default function CadastrosPage() {
     async function buscar() {
       const { data } = await supabase
         .from('clientes')
-        .select('id, nome, whatsapp, autoriza_contato')
+        .select('id, nome, whatsapp, data_nascimento, observacoes, autoriza_contato')
         .eq('origem', 'formulario')
         .order('nome')
 
-      setClientes((data ?? []) as ClienteFormulario[])
+      setClientes((data ?? []) as ClienteCadastrado[])
       setCarregando(false)
     }
     buscar()
@@ -39,7 +50,7 @@ export default function CadastrosPage() {
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 pb-24 dark:bg-zinc-950">
       <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Cadastros</h1>
+        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Cadastrados</h1>
         <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
           Clientes cadastradas pelo formulário público
         </p>
@@ -61,7 +72,7 @@ export default function CadastrosPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-20 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800"
+                className="h-28 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800"
               />
             ))}
           </div>
@@ -77,30 +88,35 @@ export default function CadastrosPage() {
         ) : (
           <ul className="flex flex-col gap-3">
             {clientesFiltrados.map((cliente) => (
-              <li key={cliente.id}>
-                <Link
-                  href={`/cadastro?clienteId=${cliente.id}`}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-zinc-100 bg-white px-4 py-4 transition hover:border-pink-200 active:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-pink-900 dark:active:bg-zinc-800/50"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">
-                      {cliente.nome}
+              <li
+                key={cliente.id}
+                className="rounded-xl border border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <p className="font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+
+                <div className="mt-2 flex flex-col gap-1">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    📱 {formatarWhatsApp(cliente.whatsapp)}
+                  </p>
+
+                  {cliente.data_nascimento && (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      🎂 {formatarData(cliente.data_nascimento)}
                     </p>
-                    <p className="mt-0.5 text-sm text-zinc-400 dark:text-zinc-500">
-                      {formatarWhatsApp(cliente.whatsapp)}
+                  )}
+
+                  {cliente.observacoes && (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      📝 {cliente.observacoes}
                     </p>
-                  </div>
-                  <div className="flex flex-shrink-0 items-center gap-2">
-                    <span
-                      aria-label={
-                        cliente.autoriza_contato ? 'Autoriza contato' : 'Não autoriza contato'
-                      }
-                    >
-                      {cliente.autoriza_contato ? '✅' : '❌'}
-                    </span>
-                    <IconeChevronDireita className="text-zinc-300 dark:text-zinc-600" />
-                  </div>
-                </Link>
+                  )}
+
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {cliente.autoriza_contato
+                      ? '✅ Autoriza contato via WhatsApp'
+                      : '❌ Não autoriza contato via WhatsApp'}
+                  </p>
+                </div>
               </li>
             ))}
           </ul>
