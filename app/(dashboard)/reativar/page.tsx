@@ -45,7 +45,7 @@ export default function ReativarPage() {
         supabase
           .from('clientes_status')
           .select('id, nome, whatsapp, dias_desde_ultima_visita, ultimo_servico, status')
-          .in('status', ['vermelho', 'amarelo']),
+          .or('status.eq.vermelho,status.eq.amarelo'),
         supabase
           .from('salao_config')
           .select('id')
