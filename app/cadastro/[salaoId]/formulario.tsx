@@ -135,31 +135,46 @@ export default function FormularioCadastroPublico({
 
       {/* Cabeçalho */}
       <header
-        className="px-6 py-8 text-center rounded-b-3xl shadow-sm"
-        style={{ backgroundColor: '#fdf2f8' }}
+        className="px-6 py-8 text-center rounded-b-3xl shadow-sm overflow-hidden"
+        style={{ backgroundColor: 'white', position: 'relative' }}
       >
-        <div className="flex justify-center mb-4">
-          {fotoUrl ? (
-            <Image
-              src={fotoUrl}
-              alt={nomeManicure ?? nomeSalao}
-              width={96}
-              height={96}
-              className="rounded-full object-cover shadow-md"
-              style={{ border: `4px solid ${corPrimaria}` }}
-            />
-          ) : (
-            <div
-              className="flex h-24 w-24 items-center justify-center rounded-full text-3xl font-bold shadow-md bg-white"
-              style={{ border: `4px solid ${corPrimaria}`, color: corPrimaria }}
-            >
-              {(nomeManicure ?? nomeSalao).charAt(0).toUpperCase()}
-            </div>
-          )}
+        {/* Glow radial */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            pointerEvents: 'none',
+            backgroundImage: 'radial-gradient(circle at center, #fbb6ce, transparent)',
+          }}
+        />
+
+        {/* Conteúdo acima do gradiente */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div className="flex justify-center mb-4">
+            {fotoUrl ? (
+              <Image
+                src={fotoUrl}
+                alt={nomeManicure ?? nomeSalao}
+                width={96}
+                height={96}
+                className="rounded-full object-cover shadow-md"
+                style={{ border: `4px solid ${corPrimaria}` }}
+              />
+            ) : (
+              <div
+                className="flex h-24 w-24 items-center justify-center rounded-full text-3xl font-bold shadow-md bg-white"
+                style={{ border: `4px solid ${corPrimaria}`, color: corPrimaria }}
+              >
+                {(nomeManicure ?? nomeSalao).charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
+            Olá! Faça seu cadastro e entre para a lista de clientes da {nomeManicure ?? nomeSalao} 💅
+          </h1>
         </div>
-        <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-          Olá! Faça seu cadastro e entre para a lista de clientes da {nomeManicure ?? nomeSalao} 💅
-        </h1>
       </header>
 
       <main className="flex-1 px-4 pb-12 pt-6">
