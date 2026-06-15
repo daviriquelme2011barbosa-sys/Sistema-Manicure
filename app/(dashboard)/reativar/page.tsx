@@ -40,38 +40,52 @@ export default function ReativarPage() {
     async function carregar() {
       const mesAtual = new Date().getMonth() + 1
 
-      const [
-        { data: clientesData, error: clientesError },
-        { data: anivData },
-      ] = await Promise.all([
+      // Roda clientes_status e salao_config em paralelo
+      const [clientesResult, salaoResult] = await Promise.all([
         supabase
           .from('clientes_status')
           .select('id, nome, whatsapp, dias_desde_ultima_visita, ultimo_servico, status')
           .in('status', ['vermelho', 'amarelo']),
         supabase
-          .from('clientes')
-          .select('id, nome, whatsapp, data_nascimento')
-          .not('data_nascimento', 'is', null),
+          .from('salao_config')
+          .select('id')
+          .maybeSingle(),
       ])
 
-      if (clientesError) {
-        setErro('Não foi possível carregar. Tente novamente.')
-      } else {
-        const ordenados = ((clientesData ?? []) as ClienteReativar[]).sort((a, b) => {
+      // Query principal — falha bloqueia a tela
+      try {
+        if (clientesResult.error) throw clientesResult.error
+        const ordenados = ((clientesResult.data ?? []) as ClienteReativar[]).sort((a, b) => {
           if (a.status !== b.status) return a.status === 'vermelho' ? -1 : 1
           return b.dias_desde_ultima_visita - a.dias_desde_ultima_visita
         })
         setClientes(ordenados)
+      } catch {
+        setErro('Não foi possível carregar. Tente novamente.')
       }
 
-      if (anivData) {
-        const doMes = (anivData as Aniversariante[])
-          .filter(c => parseInt(c.data_nascimento.split('-')[1], 10) === mesAtual)
-          .sort((a, b) =>
-            parseInt(a.data_nascimento.split('-')[2], 10) -
-            parseInt(b.data_nascimento.split('-')[2], 10)
-          )
-        setAniversariantes(doMes)
+      // Aniversariantes — falha é não-fatal; lista de sumidas continua
+      try {
+        const salaoId = salaoResult.data?.id
+        if (salaoId) {
+          const { data, error } = await supabase
+            .from('clientes')
+            .select('id, nome, whatsapp, data_nascimento')
+            .eq('salao_id', salaoId)
+            .not('data_nascimento', 'is', null)
+
+          if (!error && data) {
+            const doMes = (data as Aniversariante[])
+              .filter(c => parseInt(c.data_nascimento.split('-')[1], 10) === mesAtual)
+              .sort((a, b) =>
+                parseInt(a.data_nascimento.split('-')[2], 10) -
+                parseInt(b.data_nascimento.split('-')[2], 10)
+              )
+            setAniversariantes(doMes)
+          }
+        }
+      } catch {
+        // não-fatal: seção de aniversariantes simplesmente não aparece
       }
 
       setCarregando(false)
