@@ -138,7 +138,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {nomeSalao}
         </p>
 
-        <div className="mr-2 h-9 w-9 flex-shrink-0" aria-hidden="true" />
+        <div className="mr-2 flex flex-shrink-0 items-center gap-1">
+          <button
+            onClick={alternarTema}
+            aria-label="Ativar modo escuro"
+            className={`flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-zinc-100 dark:hover:bg-zinc-700 ${
+              tema === 'escuro' ? 'text-pink-500' : 'text-zinc-300 dark:text-zinc-600'
+            }`}
+          >
+            <IconeLua />
+          </button>
+          <button
+            onClick={alternarTema}
+            aria-label="Ativar modo claro"
+            className={`flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-zinc-100 dark:hover:bg-zinc-700 ${
+              tema === 'claro' ? 'text-pink-500' : 'text-zinc-300 dark:text-zinc-600'
+            }`}
+          >
+            <IconeSol />
+          </button>
+        </div>
       </header>
 
       {/* Menu lateral */}
@@ -244,33 +263,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
 
             <div className="flex flex-col gap-5">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Tema</p>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                    {tema === 'claro' ? 'Modo claro ativo' : 'Modo escuro ativo'}
-                  </p>
-                </div>
-                <button
-                  onClick={alternarTema}
-                  role="switch"
-                  aria-checked={tema === 'escuro'}
-                  aria-label={`Mudar para modo ${tema === 'claro' ? 'escuro' : 'claro'}`}
-                  className={`relative flex h-8 w-14 flex-shrink-0 items-center rounded-full transition-colors ${
-                    tema === 'escuro' ? 'bg-pink-500' : 'bg-zinc-200'
-                  }`}
-                >
-                  <span
-                    className={`absolute flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm transition-transform ${
-                      tema === 'escuro' ? 'translate-x-7' : 'translate-x-1'
-                    }`}
-                  >
-                    {tema === 'claro' ? <IconeSol /> : <IconeLua />}
-                  </span>
-                </button>
-              </div>
-
-              <hr className="border-zinc-100 dark:border-zinc-800" />
 
               <div className="flex flex-col gap-2">
                 <label
