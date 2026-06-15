@@ -44,6 +44,8 @@ export default function FormularioCadastroPublico({
 
     if (!nome.trim()) {
       novosErros.nome = 'Informe seu nome'
+    } else if (nome.trim().split(/\s+/).length < 2) {
+      novosErros.nome = 'Por favor, informe seu nome completo (nome e sobrenome)'
     }
 
     const whatsappNormalizado = normalizarWhatsApp(whatsapp)
