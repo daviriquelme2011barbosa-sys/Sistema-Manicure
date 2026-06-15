@@ -170,7 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
                 <IconeLista />
               </MenuItem>
-              <MenuItem href="/cadastros" label="Cadastros" ativo={pathname === '/cadastros'}>
+              <MenuItem href="/cadastros" label="Cadastrados" ativo={pathname === '/cadastros'}>
                 <IconePessoa />
               </MenuItem>
               <MenuItem href="/cadastro" label="Cadastrar" ativo={pathname === '/cadastro'}>
