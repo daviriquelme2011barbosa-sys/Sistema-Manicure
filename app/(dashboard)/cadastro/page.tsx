@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { dataHoje, parsearPreco } from '@/lib/formatters'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
@@ -14,41 +14,25 @@ type ClienteBusca = {
   whatsapp: string
 }
 
-function BuscaCliente({ onSelecionar }: { onSelecionar: (cliente: ClienteBusca) => void }) {
+function BuscaCliente({
+  clientes,
+  carregando,
+  onSelecionar,
+}: {
+  clientes: ClienteBusca[]
+  carregando: boolean
+  onSelecionar: (cliente: ClienteBusca) => void
+}) {
   const [busca, setBusca] = useState('')
-  const [resultados, setResultados] = useState<ClienteBusca[]>([])
-  const [buscando, setBuscando] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-
-    if (!busca.trim()) {
-      setResultados([])
-      setBuscando(false)
-      return
-    }
-
-    setBuscando(true)
-    timerRef.current = setTimeout(async () => {
-      const { data } = await supabase
-        .from('clientes')
-        .select('id, nome, whatsapp')
-        .ilike('nome', `%${busca.trim()}%`)
-        .order('nome')
-        .limit(10)
-
-      setResultados(data ?? [])
-      setBuscando(false)
-    }, 300)
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
-  }, [busca])
+  const listaFiltrada = busca.trim()
+    ? clientes.filter((c) =>
+        c.nome.toLowerCase().includes(busca.trim().toLowerCase())
+      )
+    : clientes
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <div>
         <label
           htmlFor="busca-cliente"
@@ -67,27 +51,32 @@ function BuscaCliente({ onSelecionar }: { onSelecionar: (cliente: ClienteBusca) 
         />
       </div>
 
-      {busca.trim() && (
+      {carregando ? (
+        <div className="flex flex-col gap-2">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="h-12 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800"
+            />
+          ))}
+        </div>
+      ) : listaFiltrada.length === 0 ? (
+        <p className="py-4 text-center text-sm text-zinc-400 dark:text-zinc-500">
+          Nenhuma cliente encontrada
+        </p>
+      ) : (
         <ul className="flex flex-col overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-          {buscando ? (
-            <li className="px-4 py-3 text-sm text-zinc-400 dark:text-zinc-500">Buscando…</li>
-          ) : resultados.length === 0 ? (
-            <li className="px-4 py-3 text-sm text-zinc-400 dark:text-zinc-500">
-              Nenhuma cliente encontrada
+          {listaFiltrada.map((c) => (
+            <li key={c.id} className="border-b border-zinc-50 dark:border-zinc-800 last:border-0">
+              <button
+                type="button"
+                onClick={() => onSelecionar(c)}
+                className="w-full px-4 py-3 text-left text-sm font-medium text-zinc-800 dark:text-zinc-100 transition hover:bg-pink-50 dark:hover:bg-pink-950/20 active:bg-pink-100"
+              >
+                {c.nome}
+              </button>
             </li>
-          ) : (
-            resultados.map((c) => (
-              <li key={c.id} className="border-b border-zinc-50 dark:border-zinc-800 last:border-0">
-                <button
-                  type="button"
-                  onClick={() => onSelecionar(c)}
-                  className="w-full px-4 py-3 text-left text-sm font-medium text-zinc-800 dark:text-zinc-100 transition hover:bg-pink-50 dark:hover:bg-pink-950/20 active:bg-pink-100"
-                >
-                  {c.nome}
-                </button>
-              </li>
-            ))
-          )}
+          ))}
         </ul>
       )}
     </div>
@@ -96,6 +85,8 @@ function BuscaCliente({ onSelecionar }: { onSelecionar: (cliente: ClienteBusca) 
 
 export default function CadastroPage() {
   const [clienteSelecionado, setClienteSelecionado] = useState<ClienteBusca | null>(null)
+  const [todasClientes, setTodasClientes] = useState<ClienteBusca[]>([])
+  const [carregandoClientes, setCarregandoClientes] = useState(true)
   const [salaoId, setSalaoId] = useState<string | null>(null)
   const [servico, setServico] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
@@ -106,13 +97,18 @@ export default function CadastroPage() {
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
-    supabase
-      .from('salao_config')
-      .select('id')
-      .single()
-      .then(({ data }) => {
-        if (data) setSalaoId(data.id)
-      })
+    async function inicializar() {
+      const [configResult, clientesResult] = await Promise.all([
+        supabase.from('salao_config').select('id').single(),
+        supabase.from('clientes').select('id, nome, whatsapp').order('nome'),
+      ])
+
+      if (configResult.data) setSalaoId(configResult.data.id)
+      setTodasClientes((clientesResult.data ?? []) as ClienteBusca[])
+      setCarregandoClientes(false)
+    }
+
+    inicializar()
   }, [])
 
   function limpar() {
@@ -175,7 +171,11 @@ export default function CadastroPage() {
 
       <main className="flex-1 px-4 pb-28 pt-6">
         {!clienteSelecionado ? (
-          <BuscaCliente onSelecionar={setClienteSelecionado} />
+          <BuscaCliente
+            clientes={todasClientes}
+            carregando={carregandoClientes}
+            onSelecionar={setClienteSelecionado}
+          />
         ) : (
           <>
             {/* Cliente selecionado */}
