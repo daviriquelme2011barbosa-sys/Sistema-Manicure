@@ -123,15 +123,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <>
       <ToastView toast={toast} />
 
-      {/* Botão hamburguer */}
-      <button
-        onClick={() => setMenuAberto(true)}
-        className="fixed left-4 top-3.5 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-zinc-500 shadow-sm backdrop-blur-sm transition hover:bg-zinc-100 hover:text-zinc-700 dark:bg-zinc-800/90 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
-        aria-label="Abrir menu"
-        aria-expanded={menuAberto}
-      >
-        <IconeHamburguer />
-      </button>
+      {/* Header fixo: hamburguer | nome do salão | spacer */}
+      <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-zinc-100 bg-white/90 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+        <button
+          onClick={() => setMenuAberto(true)}
+          className="ml-2 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+          aria-label="Abrir menu"
+          aria-expanded={menuAberto}
+        >
+          <IconeHamburguer />
+        </button>
+
+        <p className="flex-1 truncate text-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          {nomeSalao}
+        </p>
+
+        <div className="mr-2 h-9 w-9 flex-shrink-0" aria-hidden="true" />
+      </header>
 
       {/* Menu lateral */}
       {menuAberto && (
@@ -309,7 +317,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      {children}
+      <div className="pt-14">{children}</div>
     </>
   )
 }
