@@ -196,11 +196,14 @@ export default function FormularioCadastroPublico({
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               disabled={enviando}
-              placeholder="Seu nome completo"
+              placeholder="Nome completo"
               className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
                 erros.nome ? 'border-red-500' : 'border-zinc-300'
               }`}
             />
+            <p className="text-sm text-zinc-400">
+              Por favor, informe seu nome completo para evitar confusões
+            </p>
             {erros.nome && (
               <span role="alert" className="text-sm text-red-600">
                 {erros.nome}
