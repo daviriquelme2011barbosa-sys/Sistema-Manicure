@@ -155,7 +155,7 @@ export default function FormularioCadastroPublico({
           )}
         </div>
         <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-          Faça seu cadastro para ser atendida pela {nomeManicure ?? nomeSalao}
+          Olá! Faça seu cadastro e entre para a lista de clientes da {nomeManicure ?? nomeSalao} 💅
         </h1>
       </header>
 
