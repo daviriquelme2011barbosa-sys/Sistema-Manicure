@@ -55,7 +55,6 @@ export type ClienteReativar = {
   nome: string
   whatsapp: string
   dias_desde_ultima_visita: number
-  ultimo_servico: string | null
   status: 'vermelho' | 'amarelo'
 }
 

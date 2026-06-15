@@ -44,7 +44,7 @@ export default function ReativarPage() {
       const [clientesResult, salaoResult] = await Promise.all([
         supabase
           .from('clientes_status')
-          .select('id, nome, whatsapp, dias_desde_ultima_visita, ultimo_servico, status')
+          .select('id, nome, whatsapp, dias_desde_ultima_visita, status')
           .or('status.eq.vermelho,status.eq.amarelo'),
         supabase
           .from('salao_config')
@@ -182,7 +182,6 @@ export default function ReativarPage() {
                         <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
                         <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
                           {textoSemAparecer(cliente.dias_desde_ultima_visita)}
-                          {cliente.ultimo_servico && ` · ${cliente.ultimo_servico}`}
                         </p>
                       </div>
                     </div>
