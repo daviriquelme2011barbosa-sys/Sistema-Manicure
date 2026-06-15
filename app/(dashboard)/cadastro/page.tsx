@@ -1,22 +1,101 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { dataHoje, parsearPreco } from '@/lib/formatters'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
 import { useToast } from '@/hooks/useToast'
 import { ToastView } from '@/components/Toast'
-import { IconeVoltar } from '@/components/icons'
+import { IconeFechar } from '@/components/icons'
 
-function CadastroAtendimento() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const clienteId = searchParams.get('clienteId')
+type ClienteBusca = {
+  id: string
+  nome: string
+  whatsapp: string
+}
 
-  const [nomeCliente, setNomeCliente] = useState<string | null>(null)
-  const [carregandoCliente, setCarregandoCliente] = useState(!!clienteId)
+function BuscaCliente({ onSelecionar }: { onSelecionar: (cliente: ClienteBusca) => void }) {
+  const [busca, setBusca] = useState('')
+  const [resultados, setResultados] = useState<ClienteBusca[]>([])
+  const [buscando, setBuscando] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+
+    if (!busca.trim()) {
+      setResultados([])
+      setBuscando(false)
+      return
+    }
+
+    setBuscando(true)
+    timerRef.current = setTimeout(async () => {
+      const { data } = await supabase
+        .from('clientes')
+        .select('id, nome, whatsapp')
+        .ilike('nome', `%${busca.trim()}%`)
+        .order('nome')
+        .limit(10)
+
+      setResultados(data ?? [])
+      setBuscando(false)
+    }, 300)
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [busca])
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <label
+          htmlFor="busca-cliente"
+          className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+        >
+          Buscar cliente pelo nome
+        </label>
+        <input
+          id="busca-cliente"
+          type="search"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Nome da cliente…"
+          autoComplete="off"
+          className="mt-1 h-12 w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 text-base text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500"
+        />
+      </div>
+
+      {busca.trim() && (
+        <ul className="flex flex-col overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+          {buscando ? (
+            <li className="px-4 py-3 text-sm text-zinc-400 dark:text-zinc-500">Buscando…</li>
+          ) : resultados.length === 0 ? (
+            <li className="px-4 py-3 text-sm text-zinc-400 dark:text-zinc-500">
+              Nenhuma cliente encontrada
+            </li>
+          ) : (
+            resultados.map((c) => (
+              <li key={c.id} className="border-b border-zinc-50 dark:border-zinc-800 last:border-0">
+                <button
+                  type="button"
+                  onClick={() => onSelecionar(c)}
+                  className="w-full px-4 py-3 text-left text-sm font-medium text-zinc-800 dark:text-zinc-100 transition hover:bg-pink-50 dark:hover:bg-pink-950/20 active:bg-pink-100"
+                >
+                  {c.nome}
+                </button>
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+export default function CadastroPage() {
+  const [clienteSelecionado, setClienteSelecionado] = useState<ClienteBusca | null>(null)
   const [salaoId, setSalaoId] = useState<string | null>(null)
   const [servico, setServico] = useState('')
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
@@ -36,39 +115,36 @@ function CadastroAtendimento() {
       })
   }, [])
 
-  useEffect(() => {
-    if (!clienteId) return
-    supabase
-      .from('clientes')
-      .select('nome')
-      .eq('id', clienteId)
-      .single()
-      .then(({ data, error }) => {
-        if (!error && data) setNomeCliente(data.nome)
-        setCarregandoCliente(false)
-      })
-  }, [clienteId])
+  function limpar() {
+    setClienteSelecionado(null)
+    setServico('')
+    setDataAtendimento(dataHoje)
+    setHorario('')
+    setPreco('')
+    setErros({})
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
     const novosErros: Record<string, string> = {}
     if (!servico.trim()) novosErros.servico = 'Selecione ou descreva o serviço'
-    if (!horario) novosErros.horario = 'Informe o horário'
-    const precoNum = parsearPreco(preco)
-    if (!preco.trim() || precoNum === null || precoNum < 0) {
-      novosErros.preco = 'Informe um valor válido'
+
+    const precoNum = preco.trim() ? parsearPreco(preco) : null
+    if (preco.trim() && (precoNum === null || precoNum < 0)) {
+      novosErros.preco = 'Valor inválido'
     }
+
     setErros(novosErros)
     if (Object.keys(novosErros).length > 0) return
 
     setSalvando(true)
 
     const { error } = await supabase.from('atendimentos').insert({
-      cliente_id: clienteId,
+      cliente_id: clienteSelecionado!.id,
       servico: servico.trim(),
       data_atendimento: dataAtendimento,
-      horario,
+      horario: horario || null,
       preco: precoNum,
       salao_id: salaoId,
     })
@@ -80,60 +156,46 @@ function CadastroAtendimento() {
     }
 
     mostrarToast(
-      `Atendimento salvo para ${nomeCliente?.split(' ')[0] ?? 'cliente'}`,
+      `Atendimento salvo para ${clienteSelecionado!.nome.split(' ')[0]}`,
       'sucesso',
     )
-    setTimeout(() => router.push('/clientes'), 1500)
+    setSalvando(false)
+    limpar()
   }
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
       <ToastView toast={toast} />
 
-      {/* Cabeçalho */}
-      <header className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4">
-        <Link
-          href="/clientes"
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          aria-label="Voltar para lista de clientes"
-        >
-          <IconeVoltar />
-        </Link>
+      <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4">
         <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          Novo atendimento
+          Registrar Atendimento
         </h1>
       </header>
 
       <main className="flex-1 px-4 pb-28 pt-6">
-        {!clienteId ? (
-          <div className="flex flex-col items-center py-16 text-center">
-            <p className="text-4xl">💅</p>
-            <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-              Selecione uma cliente na aba Cadastros para registrar o atendimento.
-            </p>
-            <Link
-              href="/clientes"
-              className="mt-6 rounded-lg bg-pink-500 px-5 py-3 text-sm font-medium text-white transition hover:bg-pink-600"
-            >
-              Ver clientes
-            </Link>
-          </div>
-        ) : carregandoCliente ? (
-          <div className="flex flex-col gap-4">
-            <div className="h-16 w-full animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-12 w-full animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-12 w-full animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-          </div>
+        {!clienteSelecionado ? (
+          <BuscaCliente onSelecionar={setClienteSelecionado} />
         ) : (
           <>
-            {/* Nome da cliente */}
-            <div className="mb-6 rounded-xl border border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                Registrando atendimento para
-              </p>
-              <p className="mt-0.5 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                {nomeCliente ?? '—'}
-              </p>
+            {/* Cliente selecionado */}
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+              <div>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  Registrando atendimento para
+                </p>
+                <p className="mt-0.5 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                  {clienteSelecionado.nome}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={limpar}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                aria-label="Trocar cliente"
+              >
+                <IconeFechar />
+              </button>
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
@@ -192,7 +254,8 @@ function CadastroAtendimento() {
                     htmlFor="horario"
                     className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
                   >
-                    Horário <span aria-hidden="true" className="text-red-500">*</span>
+                    Horário
+                    <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
                   </label>
                   <input
                     id="horario"
@@ -200,15 +263,8 @@ function CadastroAtendimento() {
                     value={horario}
                     onChange={(e) => setHorario(e.target.value)}
                     disabled={salvando}
-                    className={`h-12 rounded-lg border px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
-                      erros.horario ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
-                    }`}
+                    className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
                   />
-                  {erros.horario && (
-                    <span role="alert" className="text-sm text-red-600">
-                      {erros.horario}
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -218,10 +274,11 @@ function CadastroAtendimento() {
                   htmlFor="preco"
                   className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
                 >
-                  Preço <span aria-hidden="true" className="text-red-500">*</span>
+                  Preço
+                  <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base text-zinc-400 dark:text-zinc-500 select-none">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 select-none text-base text-zinc-400 dark:text-zinc-500">
                     R$
                   </span>
                   <input
@@ -246,33 +303,17 @@ function CadastroAtendimento() {
                 )}
               </div>
 
-              <div className="flex gap-3">
-                <Link
-                  href="/cadastros"
-                  className="flex h-12 flex-1 items-center justify-center rounded-lg border border-zinc-300 font-semibold text-zinc-700 transition hover:bg-zinc-50 active:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:active:bg-zinc-700"
-                >
-                  Cancelar
-                </Link>
-                <button
-                  type="submit"
-                  disabled={salvando}
-                  className="h-12 flex-1 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {salvando ? 'Salvando…' : 'Salvar'}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={salvando}
+                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {salvando ? 'Salvando…' : 'Registrar atendimento'}
+              </button>
             </form>
           </>
         )}
       </main>
     </div>
-  )
-}
-
-export default function CadastroPage() {
-  return (
-    <Suspense>
-      <CadastroAtendimento />
-    </Suspense>
   )
 }
