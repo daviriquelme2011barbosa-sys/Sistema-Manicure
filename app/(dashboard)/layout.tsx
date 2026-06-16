@@ -19,6 +19,7 @@ import {
   IconeRelogio,
   IconeHamburguer,
   IconeVoltar,
+  IconeCasa,
 } from '@/components/icons'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
 
@@ -208,6 +209,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
 
             <nav className="flex flex-col gap-1 px-3 py-3">
+              <MenuItem href="/" label="Início" ativo={pathname === '/'}>
+                <IconeCasa />
+              </MenuItem>
               <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
                 <IconeLista />
               </MenuItem>
