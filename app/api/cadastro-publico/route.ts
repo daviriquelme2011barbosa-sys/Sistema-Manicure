@@ -119,15 +119,23 @@ export async function POST(request: NextRequest) {
       ? dataNascimento
       : null
 
-  const emailValido =
-    typeof email === 'string' && email.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-      ? email.trim()
-      : null
+  if (typeof email !== 'string' || !email.trim()) {
+    return NextResponse.json(
+      { erro: 'Informe seu e-mail.', campo: 'email' },
+      { status: 400 },
+    )
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return NextResponse.json(
+      { erro: 'Digite um e-mail válido.', campo: 'email' },
+      { status: 400 },
+    )
+  }
 
   const { error: erroCliente } = await supabase.from('clientes').insert({
     nome: nome.trim(),
     whatsapp: whatsappNormalizado,
-    email: emailValido,
+    email: (email as string).trim(),
     data_nascimento: dataNascimentoValida,
     observacoes:
       typeof observacoes === 'string' && observacoes.trim()

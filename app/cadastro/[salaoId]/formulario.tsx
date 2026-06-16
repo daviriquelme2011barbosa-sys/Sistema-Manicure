@@ -57,8 +57,10 @@ export default function FormularioCadastroPublico({
       novosErros.whatsapp = 'Número inválido — mínimo 10 dígitos'
     }
 
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      novosErros.email = 'E-mail inválido'
+    if (!email.trim()) {
+      novosErros.email = 'Informe seu e-mail para receber confirmações de cadastro'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      novosErros.email = 'Digite um e-mail válido (ex: nome@email.com)'
     }
 
     return novosErros
@@ -267,8 +269,7 @@ export default function FormularioCadastroPublico({
           {/* E-mail */}
           <div className="flex flex-col gap-1">
             <label htmlFor="email" className="text-sm font-medium text-zinc-700">
-              E-mail
-              <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+              E-mail <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
               id="email"
