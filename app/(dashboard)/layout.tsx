@@ -46,6 +46,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [novoNomeSalao, setNovoNomeSalao] = useState('')
   const [idSalao, setIdSalao] = useState<string | null>(null)
   const [salvandoNome, setSalvandoNome] = useState(false)
+  const [copiado, setCopiado] = useState(false)
+  const [linkFormulario, setLinkFormulario] = useState('')
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
@@ -84,6 +86,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setNomeSalao(config.nome_salao)
         setNovoNomeSalao(config.nome_salao)
         setIdSalao(config.id)
+        setLinkFormulario(`${window.location.origin}/cadastro/${config.id}`)
       }
 
       setVerificando(false)
@@ -115,6 +118,12 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       mostrarToast('Nome do salão atualizado', 'sucesso')
     }
     setSalvandoNome(false)
+  }
+
+  async function copiarLink() {
+    await navigator.clipboard.writeText(linkFormulario)
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
   }
 
   async function fazerLogout() {
@@ -320,6 +329,33 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
               </div>
+
+              {linkFormulario && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                    Link do seu formulário
+                  </p>
+                  <div className="flex items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 dark:bg-zinc-800">
+                    <span className="min-w-0 flex-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                      {linkFormulario}
+                    </span>
+                    <button
+                      onClick={copiarLink}
+                      className="flex-shrink-0 rounded-md bg-pink-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+                    >
+                      {copiado ? 'Copiado!' : 'Copiar link'}
+                    </button>
+                  </div>
+                  <a
+                    href={`https://qr.io/?url=${encodeURIComponent(linkFormulario)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-pink-500 hover:text-pink-600 hover:underline dark:text-pink-400"
+                  >
+                    Gerar QR Code
+                  </a>
+                </div>
+              )}
 
               <hr className="border-zinc-100 dark:border-zinc-800" />
 
