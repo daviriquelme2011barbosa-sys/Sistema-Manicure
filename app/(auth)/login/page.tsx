@@ -36,7 +36,7 @@ export default function LoginPage() {
     if (params.get('sessao') === 'expirada') setSessaoExpirada(true)
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace('/clientes')
+      if (session) router.replace('/')
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -75,7 +75,7 @@ export default function LoginPage() {
 
     await supabase.auth.setSession(dados.sessao)
     document.cookie = 'sb-logged-in=1; path=/; SameSite=Lax; Max-Age=604800'
-    router.push('/clientes')
+    router.push('/')
   }
 
   async function handleEnviarRecuperacao(e: React.FormEvent) {

@@ -5,7 +5,11 @@
       "Bash(ls components *)",
       "Bash(ls hooks *)",
       "Bash(ls types *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(ls ~/.claude/plugins/ 2>/dev/null || echo \"vazio\")",
+      "Read(//c/Users/tfdav/.claude/plugins/**)",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)"
     ]
   }
 }
