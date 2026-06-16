@@ -22,6 +22,7 @@ import {
   IconeCasa,
 } from '@/components/icons'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
+import QRCode from 'qrcode'
 
 type Tema = 'claro' | 'escuro'
 
@@ -118,6 +119,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       mostrarToast('Nome do salão atualizado', 'sucesso')
     }
     setSalvandoNome(false)
+  }
+
+  async function baixarQrCode() {
+    const dataUrl = await QRCode.toDataURL(linkFormulario, { width: 500, margin: 2 })
+    const a = document.createElement('a')
+    a.href = dataUrl
+    a.download = `qrcode-${nomeSalao.replace(/\s+/g, '-').toLowerCase()}.png`
+    a.click()
   }
 
   async function copiarLink() {
@@ -346,14 +355,12 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       {copiado ? 'Copiado!' : 'Copiar link'}
                     </button>
                   </div>
-                  <a
-                    href={`https://qr.io/?url=${encodeURIComponent(linkFormulario)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-pink-500 hover:text-pink-600 hover:underline dark:text-pink-400"
+                  <button
+                    onClick={baixarQrCode}
+                    className="self-start text-sm text-pink-500 hover:text-pink-600 hover:underline dark:text-pink-400"
                   >
-                    Gerar QR Code
-                  </a>
+                    Baixar QR Code
+                  </button>
                 </div>
               )}
 
