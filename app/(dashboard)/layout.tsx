@@ -20,6 +20,7 @@ import {
   IconeHamburguer,
   IconeVoltar,
   IconeCasa,
+  IconeBolo,
 } from '@/components/icons'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
 import QRCode from 'qrcode'
@@ -241,6 +242,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </MenuItem>
               <MenuItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'}>
                 <IconeCoracao />
+              </MenuItem>
+              <MenuItem href="/aniversariantes" label="Aniversariantes" ativo={pathname === '/aniversariantes'}>
+                <IconeBolo />
               </MenuItem>
               <MenuItem href="/historico" label="Histórico" ativo={pathname === '/historico'}>
                 <IconeRelogio />

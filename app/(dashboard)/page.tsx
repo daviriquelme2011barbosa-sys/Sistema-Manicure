@@ -305,7 +305,7 @@ export default function DashboardPage() {
               icone={<IcAniversariantes />}
               numero={dados.aniversariantesDoMes}
               rotulo="Aniversariantes do mês"
-              href="/reativar"
+              href="/aniversariantes"
               classeIcone="text-amber-500 dark:text-amber-400"
               classeFundo="bg-amber-50 ring-1 ring-amber-100 dark:bg-amber-950/30 dark:ring-amber-900/50"
             />
