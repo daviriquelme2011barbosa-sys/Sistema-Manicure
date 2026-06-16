@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (clienteExistente) {
-    return NextResponse.json({ sucesso: true })
+    return NextResponse.json({ duplicado: true }, { status: 409 })
   }
 
   const dataNascimentoValida =

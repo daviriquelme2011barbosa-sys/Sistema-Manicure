@@ -32,6 +32,7 @@ export default function FormularioCadastroPublico({
   const [enviando, setEnviando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
+  const [avisoWhatsApp, setAvisoWhatsApp] = useState('')
   const [toast, setToast] = useState<Toast>(null)
 
   function mostrarToast(mensagem: string, tipo: 'sucesso' | 'erro') {
@@ -63,6 +64,7 @@ export default function FormularioCadastroPublico({
 
     const novosErros = validar()
     setErros(novosErros)
+    setAvisoWhatsApp('')
     if (Object.keys(novosErros).length > 0) return
 
     setEnviando(true)
@@ -84,6 +86,12 @@ export default function FormularioCadastroPublico({
       const corpo = await resposta.json()
 
       if (!resposta.ok) {
+        if (corpo.duplicado) {
+          setAvisoWhatsApp(
+            'Este número já está cadastrado no nosso sistema. Provavelmente você já fez seu cadastro anteriormente! 😊',
+          )
+          return
+        }
         if (corpo.campo) {
           setErros({ [corpo.campo]: corpo.erro })
         } else {
@@ -223,16 +231,28 @@ export default function FormularioCadastroPublico({
               type="tel"
               autoComplete="tel"
               value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
+              onChange={(e) => {
+                setWhatsapp(e.target.value)
+                setAvisoWhatsApp('')
+              }}
               disabled={enviando}
               placeholder="(38) 99999-0000"
               className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                erros.whatsapp ? 'border-red-500' : 'border-zinc-300'
+                erros.whatsapp
+                  ? 'border-red-500'
+                  : avisoWhatsApp
+                    ? 'border-amber-400'
+                    : 'border-zinc-300'
               }`}
             />
             {erros.whatsapp && (
               <span role="alert" className="text-sm text-red-600">
                 {erros.whatsapp}
+              </span>
+            )}
+            {avisoWhatsApp && !erros.whatsapp && (
+              <span role="status" className="text-sm text-amber-600">
+                {avisoWhatsApp}
               </span>
             )}
           </div>
