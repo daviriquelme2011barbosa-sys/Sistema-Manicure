@@ -8,6 +8,7 @@ type ClienteCadastrado = {
   id: string
   nome: string
   whatsapp: string
+  email: string | null
   data_nascimento: string | null
   observacoes: string | null
   autoriza_contato: boolean
@@ -27,7 +28,7 @@ export default function CadastrosPage() {
     async function buscar() {
       const { data } = await supabase
         .from('clientes')
-        .select('id, nome, whatsapp, data_nascimento, observacoes, autoriza_contato')
+        .select('id, nome, whatsapp, email, data_nascimento, observacoes, autoriza_contato')
         .eq('origem', 'formulario')
         .order('nome')
 
@@ -98,6 +99,12 @@ export default function CadastrosPage() {
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     📱 {formatarWhatsApp(cliente.whatsapp)}
                   </p>
+
+                  {cliente.email && (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      ✉️ {cliente.email}
+                    </p>
+                  )}
 
                   {cliente.data_nascimento && (
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">

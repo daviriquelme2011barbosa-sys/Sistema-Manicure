@@ -26,6 +26,7 @@ export default function FormularioCadastroPublico({
 }: Props) {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [email, setEmail] = useState('')
   const [dataNascimento, setDataNascimento] = useState('')
   const [observacoes, setObservacoes] = useState('')
   const [autorizaContato, setAutorizaContato] = useState(false)
@@ -56,6 +57,10 @@ export default function FormularioCadastroPublico({
       novosErros.whatsapp = 'Número inválido — mínimo 10 dígitos'
     }
 
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      novosErros.email = 'E-mail inválido'
+    }
+
     return novosErros
   }
 
@@ -77,6 +82,7 @@ export default function FormularioCadastroPublico({
           salaoId,
           nome: nome.trim(),
           whatsapp,
+          email: email.trim() || null,
           dataNascimento: dataNascimento || null,
           observacoes: observacoes.trim() || null,
           autorizaContato,
@@ -103,6 +109,7 @@ export default function FormularioCadastroPublico({
       setSucesso(true)
       setNome('')
       setWhatsapp('')
+      setEmail('')
       setDataNascimento('')
       setObservacoes('')
       setAutorizaContato(false)
@@ -253,6 +260,31 @@ export default function FormularioCadastroPublico({
             {avisoWhatsApp && !erros.whatsapp && (
               <span role="status" className="text-sm text-amber-600">
                 {avisoWhatsApp}
+              </span>
+            )}
+          </div>
+
+          {/* E-mail */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="text-sm font-medium text-zinc-700">
+              E-mail
+              <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={enviando}
+              placeholder="seu@email.com"
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
+                erros.email ? 'border-red-500' : 'border-zinc-300'
+              }`}
+            />
+            {erros.email && (
+              <span role="alert" className="text-sm text-red-600">
+                {erros.email}
               </span>
             )}
           </div>

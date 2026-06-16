@@ -13,6 +13,7 @@ export type Cliente = {
   salao_id: string
   nome: string
   whatsapp: string
+  email: string | null
   observacoes: string | null
   autoriza_contato: boolean
   origem: 'manual' | 'formulario'
@@ -34,6 +35,7 @@ export type ClienteStatus = {
   id: string
   nome: string
   whatsapp: string
+  email?: string | null
   observacoes: string | null
   ultima_visita: string | null
   dias_desde_ultima_visita: number | null

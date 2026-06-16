@@ -19,6 +19,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
   const [edicao, setEdicao] = useState({
     nome: cliente.nome,
     whatsapp: cliente.whatsapp,
+    email: cliente.email ?? '',
     servico: cliente.ultimo_servico ?? '',
     ultimaVisita: cliente.ultima_visita ?? '',
     observacoes: cliente.observacoes ?? '',
@@ -87,6 +88,10 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       novosErros.whatsapp = 'Número inválido — confira o WhatsApp'
     }
 
+    if (edicao.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(edicao.email.trim())) {
+      novosErros.email = 'E-mail inválido'
+    }
+
     setErrosEdicao(novosErros)
     if (Object.keys(novosErros).length > 0) return
 
@@ -112,6 +117,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       .update({
         nome: edicao.nome.trim(),
         whatsapp: whatsappNormalizado,
+        email: edicao.email.trim() || null,
         observacoes: edicao.observacoes.trim() || null,
         autoriza_contato: edicao.autorizaContato,
       })
@@ -160,6 +166,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       ...cliente,
       nome: edicao.nome.trim(),
       whatsapp: whatsappNormalizado,
+      email: edicao.email.trim() || null,
       observacoes: edicao.observacoes.trim() || null,
       ultimo_servico: servicoAlterado ? edicao.servico.trim() : cliente.ultimo_servico,
       ultima_visita: dataAlterada ? edicao.ultimaVisita : cliente.ultima_visita,
@@ -273,6 +280,28 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
             />
             {errosEdicao.whatsapp && (
               <span role="alert" className="text-sm text-red-600">{errosEdicao.whatsapp}</span>
+            )}
+          </div>
+
+          {/* E-mail */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="edit-email" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              E-mail
+              <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
+            </label>
+            <input
+              id="edit-email"
+              type="email"
+              value={edicao.email}
+              onChange={(e) => setEdicao((prev) => ({ ...prev, email: e.target.value }))}
+              disabled={salvandoEdicao || excluindo}
+              placeholder="seu@email.com"
+              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
+                errosEdicao.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+              }`}
+            />
+            {errosEdicao.email && (
+              <span role="alert" className="text-sm text-red-600">{errosEdicao.email}</span>
             )}
           </div>
 
