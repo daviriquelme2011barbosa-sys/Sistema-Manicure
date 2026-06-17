@@ -111,13 +111,16 @@ export default function MovimentacaoPage() {
       }
 
       for (const a of atendimentosData ?? []) {
-        const row = a as {
+        const row = (a as unknown) as {
           id: string
           servico: string
           criado_em: string
-          clientes: { nome: string } | null
+          clientes: { nome: string } | { nome: string }[] | null
         }
-        const nomeCliente = row.clientes?.nome ?? 'Cliente'
+        const clienteNome = Array.isArray(row.clientes)
+          ? row.clientes[0]?.nome
+          : row.clientes?.nome
+        const nomeCliente = clienteNome ?? 'Cliente'
         resultado.push({
           id: `atendimento-${row.id}`,
           tipo: 'atendimento',
@@ -127,12 +130,15 @@ export default function MovimentacaoPage() {
       }
 
       for (const r of reativacoesData ?? []) {
-        const row = r as {
+        const row = (r as unknown) as {
           id: string
           criado_em: string
-          clientes: { nome: string } | null
+          clientes: { nome: string } | { nome: string }[] | null
         }
-        const nomeCliente = row.clientes?.nome ?? 'Cliente'
+        const clienteNome = Array.isArray(row.clientes)
+          ? row.clientes[0]?.nome
+          : row.clientes?.nome
+        const nomeCliente = clienteNome ?? 'Cliente'
         resultado.push({
           id: `reativacao-${row.id}`,
           tipo: 'reativacao',
