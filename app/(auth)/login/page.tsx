@@ -282,7 +282,7 @@ export default function LoginPage() {
       <div className="mb-8 text-center">
         <p className="text-5xl">💅</p>
         <h1 className="mt-3 text-xl font-bold text-zinc-900">Gestão de Clientes</h1>
-        <p className="mt-1 text-sm text-zinc-500">Acesso exclusivo para a dona do salão</p>
+        <p className="mt-1 text-sm text-zinc-500">Acesso exclusivo para a(o) dona do negócio</p>
       </div>
 
       <div className="rounded-2xl bg-white px-6 py-8 shadow-lg">
