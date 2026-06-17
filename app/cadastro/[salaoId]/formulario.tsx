@@ -7,6 +7,13 @@ function normalizarWhatsApp(valor: string): string {
   return valor.replace(/\D/g, '')
 }
 
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 type Toast = { mensagem: string; tipo: 'sucesso' | 'erro' } | null
 
 type Props = {
@@ -165,7 +172,7 @@ export default function FormularioCadastroPublico({
             inset: 0,
             zIndex: 0,
             pointerEvents: 'none',
-            backgroundImage: 'radial-gradient(circle at center, #fbb6ce, transparent)',
+            backgroundImage: `radial-gradient(circle at center, ${hexToRgba(corPrimaria, 0.35)}, transparent)`,
           }}
         />
 

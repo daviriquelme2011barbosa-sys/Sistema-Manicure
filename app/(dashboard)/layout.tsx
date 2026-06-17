@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -75,6 +75,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [salvandoFoto, setSalvandoFoto] = useState(false)
   const [salvandoCor, setSalvandoCor] = useState(false)
   const [opcoesFotoAbertas, setOpcoesFotoAbertas] = useState(false)
+  const inputCameraRef = useRef<HTMLInputElement>(null)
+  const inputGaleriaRef = useRef<HTMLInputElement>(null)
+  const inputUploadRef = useRef<HTMLInputElement>(null)
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
@@ -222,6 +225,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   async function uploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
     setOpcoesFotoAbertas(false)
     const arquivo = e.target.files?.[0]
+    e.target.value = ''
     if (!arquivo || !idSalao) return
     setSalvandoFoto(true)
     const ext = arquivo.name.split('.').pop() ?? 'jpg'
@@ -281,6 +285,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {/* Inputs de foto fora de qualquer container fixed/overflow — necessário para iOS */}
+      <input ref={inputCameraRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={uploadFoto} />
+      <input ref={inputGaleriaRef} type="file" accept="image/*" className="sr-only" onChange={uploadFoto} />
+      <input ref={inputUploadRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={uploadFoto} />
+
       <ToastView toast={toast} />
 
       {/* Header fixo: hamburguer+voltar | nome do salão | tema */}
@@ -533,48 +542,29 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   {opcoesFotoAbertas && !salvandoFoto && (
                     <div className="flex flex-col overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
                       {/* câmera — apenas mobile */}
-                      <label
-                        htmlFor="config-foto-camera"
+                      <button
+                        type="button"
+                        onClick={() => { setOpcoesFotoAbertas(false); inputCameraRef.current?.click() }}
                         className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:hidden"
                       >
                         <span aria-hidden="true">📷</span> Tirar foto
-                        <input
-                          id="config-foto-camera"
-                          type="file"
-                          accept="image/*"
-                          capture="environment"
-                          className="sr-only"
-                          onChange={uploadFoto}
-                        />
-                      </label>
+                      </button>
                       {/* galeria — apenas mobile */}
-                      <label
-                        htmlFor="config-foto-galeria"
+                      <button
+                        type="button"
+                        onClick={() => { setOpcoesFotoAbertas(false); inputGaleriaRef.current?.click() }}
                         className="flex h-11 cursor-pointer items-center gap-3 border-t border-zinc-100 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:hidden"
                       >
                         <span aria-hidden="true">🖼️</span> Escolher da galeria
-                        <input
-                          id="config-foto-galeria"
-                          type="file"
-                          accept="image/*"
-                          className="sr-only"
-                          onChange={uploadFoto}
-                        />
-                      </label>
+                      </button>
                       {/* upload — sempre visível */}
-                      <label
-                        htmlFor="config-foto-upload"
+                      <button
+                        type="button"
+                        onClick={() => { setOpcoesFotoAbertas(false); inputUploadRef.current?.click() }}
                         className="flex h-11 cursor-pointer items-center gap-3 border-t border-zinc-100 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:border-t-0"
                       >
                         <span aria-hidden="true">💻</span> Fazer upload
-                        <input
-                          id="config-foto-upload"
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="sr-only"
-                          onChange={uploadFoto}
-                        />
-                      </label>
+                      </button>
                     </div>
                   )}
                 </div>
