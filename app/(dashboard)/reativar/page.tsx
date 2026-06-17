@@ -26,23 +26,30 @@ function montarLinkWhatsApp(cliente: ClienteReativar): string {
 
 export default function ReativarPage() {
   const [clientes, setClientes] = useState<ClienteReativar[]>([])
+  const [salaoId, setSalaoId] = useState<string | null>(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
+  const [enviando, setEnviando] = useState<string | null>(null)
 
   useEffect(() => {
     async function carregar() {
-      const { data, error } = await supabase
-        .from('clientes_status')
-        .select('id, nome, whatsapp, dias_desde_ultima_visita, status')
-        .or('status.eq.vermelho,status.eq.amarelo')
+      const [{ data: statusData, error: statusError }, { data: configData }] =
+        await Promise.all([
+          supabase
+            .from('clientes_status')
+            .select('id, nome, whatsapp, dias_desde_ultima_visita, status')
+            .or('status.eq.vermelho,status.eq.amarelo'),
+          supabase.from('salao_config').select('id').single(),
+        ])
 
       try {
-        if (error) throw error
-        const ordenados = ((data ?? []) as ClienteReativar[]).sort((a, b) => {
+        if (statusError) throw statusError
+        const ordenados = ((statusData ?? []) as ClienteReativar[]).sort((a, b) => {
           if (a.status !== b.status) return a.status === 'vermelho' ? -1 : 1
           return b.dias_desde_ultima_visita - a.dias_desde_ultima_visita
         })
         setClientes(ordenados)
+        if (configData) setSalaoId(configData.id)
       } catch {
         setErro('Não foi possível carregar. Tente novamente.')
       }
@@ -52,6 +59,17 @@ export default function ReativarPage() {
 
     carregar()
   }, [])
+
+  async function handleReativar(cliente: ClienteReativar) {
+    if (salaoId) {
+      setEnviando(cliente.id)
+      await supabase
+        .from('reativacoes')
+        .insert({ salao_id: salaoId, cliente_id: cliente.id })
+      setEnviando(null)
+    }
+    window.open(montarLinkWhatsApp(cliente), '_blank', 'noopener,noreferrer')
+  }
 
   const totalSumidas = clientes.filter((c) => c.status === 'vermelho').length
 
@@ -121,15 +139,14 @@ export default function ReativarPage() {
                     </p>
                   </div>
                 </div>
-                <a
-                  href={montarLinkWhatsApp(cliente)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700"
+                <button
+                  onClick={() => handleReativar(cliente)}
+                  disabled={enviando === cliente.id}
+                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <IconeWhatsApp />
-                  Mandar mensagem
-                </a>
+                  {enviando === cliente.id ? 'Abrindo…' : 'Mandar mensagem'}
+                </button>
               </li>
             ))}
           </ul>
