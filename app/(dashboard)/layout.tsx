@@ -217,8 +217,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={() => setMenuAberto(false)}
           />
 
-          <div className="relative flex w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
-            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
+          <div className="relative flex h-full w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
               <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Menu</span>
               <button
                 onClick={() => setMenuAberto(false)}
@@ -229,7 +229,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
-            <nav className="flex flex-col gap-1 px-3 py-3">
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
               <MenuItem href="/" label="Início" ativo={pathname === '/'}>
                 <IconeCasa />
               </MenuItem>
