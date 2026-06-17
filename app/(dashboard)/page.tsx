@@ -11,6 +11,7 @@ type DadosDashboard = {
   atendimentosDoMes: number
   faturamentoDoMes: number
   totalClientes: number
+  movimentacoesHoje: number
 }
 
 function saudacao(): string {
@@ -175,6 +176,23 @@ function IcFaturamento() {
   )
 }
 
+function IcMovimentacao() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  )
+}
+
 function IcTotal() {
   return (
     <svg
@@ -208,16 +226,24 @@ export default function DashboardPage() {
         .slice(0, 10)
       const mesAtual = agora.getMonth() + 1
 
+      const cutoff24hISO = new Date(agora.getTime() - 24 * 60 * 60 * 1000).toISOString()
+
       const [
         { data: config },
         { data: statusList },
         { data: todosClientes },
         { data: atendimentosList },
+        { data: cadastros24h },
+        { data: atendimentos24h },
+        { data: reativacoes24h },
       ] = await Promise.all([
         supabase.from('salao_config').select('nome_salao, nome_manicure').single(),
         supabase.from('clientes_status').select('status'),
         supabase.from('clientes').select('data_nascimento').not('data_nascimento', 'is', null),
         supabase.from('atendimentos').select('preco').gte('data_atendimento', inicioMes),
+        supabase.from('clientes').select('id').eq('origem', 'formulario').gte('criado_em', cutoff24hISO),
+        supabase.from('atendimentos').select('id').gte('criado_em', cutoff24hISO),
+        supabase.from('reativacoes').select('id').gte('criado_em', cutoff24hISO),
       ])
 
       if (config) {
@@ -243,6 +269,11 @@ export default function DashboardPage() {
       const atendCount = atendimentos.length
       const faturamento = atendimentos.reduce((acc, a) => acc + (a.preco ?? 0), 0)
 
+      const movimentacoesHoje =
+        (cadastros24h?.length ?? 0) +
+        (atendimentos24h?.length ?? 0) +
+        (reativacoes24h?.length ?? 0)
+
       setDados({
         clientesAtivas: ativas,
         clientesSumidas: sumidas,
@@ -250,6 +281,7 @@ export default function DashboardPage() {
         atendimentosDoMes: atendCount,
         faturamentoDoMes: faturamento,
         totalClientes: total,
+        movimentacoesHoje,
       })
       setCarregando(false)
     }
@@ -332,6 +364,14 @@ export default function DashboardPage() {
               href="/clientes"
               classeIcone="text-pink-500 dark:text-pink-400"
               classeFundo="bg-pink-50 ring-1 ring-pink-100 dark:bg-pink-950/30 dark:ring-pink-900/50"
+            />
+            <CartaoDado
+              icone={<IcMovimentacao />}
+              numero={dados.movimentacoesHoje}
+              rotulo="Movimentações hoje"
+              href="/movimentacao"
+              classeIcone="text-teal-500 dark:text-teal-400"
+              classeFundo="bg-teal-50 ring-1 ring-teal-100 dark:bg-teal-950/30 dark:ring-teal-900/50"
             />
           </>
         ) : null}
