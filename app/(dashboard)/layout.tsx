@@ -29,6 +29,21 @@ import QRCode from 'qrcode'
 
 type Tema = 'claro' | 'escuro'
 
+const CORES_PALETA = [
+  '#ec4899', // pink
+  '#f43f5e', // rose
+  '#ef4444', // red
+  '#f97316', // orange
+  '#eab308', // yellow
+  '#84cc16', // lime
+  '#10b981', // emerald
+  '#06b6d4', // cyan
+  '#3b82f6', // blue
+  '#6366f1', // indigo
+  '#8b5cf6', // violet
+  '#a855f7', // purple
+]
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <HeaderProvider>
@@ -54,6 +69,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [linkFormulario, setLinkFormulario] = useState('')
   const [badgeChangelog, setBadgeChangelog] = useState(0)
   const [badgeMovimentacao, setBadgeMovimentacao] = useState(0)
+  const [fotoUrl, setFotoUrl] = useState('')
+  const [corPrimaria, setCorPrimaria] = useState('#ec4899')
+  const [corSelecionada, setCorSelecionada] = useState('#ec4899')
+  const [salvandoFoto, setSalvandoFoto] = useState(false)
+  const [salvandoCor, setSalvandoCor] = useState(false)
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
@@ -101,7 +121,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       const { data: config } = await supabase
         .from('salao_config')
-        .select('id, nome_salao')
+        .select('id, nome_salao, foto_url, cor_primaria')
         .single()
 
       if (config) {
@@ -109,6 +129,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setNovoNomeSalao(config.nome_salao)
         setIdSalao(config.id)
         setLinkFormulario(`${window.location.origin}/cadastro/${config.id}`)
+        setFotoUrl((config.foto_url as string | null) ?? '')
+        const corInicial = (config.cor_primaria as string | null) ?? '#ec4899'
+        setCorPrimaria(corInicial)
+        setCorSelecionada(corInicial)
 
         const agoraISO = new Date().toISOString()
         const ultimoChangelog = localStorage.getItem('ultimo_acesso_changelog')
@@ -192,6 +216,51 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     await navigator.clipboard.writeText(linkFormulario)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
+  }
+
+  async function uploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0]
+    if (!arquivo || !idSalao) return
+    setSalvandoFoto(true)
+    const ext = arquivo.name.split('.').pop() ?? 'jpg'
+    const caminho = `${idSalao}/foto.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(caminho, arquivo, { upsert: true })
+    if (uploadError) {
+      mostrarToast('Não foi possível enviar a foto. Tente novamente.', 'erro')
+      setSalvandoFoto(false)
+      return
+    }
+    const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(caminho)
+    const novaUrl = urlData.publicUrl
+    const { error: updateError } = await supabase
+      .from('salao_config')
+      .update({ foto_url: novaUrl })
+      .eq('id', idSalao)
+    if (updateError) {
+      mostrarToast('Foto enviada mas não foi possível salvar. Tente novamente.', 'erro')
+    } else {
+      setFotoUrl(novaUrl)
+      mostrarToast('Foto atualizada com sucesso', 'sucesso')
+    }
+    setSalvandoFoto(false)
+  }
+
+  async function salvarCor() {
+    if (!idSalao || corSelecionada === corPrimaria) return
+    setSalvandoCor(true)
+    const { error } = await supabase
+      .from('salao_config')
+      .update({ cor_primaria: corSelecionada })
+      .eq('id', idSalao)
+    if (error) {
+      mostrarToast('Não foi possível salvar a cor. Tente novamente.', 'erro')
+    } else {
+      setCorPrimaria(corSelecionada)
+      mostrarToast('Cor salva com sucesso', 'sucesso')
+    }
+    setSalvandoCor(false)
   }
 
   async function fazerLogout() {
@@ -431,6 +500,83 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
               )}
+
+              <hr className="border-zinc-100 dark:border-zinc-800" />
+
+              <div className="flex flex-col gap-4">
+                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                  Personalizar formulário
+                </p>
+
+                {/* Foto */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Foto</p>
+                  {fotoUrl && (
+                    <img
+                      src={fotoUrl}
+                      alt="Foto do salão"
+                      className="h-14 w-14 rounded-full object-cover"
+                    />
+                  )}
+                  <label
+                    htmlFor="config-foto"
+                    className={`flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-zinc-300 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 ${
+                      salvandoFoto ? 'cursor-not-allowed opacity-60' : ''
+                    }`}
+                  >
+                    {salvandoFoto ? 'Enviando…' : fotoUrl ? 'Alterar foto' : 'Escolher foto'}
+                    <input
+                      id="config-foto"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      disabled={salvandoFoto}
+                      className="sr-only"
+                      onChange={uploadFoto}
+                    />
+                  </label>
+                </div>
+
+                {/* Cor primária */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                    Cor primária
+                  </p>
+                  <div className="grid grid-cols-6 gap-2">
+                    {CORES_PALETA.map((cor) => (
+                      <button
+                        key={cor}
+                        onClick={() => setCorSelecionada(cor)}
+                        className="relative flex h-9 w-9 items-center justify-center rounded-full transition hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        style={{ backgroundColor: cor }}
+                        aria-label={`Selecionar cor ${cor}`}
+                        aria-pressed={corSelecionada === cor}
+                      >
+                        {corSelecionada === cor && (
+                          <svg
+                            className="h-4 w-4 drop-shadow"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="white"
+                            strokeWidth={3}
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+                    {corSelecionada}
+                  </p>
+                  <button
+                    onClick={salvarCor}
+                    disabled={salvandoCor || corSelecionada === corPrimaria}
+                    className="flex h-11 items-center justify-center rounded-lg bg-pink-500 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {salvandoCor ? 'Salvando…' : 'Salvar cor'}
+                  </button>
+                </div>
+              </div>
 
               <hr className="border-zinc-100 dark:border-zinc-800" />
 
