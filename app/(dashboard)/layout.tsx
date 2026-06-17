@@ -133,7 +133,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setNovoNomeSalao(config.nome_salao)
         setIdSalao(config.id)
         setLinkFormulario(`${window.location.origin}/cadastro/${config.id}`)
-        setFotoUrl((config.foto_url as string | null) ?? '')
+        const fotoRaw = (config.foto_url as string | null) ?? ''
+        setFotoUrl(fotoRaw ? `${fotoRaw}?t=${Date.now()}` : '')
         const corInicial = (config.cor_primaria as string | null) ?? '#ec4899'
         setCorPrimaria(corInicial)
         setCorSelecionada(corInicial)
@@ -247,7 +248,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     if (updateError) {
       mostrarToast('Foto enviada mas não foi possível salvar. Tente novamente.', 'erro')
     } else {
-      setFotoUrl(novaUrl)
+      setFotoUrl(`${novaUrl}?t=${Date.now()}`)
       mostrarToast('Foto atualizada com sucesso', 'sucesso')
     }
     setSalvandoFoto(false)
