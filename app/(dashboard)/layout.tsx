@@ -29,21 +29,6 @@ import QRCode from 'qrcode'
 
 type Tema = 'claro' | 'escuro'
 
-const CORES_PALETA = [
-  '#ec4899', // pink
-  '#f43f5e', // rose
-  '#ef4444', // red
-  '#f97316', // orange
-  '#eab308', // yellow
-  '#84cc16', // lime
-  '#10b981', // emerald
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#6366f1', // indigo
-  '#8b5cf6', // violet
-  '#a855f7', // purple
-]
-
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <HeaderProvider>
@@ -73,6 +58,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [corPrimaria, setCorPrimaria] = useState('#ec4899')
   const [corSelecionada, setCorSelecionada] = useState('#ec4899')
   const [salvandoFoto, setSalvandoFoto] = useState(false)
+  const [removendoFoto, setRemovendoFoto] = useState(false)
+  const [confirmandoRemoverFoto, setConfirmandoRemoverFoto] = useState(false)
   const [salvandoCor, setSalvandoCor] = useState(false)
   const [opcoesFotoAbertas, setOpcoesFotoAbertas] = useState(false)
   const inputCameraRef = useRef<HTMLInputElement>(null)
@@ -252,6 +239,23 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       mostrarToast('Foto atualizada com sucesso', 'sucesso')
     }
     setSalvandoFoto(false)
+  }
+
+  async function removerFoto() {
+    if (!idSalao) return
+    setRemovendoFoto(true)
+    const { error } = await supabase
+      .from('salao_config')
+      .update({ foto_url: null })
+      .eq('id', idSalao)
+    if (error) {
+      mostrarToast('Não foi possível remover a foto. Tente novamente.', 'erro')
+    } else {
+      setFotoUrl('')
+      mostrarToast('Foto removida', 'sucesso')
+    }
+    setConfirmandoRemoverFoto(false)
+    setRemovendoFoto(false)
   }
 
   async function salvarCor() {
@@ -530,6 +534,37 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       className="h-14 w-14 rounded-full object-cover"
                     />
                   )}
+                  {fotoUrl && !confirmandoRemoverFoto && (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmandoRemoverFoto(true)}
+                      disabled={salvandoFoto}
+                      className="self-start text-xs text-red-500 transition hover:text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      Remover foto
+                    </button>
+                  )}
+                  {fotoUrl && confirmandoRemoverFoto && (
+                    <div className="flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2 dark:bg-red-950/30">
+                      <span className="flex-1 text-xs text-red-700 dark:text-red-300">Remover a foto?</span>
+                      <button
+                        type="button"
+                        onClick={removerFoto}
+                        disabled={removendoFoto}
+                        className="text-xs font-semibold text-red-600 transition hover:text-red-700 disabled:opacity-50 dark:text-red-400"
+                      >
+                        {removendoFoto ? 'Removendo…' : 'Sim, remover'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmandoRemoverFoto(false)}
+                        disabled={removendoFoto}
+                        className="text-xs text-zinc-500 transition hover:text-zinc-700 disabled:opacity-50 dark:text-zinc-400"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
                   <button
                     onClick={() => setOpcoesFotoAbertas((v) => !v)}
                     disabled={salvandoFoto}
@@ -575,33 +610,30 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                     Cor primária
                   </p>
-                  <div className="grid grid-cols-6 gap-2">
-                    {CORES_PALETA.map((cor) => (
-                      <button
-                        key={cor}
-                        onClick={() => setCorSelecionada(cor)}
-                        className="relative flex h-9 w-9 items-center justify-center rounded-full transition hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                        style={{ backgroundColor: cor }}
-                        aria-label={`Selecionar cor ${cor}`}
-                        aria-pressed={corSelecionada === cor}
-                      >
-                        {corSelecionada === cor && (
-                          <svg
-                            className="h-4 w-4 drop-shadow"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="white"
-                            strokeWidth={3}
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        )}
-                      </button>
-                    ))}
+                  <div className="flex flex-col items-center gap-3">
+                    <label className="relative block h-20 w-20 cursor-pointer">
+                      <div
+                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-white dark:ring-zinc-800"
+                        style={{ backgroundColor: corSelecionada }}
+                      />
+                      <input
+                        type="color"
+                        value={corSelecionada}
+                        onChange={(e) => setCorSelecionada(e.target.value)}
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        aria-label="Escolher cor primária"
+                      />
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-5 w-5 rounded-full border border-zinc-200 dark:border-zinc-700"
+                        style={{ backgroundColor: corSelecionada }}
+                      />
+                      <span className="font-mono text-sm text-zinc-600 dark:text-zinc-300">
+                        {corSelecionada}
+                      </span>
+                    </div>
                   </div>
-                  <p className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-                    {corSelecionada}
-                  </p>
                   <button
                     onClick={salvarCor}
                     disabled={salvandoCor || corSelecionada === corPrimaria}
