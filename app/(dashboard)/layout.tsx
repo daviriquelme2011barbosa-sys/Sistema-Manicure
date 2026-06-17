@@ -74,6 +74,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [corSelecionada, setCorSelecionada] = useState('#ec4899')
   const [salvandoFoto, setSalvandoFoto] = useState(false)
   const [salvandoCor, setSalvandoCor] = useState(false)
+  const [opcoesFotoAbertas, setOpcoesFotoAbertas] = useState(false)
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
@@ -219,6 +220,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   async function uploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    setOpcoesFotoAbertas(false)
     const arquivo = e.target.files?.[0]
     if (!arquivo || !idSalao) return
     setSalvandoFoto(true)
@@ -415,7 +417,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={() => !salvandoNome && setPainelAberto(false)}
           />
 
-          <div className="relative w-full rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-zinc-900 sm:max-w-md sm:rounded-2xl">
+          <div className="relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
 
             <div className="mb-5 flex items-center justify-between">
@@ -518,22 +520,63 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       className="h-14 w-14 rounded-full object-cover"
                     />
                   )}
-                  <label
-                    htmlFor="config-foto"
-                    className={`flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-zinc-300 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 ${
+                  <button
+                    onClick={() => setOpcoesFotoAbertas((v) => !v)}
+                    disabled={salvandoFoto}
+                    className={`flex h-11 items-center justify-center gap-2 rounded-lg border border-zinc-300 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 ${
                       salvandoFoto ? 'cursor-not-allowed opacity-60' : ''
                     }`}
                   >
                     {salvandoFoto ? 'Enviando…' : fotoUrl ? 'Alterar foto' : 'Escolher foto'}
-                    <input
-                      id="config-foto"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      disabled={salvandoFoto}
-                      className="sr-only"
-                      onChange={uploadFoto}
-                    />
-                  </label>
+                  </button>
+
+                  {opcoesFotoAbertas && !salvandoFoto && (
+                    <div className="flex flex-col overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
+                      {/* câmera — apenas mobile */}
+                      <label
+                        htmlFor="config-foto-camera"
+                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:hidden"
+                      >
+                        <span aria-hidden="true">📷</span> Tirar foto
+                        <input
+                          id="config-foto-camera"
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          className="sr-only"
+                          onChange={uploadFoto}
+                        />
+                      </label>
+                      {/* galeria — apenas mobile */}
+                      <label
+                        htmlFor="config-foto-galeria"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-zinc-100 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:hidden"
+                      >
+                        <span aria-hidden="true">🖼️</span> Escolher da galeria
+                        <input
+                          id="config-foto-galeria"
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={uploadFoto}
+                        />
+                      </label>
+                      {/* upload — sempre visível */}
+                      <label
+                        htmlFor="config-foto-upload"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-zinc-100 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:border-t-0"
+                      >
+                        <span aria-hidden="true">💻</span> Fazer upload
+                        <input
+                          id="config-foto-upload"
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="sr-only"
+                          onChange={uploadFoto}
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
 
                 {/* Cor primária */}
