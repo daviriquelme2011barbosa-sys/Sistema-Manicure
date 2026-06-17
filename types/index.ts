@@ -80,3 +80,20 @@ export type AtendimentoHistorico = {
 }
 
 export type Toast = { mensagem: string; tipo: 'sucesso' | 'erro' } | null
+
+export type FiltroMovimentacao = '24h' | 'semana' | 'mes'
+
+export type TipoMovimentacao =
+  | 'cadastro'
+  | 'atendimento'
+  | 'reativacao'
+  | 'aniversario'
+  | 'resumo_mes'
+
+export type ItemMovimentacao = {
+  id: string
+  tipo: TipoMovimentacao
+  descricao: string
+  criado_em: string
+  href?: string
+}
