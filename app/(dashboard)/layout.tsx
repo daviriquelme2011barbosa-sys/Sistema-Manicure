@@ -52,10 +52,21 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [salvandoNome, setSalvandoNome] = useState(false)
   const [copiado, setCopiado] = useState(false)
   const [linkFormulario, setLinkFormulario] = useState('')
+  const [badgeChangelog, setBadgeChangelog] = useState(0)
+  const [badgeMovimentacao, setBadgeMovimentacao] = useState(0)
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
     setMenuAberto(false)
+    const agora = new Date().toISOString()
+    if (pathname === '/changelog') {
+      localStorage.setItem('ultimo_acesso_changelog', agora)
+      setBadgeChangelog(0)
+    }
+    if (pathname === '/movimentacao') {
+      localStorage.setItem('ultimo_acesso_movimentacao', agora)
+      setBadgeMovimentacao(0)
+    }
   }, [pathname])
 
   useEffect(() => {
@@ -91,6 +102,44 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setNovoNomeSalao(config.nome_salao)
         setIdSalao(config.id)
         setLinkFormulario(`${window.location.origin}/cadastro/${config.id}`)
+
+        const agoraISO = new Date().toISOString()
+        const ultimoChangelog = localStorage.getItem('ultimo_acesso_changelog')
+        const ultimoMovimentacao = localStorage.getItem('ultimo_acesso_movimentacao')
+        const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        const corteMovimentacao =
+          ultimoMovimentacao && ultimoMovimentacao > cutoff24h ? ultimoMovimentacao : cutoff24h
+
+        const changelogQuery = ultimoChangelog
+          ? supabase.from('changelog').select('*', { count: 'exact', head: true }).gt('criado_em', ultimoChangelog)
+          : supabase.from('changelog').select('*', { count: 'exact', head: true })
+
+        const salaoId = config.id
+        const [
+          { count: cChangelog },
+          { count: cCadastros },
+          { count: cAtendimentos },
+          { count: cReativacoes },
+        ] = await Promise.all([
+          changelogQuery,
+          supabase.from('clientes').select('*', { count: 'exact', head: true })
+            .eq('salao_id', salaoId).eq('origem', 'formulario').gt('criado_em', corteMovimentacao),
+          supabase.from('atendimentos').select('*', { count: 'exact', head: true })
+            .eq('salao_id', salaoId).gt('criado_em', corteMovimentacao),
+          supabase.from('reativacoes').select('*', { count: 'exact', head: true })
+            .eq('salao_id', salaoId).gt('criado_em', corteMovimentacao),
+        ])
+
+        if (pathname !== '/changelog') {
+          setBadgeChangelog(cChangelog ?? 0)
+        } else {
+          localStorage.setItem('ultimo_acesso_changelog', agoraISO)
+        }
+        if (pathname !== '/movimentacao') {
+          setBadgeMovimentacao((cCadastros ?? 0) + (cAtendimentos ?? 0) + (cReativacoes ?? 0))
+        } else {
+          localStorage.setItem('ultimo_acesso_movimentacao', agoraISO)
+        }
       }
 
       setVerificando(false)
@@ -251,10 +300,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <MenuItem href="/historico" label="Histórico" ativo={pathname === '/historico'}>
                 <IconeRelogio />
               </MenuItem>
-              <MenuItem href="/movimentacao" label="Movimentação" ativo={pathname === '/movimentacao'}>
+              <MenuItem href="/movimentacao" label="Movimentação" ativo={pathname === '/movimentacao'} badge={badgeMovimentacao}>
                 <IconeMovimentacao />
               </MenuItem>
-              <MenuItem href="/changelog" label="Novidades" ativo={pathname === '/changelog'}>
+              <MenuItem href="/changelog" label="Novidades" ativo={pathname === '/changelog'} badge={badgeChangelog}>
                 <IconeEstrela />
               </MenuItem>
 
@@ -395,15 +444,26 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   )
 }
 
+function BadgeContagem({ contagem }: { contagem: number }) {
+  if (contagem === 0) return null
+  return (
+    <span className="ml-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-bold text-white">
+      {contagem > 99 ? '99+' : contagem}
+    </span>
+  )
+}
+
 function MenuItem({
   href,
   label,
   ativo,
+  badge,
   children,
 }: {
   href: string
   label: string
   ativo: boolean
+  badge?: number
   children: React.ReactNode
 }) {
   return (
@@ -423,6 +483,7 @@ function MenuItem({
         {children}
       </span>
       {label}
+      {badge ? <BadgeContagem contagem={badge} /> : null}
     </Link>
   )
 }
