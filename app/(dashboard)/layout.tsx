@@ -273,7 +273,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={() => setMenuAberto(false)}
           />
 
-          <div className="relative flex h-full w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
+          <div className="relative flex h-screen max-h-[100dvh] w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
             <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
               <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Menu</span>
               <button
@@ -381,7 +381,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   htmlFor="config-nome-salao"
                   className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
                 >
-                  Nome do salão
+                  Nome do profissional
                 </label>
                 <div className="flex gap-2">
                   <input
