@@ -70,6 +70,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   }, [pathname])
 
   useEffect(() => {
+    document.body.style.overflow = menuAberto ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [menuAberto])
+
+  useEffect(() => {
     const temaSalvo = localStorage.getItem('tema')
     const escuro = temaSalvo
       ? temaSalvo === 'escuro'
@@ -278,7 +285,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-scroll overscroll-contain px-3 py-3">
               <MenuItem href="/" label="Início" ativo={pathname === '/'}>
                 <IconeCasa />
               </MenuItem>
