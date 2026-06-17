@@ -52,12 +52,14 @@ export default async function CadastroPublicoPage({
     )
   }
 
+  const fotoUrl = salao.foto_url ? `${salao.foto_url}?t=${Date.now()}` : null
+
   return (
     <FormularioCadastroPublico
       salaoId={salao.id}
       nomeSalao={salao.nome_salao}
       corPrimaria={salao.cor_primaria ?? '#ec4899'}
-      fotoUrl={salao.foto_url}
+      fotoUrl={fotoUrl}
       nomeManicure={salao.nome_manicure}
     />
   )
