@@ -9,7 +9,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
 )
 
-type Estado = 'verificando' | 'invalido' | 'formulario' | 'salvando'
+type Estado = 'verificando' | 'invalido' | 'formulario' | 'salvando' | 'confirmado'
 type ModalAberto = 'termos' | 'privacidade' | null
 
 interface Props {
@@ -85,6 +85,11 @@ export default function FormularioOnboarding({ token }: Props) {
 
       const dados = await resposta.json()
 
+      if (resposta.status === 202) {
+        setEstado('confirmado')
+        return
+      }
+
       if (!resposta.ok) {
         setErroGeral(dados.erro ?? 'Erro ao criar conta. Tente novamente.')
         setEstado('formulario')
@@ -128,6 +133,34 @@ export default function FormularioOnboarding({ token }: Props) {
             <p className="mt-3 text-sm text-zinc-500">
               Solicite um novo convite à administração do sistema.
             </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── confirmado ────────────────────────────────────────────────────
+  if (estado === 'confirmado') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4 py-12">
+        <div className="w-full max-w-sm">
+          <div className="mb-8 text-center">
+            <p className="text-5xl">✅</p>
+            <h1 className="mt-3 text-xl font-bold text-zinc-900">Conta criada com sucesso!</h1>
+          </div>
+          <div className="rounded-2xl bg-white px-6 py-8 shadow-lg text-center">
+            <p className="text-sm leading-relaxed text-zinc-600">
+              Enviamos um e-mail de confirmação para{' '}
+              <span className="font-medium text-zinc-900">{email}</span>.
+              Acesse seu e-mail e clique no link para ativar sua conta e fazer o primeiro acesso.
+            </p>
+            <button
+              type="button"
+              onClick={() => router.replace('/login')}
+              className="mt-6 h-12 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+            >
+              Entendido
+            </button>
           </div>
         </div>
       </div>
