@@ -63,14 +63,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (!authData.session) {
-    return NextResponse.json(
-      { erro: 'Conta criada! Verifique seu e-mail para ativar o acesso.' },
-      { status: 202 },
-    )
-  }
-
-  // 3. Inserir salao_config usando admin (bypassa RLS)
+  // 3. Inserir salao_config usando admin (bypassa RLS) — antes de checar sessão
   const { error: erroConfig } = await admin.from('salao_config').insert({
     user_id: authData.user.id,
     nome_salao: nomeSalao.trim(),
@@ -78,7 +71,7 @@ export async function POST(request: NextRequest) {
   })
 
   if (erroConfig) {
-    console.error('[onboarding] erro ao inserir salao_config:', erroConfig.message)
+    console.error('[onboarding] erro ao inserir salao_config:', erroConfig)
     return NextResponse.json(
       { erro: 'Erro ao configurar o salão. Contate o suporte.' },
       { status: 500 },
@@ -87,6 +80,14 @@ export async function POST(request: NextRequest) {
 
   // 4. Marcar convite como usado
   await admin.from('convites').update({ usado: true }).eq('token', token)
+
+  // 5. Retornar sessão — se null, confirmação de e-mail está habilitada no Supabase
+  if (!authData.session) {
+    return NextResponse.json(
+      { erro: 'Conta criada! Verifique seu e-mail para ativar o acesso.' },
+      { status: 202 },
+    )
+  }
 
   return NextResponse.json({
     sessao: {
