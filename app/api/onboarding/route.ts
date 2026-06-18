@@ -29,12 +29,16 @@ export async function POST(request: NextRequest) {
 
   const admin = criarClienteAdmin()
 
+  console.log('[onboarding] iniciando — token:', token, '| email:', email.trim())
+
   // 1. Re-validar token server-side (previne race condition)
   const { data: convite, error: erroConvite } = await admin
     .from('convites')
     .select('id, usado')
     .eq('token', token)
     .maybeSingle()
+
+  console.log('[onboarding] convite:', convite, '| erroConvite:', erroConvite)
 
   if (erroConvite || !convite) {
     return NextResponse.json({ erro: 'Link inválido ou já utilizado.' }, { status: 400 })
@@ -50,6 +54,8 @@ export async function POST(request: NextRequest) {
     email: email.trim(),
     password: senha,
   })
+
+  console.log('[onboarding] signUp — user.id:', authData?.user?.id ?? null, '| session:', authData?.session ? 'presente' : 'null', '| erroAuth:', erroAuth)
 
   if (erroAuth || !authData.user) {
     const jaExiste = erroAuth?.message?.toLowerCase().includes('already registered')
@@ -70,6 +76,8 @@ export async function POST(request: NextRequest) {
     cor_primaria: '#ec4899',
   })
 
+  console.log('[onboarding] INSERT salao_config — user_id:', authData.user.id, '| erroConfig:', erroConfig)
+
   if (erroConfig) {
     console.error('[onboarding] erro ao inserir salao_config:', erroConfig)
     return NextResponse.json(
@@ -79,15 +87,20 @@ export async function POST(request: NextRequest) {
   }
 
   // 4. Marcar convite como usado
-  await admin.from('convites').update({ usado: true }).eq('token', token)
+  const { error: erroConviteUpdate } = await admin.from('convites').update({ usado: true }).eq('token', token)
+
+  console.log('[onboarding] UPDATE convites — erroConviteUpdate:', erroConviteUpdate)
 
   // 5. Retornar sessão — se null, confirmação de e-mail está habilitada no Supabase
   if (!authData.session) {
+    console.log('[onboarding] sessão null — confirmação de e-mail provavelmente habilitada')
     return NextResponse.json(
       { erro: 'Conta criada! Verifique seu e-mail para ativar o acesso.' },
       { status: 202 },
     )
   }
+
+  console.log('[onboarding] concluído — sessão retornada para o client')
 
   return NextResponse.json({
     sessao: {
