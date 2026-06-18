@@ -64,6 +64,8 @@ export async function POST(request: NextRequest) {
         erro: jaExiste
           ? 'Este e-mail já possui uma conta.'
           : 'Não foi possível criar a conta. Tente novamente.',
+        supabaseErro: erroAuth?.message,
+        supabaseStatus: erroAuth?.status,
       },
       { status: 400 },
     )
