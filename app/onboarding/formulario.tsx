@@ -255,7 +255,7 @@ export default function FormularioOnboarding({ token }: Props) {
                     distribuição sem autorização prévia.
                   </SecaoOnboarding>
                   <SecaoOnboarding titulo="10. Contato">
-                    davi.riquelme2011barbosa@gmail.com
+                    📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
                   </SecaoOnboarding>
                 </div>
               ) : (
@@ -266,7 +266,7 @@ export default function FormularioOnboarding({ token }: Props) {
                     coletados, utilizados e protegidos na plataforma Facilitaai. Elaborada em
                     conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei
                     nº 12.965/2014). Responsável: Davi Riquelme —
-                    davi.riquelme2011barbosa@gmail.com
+                    📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
                   </SecaoOnboarding>
                   <SecaoOnboarding titulo="Seção II — Dados Coletados">
                     Nome completo, endereço de e-mail, número de WhatsApp, data de nascimento,
@@ -289,7 +289,7 @@ export default function FormularioOnboarding({ token }: Props) {
                   <SecaoOnboarding titulo="Seção V — Direitos do Usuário">
                     Confirmar existência de tratamento, acessar dados, solicitar correção ou
                     exclusão, revogar consentimento. Contato:
-                    davi.riquelme2011barbosa@gmail.com
+                    📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
                   </SecaoOnboarding>
                   <SecaoOnboarding titulo="Seção VI — Cookies">
                     A plataforma utiliza cookies para manter a sessão autenticada. O usuário pode
@@ -299,7 +299,7 @@ export default function FormularioOnboarding({ token }: Props) {
                     Alterações serão comunicadas pela aba Novidades dentro da plataforma.
                   </SecaoOnboarding>
                   <SecaoOnboarding titulo="Seção VIII — Contato">
-                    davi.riquelme2011barbosa@gmail.com
+                    📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
                   </SecaoOnboarding>
                 </div>
               )}

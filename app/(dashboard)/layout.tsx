@@ -840,7 +840,7 @@ function ConteudoTermos() {
         autorização prévia.
       </SecaoLegal>
       <SecaoLegal titulo="10. Contato">
-        davi.riquelme2011barbosa@gmail.com
+        📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
       </SecaoLegal>
     </div>
   )
@@ -855,7 +855,7 @@ function ConteudoPrivacidade() {
         utilizados e protegidos na plataforma Facilitaai. Esta política foi elaborada em
         conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei nº
         12.965/2014). Responsável: Davi Riquelme —{' '}
-        davi.riquelme2011barbosa@gmail.com
+        📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
       </SecaoLegal>
       <SecaoLegal titulo="Seção II — Dados Coletados">
         Nome completo, endereço de e-mail, número de WhatsApp, data de nascimento, foto de perfil
@@ -874,7 +874,7 @@ function ConteudoPrivacidade() {
       </SecaoLegal>
       <SecaoLegal titulo="Seção V — Direitos do Usuário">
         Confirmar existência de tratamento, acessar dados, solicitar correção ou exclusão, revogar
-        consentimento. Contato: davi.riquelme2011barbosa@gmail.com
+        consentimento. Contato: 📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
       </SecaoLegal>
       <SecaoLegal titulo="Seção VI — Cookies">
         A plataforma utiliza cookies para manter a sessão autenticada. O usuário pode
@@ -884,7 +884,7 @@ function ConteudoPrivacidade() {
         Alterações serão comunicadas pela aba Novidades dentro da plataforma.
       </SecaoLegal>
       <SecaoLegal titulo="Seção VIII — Contato">
-        davi.riquelme2011barbosa@gmail.com
+        📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
       </SecaoLegal>
     </div>
   )
@@ -900,7 +900,7 @@ function ConteudoSobre() {
       <br />
       Desenvolvido por Davi Riquelme.
       <br />
-      Contato: davi.riquelme2011barbosa@gmail.com
+      Contato: 📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
     </p>
   )
 }
