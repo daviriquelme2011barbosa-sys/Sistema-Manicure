@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { formatarDiaMes } from '@/lib/formatters'
+import { linkWhatsApp } from '@/lib/whatsapp'
 import { SkeletonLista } from '@/components/SkeletonLista'
-import { IconeWhatsApp } from '@/components/icons'
+import { IconeWhatsApp, IconeChevronBaixo } from '@/components/icons'
 import type { Aniversariante } from '@/types'
 
 function montarLinkWhatsApp(cliente: Aniversariante): string {
   const primeiroNome = cliente.nome.split(' ')[0]
   const mensagem = `Oi ${primeiroNome}! 🎂 Hoje é um dia especial — feliz aniversário! Que tal comemorar com as unhas em dia? Adoraria te ver aqui no salão! 💅😊`
-  return `https://wa.me/55${cliente.whatsapp}?text=${encodeURIComponent(mensagem)}`
+  return linkWhatsApp(cliente.whatsapp, mensagem)
 }
 
 export default function AniversariantesPage() {
@@ -151,20 +152,9 @@ export default function AniversariantesPage() {
                       ? '1 aniversariante este mês'
                       : `${doMes.length} aniversariantes este mês`}
                   </span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <IconeChevronBaixo
                     className={`flex-shrink-0 text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${mesExpandido ? 'rotate-180' : ''}`}
-                    aria-hidden="true"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
+                  />
                 </button>
 
                 {mesExpandido && (

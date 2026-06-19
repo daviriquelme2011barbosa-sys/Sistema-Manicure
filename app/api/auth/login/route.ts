@@ -1,35 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { criarRateLimiter, obterIp } from '@/lib/rate-limit'
 
-// In-memory store: IP -> { count, resetAt }
-// Por ser MVP de instância única, memória por processo é suficiente.
-const tentativas = new Map<string, { count: number; resetAt: number }>()
-
-const LIMITE = 10
-const JANELA_MS = 60_000
-
-function verificarRateLimit(ip: string): boolean {
-  const agora = Date.now()
-  const entrada = tentativas.get(ip)
-
-  if (!entrada || agora > entrada.resetAt) {
-    tentativas.set(ip, { count: 1, resetAt: agora + JANELA_MS })
-    return true
-  }
-
-  if (entrada.count >= LIMITE) return false
-
-  entrada.count++
-  return true
-}
+const permitir = criarRateLimiter(10)
 
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    request.headers.get('x-real-ip') ??
-    '0.0.0.0'
+  const ip = obterIp(request)
 
-  if (!verificarRateLimit(ip)) {
+  if (!permitir(ip)) {
     return NextResponse.json(
       { erro: 'Muitas tentativas. Aguarde um minuto e tente novamente.' },
       { status: 429 },

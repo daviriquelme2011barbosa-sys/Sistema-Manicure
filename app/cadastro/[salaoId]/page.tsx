@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { UUID_REGEX } from '@/lib/validators'
 import FormularioCadastroPublico from './formulario'
 
 type SalaoConfig = {
@@ -8,9 +9,6 @@ type SalaoConfig = {
   foto_url: string | null
   nome_manicure: string | null
 }
-
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 async function buscarSalao(salaoId: string): Promise<SalaoConfig | null> {
   if (!UUID_REGEX.test(salaoId)) return null

@@ -2,17 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { formatarData } from '@/lib/formatters'
 
 type Entrada = {
   id: string
   titulo: string
   descricao: string
   criado_em: string
-}
-
-function formatarData(iso: string): string {
-  const [ano, mes, dia] = iso.slice(0, 10).split('-')
-  return `${dia}/${mes}/${ano}`
 }
 
 export default function ChangelogPage() {
@@ -75,7 +71,7 @@ export default function ChangelogPage() {
               <li key={entrada.id} className="relative pb-6 last:pb-0">
                 <span className="absolute -left-[21px] flex h-3.5 w-3.5 items-center justify-center rounded-full bg-pink-500 ring-4 ring-zinc-50 dark:ring-zinc-950" />
                 <time className="mb-1 block text-xs font-medium text-zinc-400 dark:text-zinc-500">
-                  {formatarData(entrada.criado_em)}
+                  {formatarData(entrada.criado_em.slice(0, 10))}
                 </time>
                 <p className="font-semibold text-zinc-900 dark:text-zinc-100">{entrada.titulo}</p>
                 <p className="mt-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">

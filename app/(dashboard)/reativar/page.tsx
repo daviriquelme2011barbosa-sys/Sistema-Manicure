@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { textoSemAparecer } from '@/lib/formatters'
+import { linkWhatsApp } from '@/lib/whatsapp'
 import { SkeletonLista } from '@/components/SkeletonLista'
 import { IconeVoltar, IconeWhatsApp } from '@/components/icons'
 import type { ClienteReativar } from '@/types'
@@ -21,7 +22,7 @@ function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
 function montarLinkWhatsApp(cliente: ClienteReativar): string {
   const primeiroNome = cliente.nome.split(' ')[0]
   const mensagem = `Oi ${primeiroNome}! 💅 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊`
-  return `https://wa.me/55${cliente.whatsapp}?text=${encodeURIComponent(mensagem)}`
+  return linkWhatsApp(cliente.whatsapp, mensagem)
 }
 
 export default function ReativarPage() {

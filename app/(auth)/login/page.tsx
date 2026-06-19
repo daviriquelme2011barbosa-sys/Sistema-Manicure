@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { CampoSenha } from '@/components/CampoSenha'
 
 type Tela = 'login' | 'esqueci' | 'link_enviado' | 'nova_senha'
 
@@ -30,11 +31,6 @@ export default function LoginPage() {
   const [erroNovaSenha, setErroNovaSenha] = useState('')
   const [erroConfirmarSenha, setErroConfirmarSenha] = useState('')
   const [salvandoSenha, setSalvandoSenha] = useState(false)
-
-  // visibilidade de senha
-  const [mostrarSenha, setMostrarSenha] = useState(false)
-  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false)
-  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -149,40 +145,15 @@ export default function LoginPage() {
               <label htmlFor="nova-senha" className="text-sm font-medium text-zinc-700">
                 Nova senha
               </label>
-              <div className="relative">
-                <input
-                  id="nova-senha"
-                  type={mostrarNovaSenha ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  value={novaSenha}
-                  onChange={(e) => setNovaSenha(e.target.value)}
-                  disabled={salvandoSenha}
-                  placeholder="Mínimo 6 caracteres"
-                  className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                    erroNovaSenha ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setMostrarNovaSenha((v) => !v)}
-                  disabled={salvandoSenha}
-                  aria-label={mostrarNovaSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:text-zinc-600 disabled:pointer-events-none"
-                >
-                  {mostrarNovaSenha ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
+              <CampoSenha
+                id="nova-senha"
+                autoComplete="new-password"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                disabled={salvandoSenha}
+                placeholder="Mínimo 6 caracteres"
+                erro={!!erroNovaSenha}
+              />
               {erroNovaSenha && (
                 <span role="alert" className="text-sm text-red-600">{erroNovaSenha}</span>
               )}
@@ -192,40 +163,15 @@ export default function LoginPage() {
               <label htmlFor="confirmar-senha" className="text-sm font-medium text-zinc-700">
                 Confirmar senha
               </label>
-              <div className="relative">
-                <input
-                  id="confirmar-senha"
-                  type={mostrarConfirmarSenha ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  value={confirmarSenha}
-                  onChange={(e) => setConfirmarSenha(e.target.value)}
-                  disabled={salvandoSenha}
-                  placeholder="Repita a senha"
-                  className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                    erroConfirmarSenha ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setMostrarConfirmarSenha((v) => !v)}
-                  disabled={salvandoSenha}
-                  aria-label={mostrarConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:text-zinc-600 disabled:pointer-events-none"
-                >
-                  {mostrarConfirmarSenha ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
+              <CampoSenha
+                id="confirmar-senha"
+                autoComplete="new-password"
+                value={confirmarSenha}
+                onChange={(e) => setConfirmarSenha(e.target.value)}
+                disabled={salvandoSenha}
+                placeholder="Repita a senha"
+                erro={!!erroConfirmarSenha}
+              />
               {erroConfirmarSenha && (
                 <span role="alert" className="text-sm text-red-600">{erroConfirmarSenha}</span>
               )}
@@ -367,40 +313,15 @@ export default function LoginPage() {
             <label htmlFor="senha" className="text-sm font-medium text-zinc-700">
               Senha
             </label>
-            <div className="relative">
-              <input
-                id="senha"
-                type={mostrarSenha ? 'text' : 'password'}
-                autoComplete="current-password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                disabled={enviando}
-                placeholder="••••••••"
-                className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                  erroSenha ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setMostrarSenha((v) => !v)}
-                disabled={enviando}
-                aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:text-zinc-600 disabled:pointer-events-none"
-              >
-                {mostrarSenha ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
-            </div>
+            <CampoSenha
+              id="senha"
+              autoComplete="current-password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              disabled={enviando}
+              placeholder="••••••••"
+              erro={!!erroSenha}
+            />
             {erroSenha && (
               <span role="alert" className="text-sm text-red-600">{erroSenha}</span>
             )}

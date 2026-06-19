@@ -2,10 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-
-function normalizarWhatsApp(valor: string): string {
-  return valor.replace(/\D/g, '')
-}
+import { normalizarWhatsApp } from '@/lib/formatters'
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16)

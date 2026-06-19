@@ -1,0 +1,52 @@
+'use client'
+
+import { useState } from 'react'
+import { IconeOlho, IconeOlhoFechado } from '@/components/icons'
+
+type Props = {
+  id: string
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  disabled?: boolean
+  placeholder?: string
+  autoComplete?: string
+  erro?: boolean
+}
+
+export function CampoSenha({
+  id,
+  value,
+  onChange,
+  disabled,
+  placeholder,
+  autoComplete,
+  erro,
+}: Props) {
+  const [mostrar, setMostrar] = useState(false)
+
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={mostrar ? 'text' : 'password'}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
+          erro ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
+        }`}
+      />
+      <button
+        type="button"
+        onClick={() => setMostrar((v) => !v)}
+        disabled={disabled}
+        aria-label={mostrar ? 'Ocultar senha' : 'Mostrar senha'}
+        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:text-zinc-600 disabled:pointer-events-none"
+      >
+        {mostrar ? <IconeOlhoFechado /> : <IconeOlho />}
+      </button>
+    </div>
+  )
+}

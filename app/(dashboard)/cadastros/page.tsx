@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { formatarWhatsApp, normalizarWhatsApp } from '@/lib/formatters'
+import { formatarData, formatarWhatsApp, normalizarWhatsApp } from '@/lib/formatters'
 
 type ClienteCadastrado = {
   id: string
@@ -12,11 +12,6 @@ type ClienteCadastrado = {
   data_nascimento: string | null
   observacoes: string | null
   autoriza_contato: boolean
-}
-
-function formatarData(data: string): string {
-  const [ano, mes, dia] = data.split('-')
-  return `${dia}/${mes}/${ano}`
 }
 
 export default function CadastrosPage() {

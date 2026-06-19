@@ -1,32 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { criarRateLimiter, obterIp } from '@/lib/rate-limit'
+import { normalizarWhatsApp } from '@/lib/formatters'
+import { UUID_REGEX } from '@/lib/validators'
 
-const tentativas = new Map<string, { count: number; resetAt: number }>()
-
-const LIMITE = 5
-const JANELA_MS = 60_000
-
-function verificarRateLimit(ip: string): boolean {
-  const agora = Date.now()
-  const entrada = tentativas.get(ip)
-
-  if (!entrada || agora > entrada.resetAt) {
-    tentativas.set(ip, { count: 1, resetAt: agora + JANELA_MS })
-    return true
-  }
-
-  if (entrada.count >= LIMITE) return false
-
-  entrada.count++
-  return true
-}
-
-function normalizarWhatsApp(valor: string): string {
-  return valor.replace(/\D/g, '')
-}
-
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const permitir = criarRateLimiter(5)
 
 function criarClienteServidor() {
   return createClient(
@@ -36,12 +14,9 @@ function criarClienteServidor() {
 }
 
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    request.headers.get('x-real-ip') ??
-    '0.0.0.0'
+  const ip = obterIp(request)
 
-  if (!verificarRateLimit(ip)) {
+  if (!permitir(ip)) {
     return NextResponse.json(
       { erro: 'Muitas tentativas. Aguarde um minuto e tente novamente.' },
       { status: 429 },

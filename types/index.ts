@@ -4,7 +4,9 @@ export type SalaoConfig = {
   id: string
   user_id: string
   nome_salao: string
+  nome_manicure: string | null
   cor_primaria: string
+  foto_url: string | null
   criado_em: string
 }
 
