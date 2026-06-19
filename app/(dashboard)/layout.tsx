@@ -23,11 +23,16 @@ import {
   IconeBolo,
   IconeEstrela,
   IconeMovimentacao,
+  IconeInfo,
+  IconeDocumento,
+  IconeEscudo,
+  IconeChevronBaixo,
 } from '@/components/icons'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
 import QRCode from 'qrcode'
 
 type Tema = 'claro' | 'escuro'
+type ModalSaibaMais = 'termos' | 'privacidade' | 'sobre' | null
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -62,6 +67,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [confirmandoRemoverFoto, setConfirmandoRemoverFoto] = useState(false)
   const [salvandoCor, setSalvandoCor] = useState(false)
   const [opcoesFotoAbertas, setOpcoesFotoAbertas] = useState(false)
+  const [submenuSaibaMaisAberto, setSubmenuSaibaMaisAberto] = useState(false)
+  const [modalSaibaMais, setModalSaibaMais] = useState<ModalSaibaMais>(null)
   const inputCameraRef = useRef<HTMLInputElement>(null)
   const inputGaleriaRef = useRef<HTMLInputElement>(null)
   const inputUploadRef = useRef<HTMLInputElement>(null)
@@ -82,6 +89,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.body.style.overflow = menuAberto ? 'hidden' : ''
+    if (!menuAberto) setSubmenuSaibaMaisAberto(false)
     return () => {
       document.body.style.overflow = ''
     }
@@ -413,6 +421,57 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </span>
                 Configurações
               </button>
+
+              <div>
+                <button
+                  onClick={() => setSubmenuSaibaMaisAberto((v) => !v)}
+                  className="flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
+                    <IconeInfo />
+                  </span>
+                  Saiba Mais
+                  <span
+                    className={`ml-auto text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${
+                      submenuSaibaMaisAberto ? 'rotate-180' : ''
+                    }`}
+                  >
+                    <IconeChevronBaixo />
+                  </span>
+                </button>
+
+                {submenuSaibaMaisAberto && (
+                  <div className="ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-zinc-100 pl-3 dark:border-zinc-800">
+                    <button
+                      onClick={() => { setMenuAberto(false); setModalSaibaMais('termos') }}
+                      className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    >
+                      <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
+                        <IconeDocumento />
+                      </span>
+                      Termos de Uso
+                    </button>
+                    <button
+                      onClick={() => { setMenuAberto(false); setModalSaibaMais('privacidade') }}
+                      className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    >
+                      <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
+                        <IconeEscudo />
+                      </span>
+                      Política de Privacidade
+                    </button>
+                    <button
+                      onClick={() => { setMenuAberto(false); setModalSaibaMais('sobre') }}
+                      className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    >
+                      <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
+                        <IconeInfo />
+                      </span>
+                      Sobre o Sistema
+                    </button>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
         </div>
@@ -658,8 +717,191 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      {/* Modal Saiba Mais */}
+      {modalSaibaMais && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={
+            modalSaibaMais === 'termos'
+              ? 'Termos de Uso'
+              : modalSaibaMais === 'privacidade'
+              ? 'Política de Privacidade'
+              : 'Sobre o Sistema'
+          }
+          className="fixed inset-0 z-50 flex flex-col justify-end sm:items-center sm:justify-center"
+        >
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setModalSaibaMais(null)}
+          />
+          <div className="relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+            <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
+
+            <div className="flex flex-shrink-0 items-center justify-between px-5 pb-4 pt-2">
+              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                {modalSaibaMais === 'termos'
+                  ? 'Termos de Uso'
+                  : modalSaibaMais === 'privacidade'
+                  ? 'Política de Privacidade'
+                  : 'Sobre o Sistema'}
+              </h2>
+              <button
+                onClick={() => setModalSaibaMais(null)}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                aria-label="Fechar"
+              >
+                <IconeFechar />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 pb-4">
+              {modalSaibaMais === 'termos' && <ConteudoTermos />}
+              {modalSaibaMais === 'privacidade' && <ConteudoPrivacidade />}
+              {modalSaibaMais === 'sobre' && <ConteudoSobre />}
+            </div>
+
+            <div className="flex-shrink-0 border-t border-zinc-100 px-5 pb-6 pt-4 dark:border-zinc-800">
+              <button
+                onClick={() => setModalSaibaMais(null)}
+                className="h-11 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="pt-14">{children}</div>
     </>
+  )
+}
+
+function SecaoLegal({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        {titulo}
+      </h3>
+      <div className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{children}</div>
+    </div>
+  )
+}
+
+function ConteudoTermos() {
+  return (
+    <div className="flex flex-col gap-5">
+      <p className="text-xs text-zinc-400 dark:text-zinc-500">Última atualização: 19/06/2026</p>
+      <SecaoLegal titulo="1. Aceitação dos Termos">
+        Ao acessar e utilizar a plataforma Facilitaai, o usuário declara ter lido, compreendido e
+        concordado com os presentes Termos de Uso. Caso não concorde com alguma condição, o uso da
+        plataforma deve ser interrompido.
+      </SecaoLegal>
+      <SecaoLegal titulo="2. Sobre a Plataforma">
+        A Facilitaai é uma plataforma de gestão e reativação de clientes destinada a profissionais
+        autônomos e pequenos negócios. Permite o cadastro de clientes, registro de atendimentos,
+        controle de histórico e envio de mensagens de reativação via WhatsApp.
+      </SecaoLegal>
+      <SecaoLegal titulo="3. Cadastro e Acesso">
+        O acesso à plataforma é concedido pelo responsável da Facilitaai após contratação do
+        serviço. O usuário é responsável por manter suas credenciais de acesso em sigilo e por
+        todas as ações realizadas em sua conta.
+      </SecaoLegal>
+      <SecaoLegal titulo="4. Planos e Pagamentos">
+        A contratação inclui uma taxa de implantação e uma mensalidade conforme o plano escolhido.
+        O pagamento é realizado via Pix ou cartão. A mensalidade é cobrada mensalmente a partir do
+        segundo mês de uso. O usuário tem 7 dias corridos após a entrega para solicitar reembolso
+        integral da taxa de implantação, sem necessidade de justificativa.
+      </SecaoLegal>
+      <SecaoLegal titulo="5. Cancelamento">
+        O usuário pode cancelar o serviço a qualquer momento mediante aviso prévio de 30 dias.
+        Após o cancelamento, os dados permanecem disponíveis por 30 dias e são permanentemente
+        excluídos após esse prazo.
+      </SecaoLegal>
+      <SecaoLegal titulo="6. Responsabilidades do Usuário">
+        O usuário se compromete a: utilizar a plataforma apenas para fins legais, não compartilhar
+        o acesso com terceiros não autorizados, manter os dados de suas clientes atualizados e
+        corretos, obter consentimento de suas clientes para coleta e uso dos dados conforme a LGPD.
+      </SecaoLegal>
+      <SecaoLegal titulo="7. Responsabilidades da Facilitaai">
+        A Facilitaai se compromete a: manter a plataforma disponível e funcional, proteger os
+        dados dos usuários conforme a Política de Privacidade, oferecer suporte conforme o plano
+        contratado, notificar o usuário sobre mudanças relevantes na plataforma.
+      </SecaoLegal>
+      <SecaoLegal titulo="8. Limitação de Responsabilidade">
+        A Facilitaai não se responsabiliza por: resultados de negócio decorrentes do uso da
+        plataforma, falhas de conexão ou indisponibilidade do WhatsApp, uso indevido das
+        credenciais de acesso pelo próprio usuário.
+      </SecaoLegal>
+      <SecaoLegal titulo="9. Propriedade Intelectual">
+        Todo o conteúdo da plataforma, incluindo código, design e funcionalidades, é de
+        propriedade exclusiva da Facilitaai. É proibida a reprodução, cópia ou distribuição sem
+        autorização prévia.
+      </SecaoLegal>
+      <SecaoLegal titulo="10. Contato">
+        davi.riquelme2011barbosa@gmail.com
+      </SecaoLegal>
+    </div>
+  )
+}
+
+function ConteudoPrivacidade() {
+  return (
+    <div className="flex flex-col gap-5">
+      <p className="text-xs text-zinc-400 dark:text-zinc-500">Última atualização: 19/06/2026</p>
+      <SecaoLegal titulo="Seção I — Informações Gerais">
+        Esta Política de Privacidade descreve como os dados pessoais dos usuários são coletados,
+        utilizados e protegidos na plataforma Facilitaai. Esta política foi elaborada em
+        conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei nº
+        12.965/2014). Responsável: Davi Riquelme —{' '}
+        davi.riquelme2011barbosa@gmail.com
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção II — Dados Coletados">
+        Nome completo, endereço de e-mail, número de WhatsApp, data de nascimento, foto de perfil
+        (opcional), dados de navegação (IP, navegador, dispositivo). Coletados no cadastro ou no
+        formulário público do profissional responsável pela conta.
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção III — Finalidade do Tratamento">
+        Dados utilizados exclusivamente para: identificação e cadastro de clientes, gestão de
+        histórico de atendimentos, comunicação via WhatsApp e melhoria da plataforma. Os dados não
+        são vendidos, compartilhados ou repassados a terceiros.
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção IV — Armazenamento e Segurança">
+        Dados armazenados com criptografia e controle de acesso por autenticação. Apenas o
+        profissional responsável pela conta tem acesso aos dados de suas clientes. Em caso de
+        cancelamento, dados mantidos por 30 dias e depois permanentemente excluídos.
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção V — Direitos do Usuário">
+        Confirmar existência de tratamento, acessar dados, solicitar correção ou exclusão, revogar
+        consentimento. Contato: davi.riquelme2011barbosa@gmail.com
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção VI — Cookies">
+        A plataforma utiliza cookies para manter a sessão autenticada. O usuário pode
+        desativá-los no navegador, porém isso pode impedir o funcionamento do login.
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção VII — Alterações">
+        Alterações serão comunicadas pela aba Novidades dentro da plataforma.
+      </SecaoLegal>
+      <SecaoLegal titulo="Seção VIII — Contato">
+        davi.riquelme2011barbosa@gmail.com
+      </SecaoLegal>
+    </div>
+  )
+}
+
+function ConteudoSobre() {
+  return (
+    <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+      A Facilitaai é uma plataforma de gestão e reativação de clientes criada para profissionais
+      autônomos e pequenos negócios. Organize suas clientes, veja quem está sumindo e reconecte
+      com um clique via WhatsApp.
+      <br />
+      <br />
+      Desenvolvido por Davi Riquelme.
+      <br />
+      Contato: davi.riquelme2011barbosa@gmail.com
+    </p>
   )
 }
 

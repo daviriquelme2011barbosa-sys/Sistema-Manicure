@@ -177,36 +177,143 @@ export default function FormularioOnboarding({ token }: Props) {
           role="dialog"
           aria-modal="true"
           aria-label={modalAberto === 'termos' ? 'Termos de Uso' : 'Política de Privacidade'}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-end bg-black/40 px-0 sm:justify-center sm:px-4"
           onClick={() => setModalAberto(null)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-white px-6 py-8 shadow-xl"
+            className="flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:max-h-[85vh] sm:max-w-sm sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 sm:hidden" />
+
+            <div className="flex flex-shrink-0 items-center justify-between px-6 pb-3 pt-2">
               <h2 className="text-base font-semibold text-zinc-900">
                 {modalAberto === 'termos' ? 'Termos de Uso' : 'Política de Privacidade'}
               </h2>
               <button
                 type="button"
                 onClick={() => setModalAberto(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600"
                 aria-label="Fechar"
               >
                 ✕
               </button>
             </div>
-            <p className="text-sm text-zinc-500 leading-relaxed">
-              Em breve — os termos completos estarão disponíveis aqui.
-            </p>
-            <button
-              type="button"
-              onClick={() => setModalAberto(null)}
-              className="mt-6 h-11 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600"
-            >
-              Entendi
-            </button>
+
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
+              {modalAberto === 'termos' ? (
+                <div className="flex flex-col gap-4">
+                  <p className="text-xs text-zinc-400">Última atualização: 19/06/2026</p>
+                  <SecaoOnboarding titulo="1. Aceitação dos Termos">
+                    Ao acessar e utilizar a plataforma Facilitaai, o usuário declara ter lido,
+                    compreendido e concordado com os presentes Termos de Uso. Caso não concorde
+                    com alguma condição, o uso da plataforma deve ser interrompido.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="2. Sobre a Plataforma">
+                    A Facilitaai é uma plataforma de gestão e reativação de clientes destinada a
+                    profissionais autônomos e pequenos negócios. Permite o cadastro de clientes,
+                    registro de atendimentos, controle de histórico e envio de mensagens de
+                    reativação via WhatsApp.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="3. Cadastro e Acesso">
+                    O acesso à plataforma é concedido pelo responsável da Facilitaai após
+                    contratação do serviço. O usuário é responsável por manter suas credenciais de
+                    acesso em sigilo e por todas as ações realizadas em sua conta.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="4. Planos e Pagamentos">
+                    A contratação inclui uma taxa de implantação e uma mensalidade conforme o plano
+                    escolhido. O pagamento é realizado via Pix ou cartão. A mensalidade é cobrada
+                    mensalmente a partir do segundo mês de uso. O usuário tem 7 dias corridos após
+                    a entrega para solicitar reembolso integral da taxa de implantação, sem
+                    necessidade de justificativa.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="5. Cancelamento">
+                    O usuário pode cancelar o serviço a qualquer momento mediante aviso prévio de
+                    30 dias. Após o cancelamento, os dados permanecem disponíveis por 30 dias e são
+                    permanentemente excluídos após esse prazo.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="6. Responsabilidades do Usuário">
+                    O usuário se compromete a: utilizar a plataforma apenas para fins legais, não
+                    compartilhar o acesso com terceiros não autorizados, manter os dados de suas
+                    clientes atualizados e corretos, obter consentimento de suas clientes para
+                    coleta e uso dos dados conforme a LGPD.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="7. Responsabilidades da Facilitaai">
+                    A Facilitaai se compromete a: manter a plataforma disponível e funcional,
+                    proteger os dados dos usuários conforme a Política de Privacidade, oferecer
+                    suporte conforme o plano contratado, notificar o usuário sobre mudanças
+                    relevantes na plataforma.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="8. Limitação de Responsabilidade">
+                    A Facilitaai não se responsabiliza por: resultados de negócio decorrentes do
+                    uso da plataforma, falhas de conexão ou indisponibilidade do WhatsApp, uso
+                    indevido das credenciais de acesso pelo próprio usuário.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="9. Propriedade Intelectual">
+                    Todo o conteúdo da plataforma, incluindo código, design e funcionalidades, é
+                    de propriedade exclusiva da Facilitaai. É proibida a reprodução, cópia ou
+                    distribuição sem autorização prévia.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="10. Contato">
+                    davi.riquelme2011barbosa@gmail.com
+                  </SecaoOnboarding>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <p className="text-xs text-zinc-400">Última atualização: 19/06/2026</p>
+                  <SecaoOnboarding titulo="Seção I — Informações Gerais">
+                    Esta Política de Privacidade descreve como os dados pessoais dos usuários são
+                    coletados, utilizados e protegidos na plataforma Facilitaai. Elaborada em
+                    conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei
+                    nº 12.965/2014). Responsável: Davi Riquelme —
+                    davi.riquelme2011barbosa@gmail.com
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção II — Dados Coletados">
+                    Nome completo, endereço de e-mail, número de WhatsApp, data de nascimento,
+                    foto de perfil (opcional), dados de navegação (IP, navegador, dispositivo).
+                    Coletados no cadastro ou no formulário público do profissional responsável pela
+                    conta.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção III — Finalidade do Tratamento">
+                    Dados utilizados exclusivamente para: identificação e cadastro de clientes,
+                    gestão de histórico de atendimentos, comunicação via WhatsApp e melhoria da
+                    plataforma. Os dados não são vendidos, compartilhados ou repassados a
+                    terceiros.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção IV — Armazenamento e Segurança">
+                    Dados armazenados com criptografia e controle de acesso por autenticação.
+                    Apenas o profissional responsável pela conta tem acesso aos dados de suas
+                    clientes. Em caso de cancelamento, dados mantidos por 30 dias e depois
+                    permanentemente excluídos.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção V — Direitos do Usuário">
+                    Confirmar existência de tratamento, acessar dados, solicitar correção ou
+                    exclusão, revogar consentimento. Contato:
+                    davi.riquelme2011barbosa@gmail.com
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção VI — Cookies">
+                    A plataforma utiliza cookies para manter a sessão autenticada. O usuário pode
+                    desativá-los no navegador, porém isso pode impedir o funcionamento do login.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção VII — Alterações">
+                    Alterações serão comunicadas pela aba Novidades dentro da plataforma.
+                  </SecaoOnboarding>
+                  <SecaoOnboarding titulo="Seção VIII — Contato">
+                    davi.riquelme2011barbosa@gmail.com
+                  </SecaoOnboarding>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-shrink-0 border-t border-zinc-100 px-6 pb-6 pt-4">
+              <button
+                type="button"
+                onClick={() => setModalAberto(null)}
+                className="h-11 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600"
+              >
+                Entendi
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -398,5 +505,14 @@ export default function FormularioOnboarding({ token }: Props) {
         </div>
       </div>
     </>
+  )
+}
+
+function SecaoOnboarding({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{titulo}</h3>
+      <p className="text-sm leading-relaxed text-zinc-600">{children}</p>
+    </div>
   )
 }
