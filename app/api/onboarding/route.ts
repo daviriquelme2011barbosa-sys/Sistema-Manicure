@@ -86,7 +86,6 @@ export async function POST(request: NextRequest) {
   })
 
   if (erroConfig) {
-    console.error('[onboarding] erro no INSERT salao_config:', JSON.stringify(erroConfig, null, 2))
     // Rollback: delete orphan user + release token.
     await admin.auth.admin.deleteUser(authData.user.id)
     await admin.from('convites').update({ usado: false }).eq('id', conviteId)
