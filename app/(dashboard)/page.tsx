@@ -43,7 +43,7 @@ function formatarMoedaCompacta(valor: number): string {
 
 function SkeletonCard() {
   return (
-    <div className="h-[116px] animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
+    <div className="shimmer h-[116px] rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
   )
 }
 

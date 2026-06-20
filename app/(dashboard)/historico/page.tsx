@@ -124,7 +124,7 @@ export default function HistoricoPage() {
             Nenhum atendimento registrado em {MESES[mes - 1]} {ano}.
           </p>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <ul className="animar-lista flex flex-col gap-3">
             {atendimentos.map((atendimento) => (
               <li
                 key={atendimento.id}

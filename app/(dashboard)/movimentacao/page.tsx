@@ -249,7 +249,7 @@ export default function MovimentacaoPage() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="animar-lista flex flex-col gap-3">
             {cardResumoMes && <CardMovimentacao item={cardResumoMes} />}
             {itens.map((item) => (
               <CardMovimentacao key={item.id} item={item} />

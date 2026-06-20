@@ -106,7 +106,7 @@ export default function AniversariantesPage() {
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
                   🎂 Hoje
                 </p>
-                <ul className="flex flex-col gap-3">
+                <ul className="animar-lista flex flex-col gap-3">
                   {deHoje.map((cliente) => (
                     <li
                       key={cliente.id}
@@ -127,7 +127,7 @@ export default function AniversariantesPage() {
                         href={montarLinkWhatsApp(cliente)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700"
+                        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98]"
                       >
                         <IconeWhatsApp />
                         Mandar mensagem
@@ -158,7 +158,7 @@ export default function AniversariantesPage() {
                 </button>
 
                 {mesExpandido && (
-                  <ul className="mt-3 flex flex-col gap-3">
+                  <ul className="animar-lista mt-3 flex flex-col gap-3">
                     {doMes.map((cliente) => (
                       <li
                         key={cliente.id}
@@ -179,7 +179,7 @@ export default function AniversariantesPage() {
                           href={montarLinkWhatsApp(cliente)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700"
+                          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98]"
                         >
                           <IconeWhatsApp />
                           Mandar mensagem

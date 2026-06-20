@@ -180,7 +180,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={salvandoSenha}
-              className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {salvandoSenha ? 'Salvando…' : 'Salvar nova senha'}
             </button>
@@ -253,7 +253,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={enviandoRecuperacao}
-              className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {enviandoRecuperacao ? 'Enviando…' : 'Enviar link de recuperação'}
             </button>
@@ -336,7 +336,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={enviando}
-            className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {enviando ? 'Entrando…' : 'Entrar'}
           </button>

@@ -216,8 +216,8 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       aria-label="Editar cliente"
       className="fixed inset-0 z-40 flex flex-col justify-end overflow-hidden sm:items-center sm:justify-center"
     >
-      <div className="absolute inset-0 bg-black/40" onClick={fecharEdicao} />
-      <div className="relative flex flex-col w-full max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-zinc-900 shadow-xl sm:max-w-md sm:rounded-2xl">
+      <div className="animar-overlay absolute inset-0 bg-black/40" onClick={fecharEdicao} />
+      <div className="animar-sheet relative flex flex-col w-full max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-zinc-900 shadow-xl sm:max-w-md sm:rounded-2xl">
         <button
           onClick={fecharEdicao}
           disabled={salvandoEdicao || excluindo}
@@ -438,7 +438,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               <button
                 onClick={salvarEdicao}
                 disabled={salvandoEdicao || !edicao.autorizaContato}
-                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {salvandoEdicao ? 'Salvando…' : 'Salvar alterações'}
               </button>

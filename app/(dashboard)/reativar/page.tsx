@@ -13,7 +13,7 @@ function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
   return (
     <span
       className={`mt-1 inline-block h-3 w-3 flex-shrink-0 rounded-full ${
-        status === 'vermelho' ? 'bg-red-500' : 'bg-yellow-400'
+        status === 'vermelho' ? 'bg-red-500 animar-dot' : 'bg-yellow-400'
       }`}
     />
   )
@@ -123,7 +123,7 @@ export default function ReativarPage() {
             </p>
           </div>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <ul className="animar-lista flex flex-col gap-3">
             {clientes.map((cliente) => (
               <li
                 key={cliente.id}
@@ -143,7 +143,7 @@ export default function ReativarPage() {
                 <button
                   onClick={() => handleReativar(cliente)}
                   disabled={enviando === cliente.id}
-                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <IconeWhatsApp />
                   {enviando === cliente.id ? 'Abrindo…' : 'Mandar mensagem'}

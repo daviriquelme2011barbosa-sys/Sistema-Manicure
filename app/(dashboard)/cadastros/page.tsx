@@ -68,7 +68,7 @@ export default function CadastrosPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-28 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800"
+                className="shimmer h-28 rounded-xl bg-zinc-200 dark:bg-zinc-800"
               />
             ))}
           </div>

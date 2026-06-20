@@ -175,11 +175,11 @@ export default function FormularioOnboarding({ token }: Props) {
           role="dialog"
           aria-modal="true"
           aria-label={modalAberto === 'termos' ? 'Termos de Uso' : 'Política de Privacidade'}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-end bg-black/40 px-0 sm:justify-center sm:px-4"
+          className="animar-overlay fixed inset-0 z-50 flex flex-col items-center justify-end bg-black/40 px-0 sm:justify-center sm:px-4"
           onClick={() => setModalAberto(null)}
         >
           <div
-            className="flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:max-h-[85vh] sm:max-w-sm sm:rounded-2xl"
+            className="animar-sheet flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:max-h-[85vh] sm:max-w-sm sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 sm:hidden" />
@@ -443,7 +443,7 @@ export default function FormularioOnboarding({ token }: Props) {
               <button
                 type="submit"
                 disabled={salvando || !termosAceitos}
-                className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {salvando ? 'Criando conta…' : 'Criar minha conta'}
               </button>

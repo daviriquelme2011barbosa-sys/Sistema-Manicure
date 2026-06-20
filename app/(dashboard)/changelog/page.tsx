@@ -46,11 +46,11 @@ export default function ChangelogPage() {
         {carregando ? (
           <div className="flex flex-col gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex flex-col gap-2 rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-900">
-                <div className="h-3 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-3 w-full animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-3 w-5/6 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
+              <div key={i} className="shimmer flex flex-col gap-2 rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-900">
+                <div className="h-3 w-24 rounded bg-zinc-200 dark:bg-zinc-700" />
+                <div className="h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
+                <div className="h-3 w-full rounded bg-zinc-200 dark:bg-zinc-700" />
+                <div className="h-3 w-5/6 rounded bg-zinc-200 dark:bg-zinc-700" />
               </div>
             ))}
           </div>
@@ -66,7 +66,7 @@ export default function ChangelogPage() {
             </p>
           </div>
         ) : (
-          <ol className="relative flex flex-col gap-0 border-l border-zinc-200 pl-5 dark:border-zinc-800">
+          <ol className="animar-lista relative flex flex-col gap-0 border-l border-zinc-200 pl-5 dark:border-zinc-800">
             {entradas.map((entrada) => (
               <li key={entrada.id} className="relative pb-6 last:pb-0">
                 <span className="absolute -left-[21px] flex h-3.5 w-3.5 items-center justify-center rounded-full bg-pink-500 ring-4 ring-zinc-50 dark:ring-zinc-950" />

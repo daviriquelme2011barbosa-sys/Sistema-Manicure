@@ -57,7 +57,7 @@ function BuscaCliente({
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="h-12 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800"
+              className="shimmer h-12 rounded-xl bg-zinc-200 dark:bg-zinc-800"
             />
           ))}
         </div>
@@ -316,7 +316,7 @@ export default function CadastroPage() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {salvando ? 'Salvando…' : 'Registrar atendimento'}
               </button>

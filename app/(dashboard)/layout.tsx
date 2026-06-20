@@ -362,11 +362,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           className="fixed inset-0 z-40 flex"
         >
           <div
-            className="absolute inset-0 bg-black/40"
+            className="animar-overlay absolute inset-0 bg-black/40"
             onClick={() => setMenuAberto(false)}
           />
 
-          <div className="relative flex h-screen max-h-[100dvh] w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
+          <div className="animar-drawer relative flex h-screen max-h-[100dvh] w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
             <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
               <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Menu</span>
               <button
@@ -486,11 +486,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           className="fixed inset-0 z-40 flex flex-col justify-end sm:items-center sm:justify-center"
         >
           <div
-            className="absolute inset-0 bg-black/40"
+            className="animar-overlay absolute inset-0 bg-black/40"
             onClick={() => !salvandoNome && setPainelAberto(false)}
           />
 
-          <div className="relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+          <div className="animar-sheet relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
 
             <div className="mb-5 flex items-center justify-between">
@@ -732,10 +732,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           className="fixed inset-0 z-50 flex flex-col justify-end sm:items-center sm:justify-center"
         >
           <div
-            className="absolute inset-0 bg-black/40"
+            className="animar-overlay absolute inset-0 bg-black/40"
             onClick={() => setModalSaibaMais(null)}
           />
-          <div className="relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+          <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
             <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
 
             <div className="flex flex-shrink-0 items-center justify-between px-5 pb-4 pt-2">

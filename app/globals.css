@@ -21,5 +21,151 @@ html.dark {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* ===== Animações (CSS puro, sem dependências) ===== */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+@keyframes shimmer-sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animar-entrada {
+  animation: fade-in-up 0.35s ease-out both;
+}
+.animar-overlay {
+  animation: overlay-in 0.25s ease-out both;
+}
+.animar-sheet {
+  animation: sheet-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.animar-drawer {
+  animation: drawer-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.animar-toast {
+  animation: toast-in 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.animar-dot {
+  animation: dot-pulse 1.8s ease-in-out infinite;
+}
+
+/* Entrada escalonada de listas — aplicar no container (ul/ol/div) */
+.animar-lista > * {
+  animation: fade-in-up 0.4s ease-out both;
+}
+.animar-lista > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.animar-lista > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.animar-lista > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.animar-lista > *:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.animar-lista > *:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.animar-lista > *:nth-child(n + 7) {
+  animation-delay: 0.24s;
+}
+
+/* Skeleton com brilho deslizante */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  animation: shimmer-sweep 1.6s ease-in-out infinite;
+}
+html.dark .shimmer::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.07),
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animar-entrada,
+  .animar-overlay,
+  .animar-sheet,
+  .animar-drawer,
+  .animar-toast,
+  .animar-dot,
+  .animar-lista > * {
+    animation: none !important;
+  }
+  .shimmer::after {
+    animation: none !important;
+  }
 }
