@@ -222,9 +222,9 @@ Novo salão consegue se cadastrar, configurar e fazer o primeiro cadastro de cli
 
 | Plano | Público | Diferenciais |
 |-------|---------|-------------|
-| **Essencial** | Manicure autônoma | Funcionalidades da Fase 0 + 1 |
-| **Profissional** | Salão pequeno (até 3 funcionárias) | + Múltiplos usuários + Insights + Templates editáveis |
-| **Completo** | Salão médio | + Agendamento + Exportação + Suporte prioritário |
+| **Sub-master** | Manicure autônoma | Funcionalidades da Fase 0 + 1 |
+| **Master** | Salão pequeno (até 3 funcionárias) | + Múltiplos usuários + Insights + Templates editáveis |
+| **Super-master** | Salão médio | + Agendamento + Exportação + Suporte prioritário |
 
 ---
 
@@ -292,5 +292,5 @@ FASE 3 — Expansão (SaaS maduro)
 ├── Insights e relatórios
 ├── Templates editáveis pela dona
 ├── Agendamento básico
-└── Planos diferenciados (Essencial · Profissional · Completo)
+└── Planos diferenciados (Sub-master · Master · Super-master)
 ```
