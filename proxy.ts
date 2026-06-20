@@ -10,10 +10,15 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
     '/clientes/:path*',
     '/cadastro',
-    '/cadastros',
+    '/cadastros/:path*',
     '/reativar/:path*',
+    '/historico/:path*',
+    '/aniversariantes/:path*',
+    '/movimentacao/:path*',
+    '/changelog/:path*',
     '/configuracoes/:path*',
   ],
 }

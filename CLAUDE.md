@@ -69,9 +69,12 @@ Todos os documentos vivem em `/docs`. Antes de construir qualquer coisa, leia o 
 ## 5. Banco de dados — regras críticas
 
 ### Tabelas existentes
-- `clientes` — identidade da cliente (1 linha por cliente)
-- `atendimentos` — histórico de visitas (N por cliente)
-- `salao_config` — configuração do salão (1 linha por instância)
+- `salao_config` — configuração do salão (1 linha por instância/tenant)
+- `clientes` — identidade da cliente (1 linha por cliente por salão, com `salao_id`)
+- `atendimentos` — histórico de visitas (N por cliente, com `salao_id`)
+- `convites` — tokens de onboarding de uso único (acesso exclusivo via `service_role`)
+- `reativacoes` — registro de cliques de reativação no WhatsApp (com `salao_id`)
+- `changelog` — atualizações do sistema exibidas na tela "Novidades" (sem vínculo de tenant)
 - `clientes_status` — VIEW calculada, nunca tabela
 
 ### Regras que nunca podem ser violadas
@@ -88,10 +91,13 @@ Todos os documentos vivem em `/docs`. Antes de construir qualquer coisa, leia o 
 
 ### Variáveis de ambiente
 ```
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 ```
-Nunca prefixar com `NEXT_PUBLIC_`. Nunca commitar valores reais.
+- `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` são públicas por design — a chave anon é segura no frontend porque o isolamento é feito pelo RLS.
+- `SUPABASE_SERVICE_ROLE_KEY` é server-only: nunca com prefixo `NEXT_PUBLIC_`, nunca commitada.
+- Nunca commitar valores reais em nenhuma dessas variáveis.
 
 ---
 
@@ -178,6 +184,42 @@ Verifique no `docs/TEST-PLAN.md`:
 
 ## 12. Modelo de negócio (contexto para decisões)
 
-Fase atual: serviço replicável, não SaaS. Cada salão tem seu próprio projeto Supabase e deploy no Vercel. O sistema é replicado manualmente para cada novo cliente. A transição para SaaS multi-tenant está documentada no `docs/ROADMAP.md` como Fase 2, com gatilho de 5–8 salões pagando mensalidade.
+Fase atual: o sistema suporta múltiplos salões no **mesmo banco Supabase**, isolados por `salao_id` em todas as tabelas (`clientes`, `atendimentos`, `reativacoes`). O isolamento depende inteiramente de RLS corretamente escopada — ver seção 13.
 
-**Não arquitetar para multi-tenant agora.** As decisões do MVP foram tomadas conscientemente para não travar a migração futura — ver `docs/ROADMAP.md` seção 8.
+A transição para SaaS completo (projeto Supabase por salão ou multi-tenant central com billing) está documentada no `docs/ROADMAP.md` como Fase 2.
+
+---
+
+## 13. RLS — padrão obrigatório de policy
+
+Toda policy de `SELECT`, `INSERT`, `UPDATE` ou `DELETE` nas tabelas com `salao_id` **deve** usar este padrão:
+
+```sql
+-- CORRETO: escopa pelo salão do usuário autenticado
+using (
+  salao_id = (select id from public.salao_config where user_id = auth.uid())
+)
+
+-- ERRADO: verifica apenas se o usuário tem algum salão — não isola entre tenants
+using (
+  exists (select 1 from public.salao_config where user_id = auth.uid())
+)
+```
+
+O padrão correto está no `sql/setup.sql` e documentado em `docs/RBAC-RLS.md`.
+
+---
+
+## 14. Fluxo de onboarding
+
+1. Administrador insere um token em `convites` via `service_role`.
+2. O link `<domínio>/onboarding?token=<token>` é enviado para a nova dona.
+3. A dona preenche nome do salão, e-mail e senha em `/onboarding/formulario`.
+4. O frontend envia para `/api/onboarding`, que:
+   - Valida e **reivindica atomicamente** o token (`UPDATE WHERE usado=false RETURNING id`).
+   - Cria o usuário no Supabase Auth (`signUp`).
+   - Insere `salao_config` via `service_role`.
+   - Em caso de falha parcial: desfaz a etapa anterior antes de retornar erro.
+5. A dona é redirecionada para o dashboard com sessão ativa.
+
+A tabela `convites` não tem policies de usuário — acessada exclusivamente via `service_role` no route de onboarding. RLS habilitado bloqueia qualquer acesso via `anon`/`authenticated`.

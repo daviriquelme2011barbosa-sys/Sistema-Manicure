@@ -223,8 +223,24 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     const arquivo = e.target.files?.[0]
     e.target.value = ''
     if (!arquivo || !idSalao) return
+
+    const tiposPermitidos: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    }
+    if (!(arquivo.type in tiposPermitidos)) {
+      mostrarToast('Formato não permitido. Use JPEG, PNG, WebP ou GIF.', 'erro')
+      return
+    }
+    if (arquivo.size > 5 * 1024 * 1024) {
+      mostrarToast('A foto deve ter no máximo 5MB.', 'erro')
+      return
+    }
+
     setSalvandoFoto(true)
-    const ext = arquivo.name.split('.').pop() ?? 'jpg'
+    const ext = tiposPermitidos[arquivo.type]
     const caminho = `${idSalao}/foto.${ext}`
     const { error: uploadError } = await supabase.storage
       .from('avatars')
