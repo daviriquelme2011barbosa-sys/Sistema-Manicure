@@ -387,3 +387,136 @@ html.dark .shimmer::after {
   .login-anim-5, .login-anim-6, .login-anim-7 { animation: none !important; }
   .login-btn::before { display: none !important; }
 }
+
+/* ===== Dashboard Premium ===== */
+@keyframes dash-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Page wrapper — light mode */
+.dash-page {
+  min-height: 100vh;
+  padding-bottom: 40px;
+  position: relative;
+  background: #f9f9fb;
+}
+
+/* Ambient tints — light only */
+.dash-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 65% 45% at 0% 0%, rgba(236,72,153,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 100% 100%, rgba(147,51,234,0.05) 0%, transparent 55%);
+}
+
+/* Dark mode: reuse login aurora */
+html.dark .dash-page {
+  background: linear-gradient(-45deg, #050510, #1a0825, #0a051a, #200a38, #0d0a20, #18052e);
+  background-size: 400% 400%;
+  animation: login-aurora 14s ease infinite;
+}
+html.dark .dash-page::before { display: none; }
+
+/* Aurora orbs — dark only */
+.dash-orb-1 {
+  display: none;
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(236,72,153,0.14) 0%, transparent 70%);
+  top: -180px;
+  left: -180px;
+  pointer-events: none;
+  z-index: 0;
+}
+.dash-orb-2 {
+  display: none;
+  position: fixed;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(147,51,234,0.11) 0%, transparent 70%);
+  bottom: -130px;
+  right: -130px;
+  pointer-events: none;
+  z-index: 0;
+}
+html.dark .dash-orb-1,
+html.dark .dash-orb-2 { display: block; }
+
+/* Content sits above orbs */
+.dash-content { position: relative; z-index: 1; }
+
+/* Greeting: transparent in dark so aurora shows through */
+html.dark .dash-greeting {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Card base */
+.dash-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  padding: 20px;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  animation: dash-fade-up 0.4s ease both;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+.dash-card:active { transform: scale(0.97); }
+
+/* Dark mode: glassmorphism overrides everything */
+html.dark .dash-card {
+  background: rgba(255,255,255,0.05) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+html.dark .dash-card:hover {
+  border-color: rgba(255,255,255,0.16) !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.09) !important;
+}
+
+/* Icon badge */
+.dash-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+/* Stagger delays */
+.dash-anim-1 { animation-delay: 0ms; }
+.dash-anim-2 { animation-delay: 80ms; }
+.dash-anim-3 { animation-delay: 160ms; }
+.dash-anim-4 { animation-delay: 240ms; }
+.dash-anim-5 { animation-delay: 320ms; }
+.dash-anim-6 { animation-delay: 400ms; }
+.dash-anim-7 { animation-delay: 480ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-page { animation: none !important; }
+  .dash-card {
+    animation: none !important;
+    transition: none !important;
+  }
+  .dash-card:hover { transform: none !important; box-shadow: none !important; }
+}

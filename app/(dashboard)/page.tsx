@@ -31,9 +31,9 @@ function gradienteGreeting(): string {
 }
 
 function formatarMoedaCompacta(valor: number): string {
-  if (valor >= 10000) return `R$ ${Math.round(valor / 1000)}k`
+  if (valor >= 10000) return `R$ ${Math.round(valor / 1000)}k`
   if (valor >= 1000)
-    return `R$ ${(valor / 1000).toFixed(1).replace('.', ',')}k`
+    return `R$ ${(valor / 1000).toFixed(1).replace('.', ',')}k`
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -52,24 +52,23 @@ function CartaoDado({
   numero,
   rotulo,
   href,
-  classeIcone,
+  classeBadge,
   classeFundo,
+  animClass,
 }: {
   icone: React.ReactNode
   numero: string | number
   rotulo: string
   href: string
-  classeIcone: string
+  classeBadge: string
   classeFundo: string
+  animClass: string
 }) {
   return (
-    <Link
-      href={href}
-      className={`flex flex-col rounded-2xl p-5 transition active:scale-[0.97] hover:shadow-md ${classeFundo}`}
-    >
-      <span className={`mb-3 ${classeIcone}`} aria-hidden="true">
+    <Link href={href} className={`dash-card ${classeFundo} ${animClass}`}>
+      <div className={`dash-icon-badge ${classeBadge}`} aria-hidden="true">
         {icone}
-      </span>
+      </div>
       <span className="text-2xl font-bold leading-none text-zinc-900 dark:text-zinc-50">
         {numero}
       </span>
@@ -293,82 +292,94 @@ export default function DashboardPage() {
   const cumprimento = saudacao()
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-10 dark:bg-zinc-950">
-      {/* Saudação com gradiente que muda conforme o horário do dia */}
-      <div className={`bg-gradient-to-br ${gradiente} px-5 py-7`}>
-        <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-          {cumprimento}
-          {nome ? `, ${nome}` : ''}!
-        </p>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Aqui está o resumo do seu salão hoje
-        </p>
-      </div>
+    <div className="dash-page">
+      {/* Orbs — visíveis apenas no modo escuro via CSS */}
+      <div className="dash-orb-1" aria-hidden="true" />
+      <div className="dash-orb-2" aria-hidden="true" />
 
-      {/* Grid de resumo */}
-      <div className="grid grid-cols-2 gap-3 p-4 lg:grid-cols-3">
-        {carregando ? (
-          Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-        ) : dados ? (
-          <>
-            <CartaoDado
-              icone={<IcAtivas />}
-              numero={dados.clientesAtivas}
-              rotulo="Clientes ativas"
-              href="/clientes"
-              classeIcone="text-emerald-500 dark:text-emerald-400"
-              classeFundo="bg-emerald-50 ring-1 ring-emerald-100 dark:bg-emerald-950/30 dark:ring-emerald-900/50"
-            />
-            <CartaoDado
-              icone={<IcSumidas />}
-              numero={dados.clientesSumidas}
-              rotulo="Sumidas"
-              href="/reativar"
-              classeIcone="text-rose-500 dark:text-rose-400"
-              classeFundo="bg-rose-50 ring-1 ring-rose-100 dark:bg-rose-950/30 dark:ring-rose-900/50"
-            />
-            <CartaoDado
-              icone={<IcAniversariantes />}
-              numero={dados.aniversariantesDoMes}
-              rotulo="Aniversariantes do mês"
-              href="/aniversariantes"
-              classeIcone="text-amber-500 dark:text-amber-400"
-              classeFundo="bg-amber-50 ring-1 ring-amber-100 dark:bg-amber-950/30 dark:ring-amber-900/50"
-            />
-            <CartaoDado
-              icone={<IcAtendimentos />}
-              numero={dados.atendimentosDoMes}
-              rotulo="Atendimentos este mês"
-              href="/historico"
-              classeIcone="text-sky-500 dark:text-sky-400"
-              classeFundo="bg-sky-50 ring-1 ring-sky-100 dark:bg-sky-950/30 dark:ring-sky-900/50"
-            />
-            <CartaoDado
-              icone={<IcFaturamento />}
-              numero={formatarMoedaCompacta(dados.faturamentoDoMes)}
-              rotulo="Faturamento do mês"
-              href="/historico"
-              classeIcone="text-violet-500 dark:text-violet-400"
-              classeFundo="bg-violet-50 ring-1 ring-violet-100 dark:bg-violet-950/30 dark:ring-violet-900/50"
-            />
-            <CartaoDado
-              icone={<IcTotal />}
-              numero={dados.totalClientes}
-              rotulo="Total de clientes"
-              href="/clientes"
-              classeIcone="text-pink-500 dark:text-pink-400"
-              classeFundo="bg-pink-50 ring-1 ring-pink-100 dark:bg-pink-950/30 dark:ring-pink-900/50"
-            />
-            <CartaoDado
-              icone={<IcMovimentacao />}
-              numero={dados.movimentacoesHoje}
-              rotulo="Movimentações hoje"
-              href="/movimentacao"
-              classeIcone="text-teal-500 dark:text-teal-400"
-              classeFundo="bg-teal-50 ring-1 ring-teal-100 dark:bg-teal-950/30 dark:ring-teal-900/50"
-            />
-          </>
-        ) : null}
+      <div className="dash-content">
+        {/* Saudação com gradiente horário — transparente no dark */}
+        <div className={`dash-greeting bg-gradient-to-br ${gradiente} px-5 py-7`}>
+          <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            {cumprimento}{nome ? `, ${nome}` : ''}!
+          </p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Aqui está o resumo do seu salão hoje
+          </p>
+        </div>
+
+        {/* Grid de resumo */}
+        <div className="grid grid-cols-2 gap-3 p-4 lg:grid-cols-3">
+          {carregando ? (
+            Array.from({ length: 7 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : dados ? (
+            <>
+              <CartaoDado
+                icone={<IcAtivas />}
+                numero={dados.clientesAtivas}
+                rotulo="Clientes ativas"
+                href="/clientes"
+                classeBadge="bg-emerald-500 text-white dark:bg-emerald-500/20 dark:text-emerald-400"
+                classeFundo="bg-white ring-2 ring-emerald-300 dark:ring-0"
+                animClass="dash-anim-1"
+              />
+              <CartaoDado
+                icone={<IcSumidas />}
+                numero={dados.clientesSumidas}
+                rotulo="Sumidas"
+                href="/reativar"
+                classeBadge="bg-rose-500 text-white dark:bg-rose-500/20 dark:text-rose-400"
+                classeFundo="bg-white ring-2 ring-rose-300 dark:ring-0"
+                animClass="dash-anim-2"
+              />
+              <CartaoDado
+                icone={<IcAniversariantes />}
+                numero={dados.aniversariantesDoMes}
+                rotulo="Aniversariantes do mês"
+                href="/aniversariantes"
+                classeBadge="bg-amber-500 text-white dark:bg-amber-500/20 dark:text-amber-400"
+                classeFundo="bg-white ring-2 ring-amber-300 dark:ring-0"
+                animClass="dash-anim-3"
+              />
+              <CartaoDado
+                icone={<IcAtendimentos />}
+                numero={dados.atendimentosDoMes}
+                rotulo="Atendimentos este mês"
+                href="/historico"
+                classeBadge="bg-sky-500 text-white dark:bg-sky-500/20 dark:text-sky-400"
+                classeFundo="bg-white ring-2 ring-sky-300 dark:ring-0"
+                animClass="dash-anim-4"
+              />
+              <CartaoDado
+                icone={<IcFaturamento />}
+                numero={formatarMoedaCompacta(dados.faturamentoDoMes)}
+                rotulo="Faturamento do mês"
+                href="/historico"
+                classeBadge="bg-violet-500 text-white dark:bg-violet-500/20 dark:text-violet-400"
+                classeFundo="bg-white ring-2 ring-violet-300 dark:ring-0"
+                animClass="dash-anim-5"
+              />
+              <CartaoDado
+                icone={<IcTotal />}
+                numero={dados.totalClientes}
+                rotulo="Total de clientes"
+                href="/clientes"
+                classeBadge="bg-pink-500 text-white dark:bg-pink-500/20 dark:text-pink-400"
+                classeFundo="bg-white ring-2 ring-pink-300 dark:ring-0"
+                animClass="dash-anim-6"
+              />
+              <CartaoDado
+                icone={<IcMovimentacao />}
+                numero={dados.movimentacoesHoje}
+                rotulo="Movimentações hoje"
+                href="/movimentacao"
+                classeBadge="bg-teal-500 text-white dark:bg-teal-500/20 dark:text-teal-400"
+                classeFundo="bg-white ring-2 ring-teal-300 dark:ring-0"
+                animClass="dash-anim-7"
+              />
+            </>
+          ) : null}
+        </div>
       </div>
     </div>
   )
