@@ -7,6 +7,15 @@ import { CampoSenha } from '@/components/CampoSenha'
 
 type Tela = 'login' | 'esqueci' | 'link_enviado' | 'nova_senha'
 
+function Background() {
+  return (
+    <>
+      <div className="login-orb-1" aria-hidden="true" />
+      <div className="login-orb-2" aria-hidden="true" />
+    </>
+  )
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [tela, setTela] = useState<Tela>('login')
@@ -132,59 +141,67 @@ export default function LoginPage() {
   // ── nova senha ────────────────────────────────────────────────────
   if (tela === 'nova_senha') {
     return (
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <p className="text-5xl">🔑</p>
-          <h1 className="mt-3 text-xl font-bold text-zinc-900">Nova senha</h1>
-          <p className="mt-1 text-sm text-zinc-500">Digite a sua nova senha de acesso</p>
-        </div>
-
-        <div className="rounded-2xl bg-white px-6 py-8 shadow-lg">
-          <form onSubmit={handleSalvarNovaSenha} noValidate className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="nova-senha" className="text-sm font-medium text-zinc-700">
-                Nova senha
-              </label>
-              <CampoSenha
-                id="nova-senha"
-                autoComplete="new-password"
-                value={novaSenha}
-                onChange={(e) => setNovaSenha(e.target.value)}
-                disabled={salvandoSenha}
-                placeholder="Mínimo 6 caracteres"
-                erro={!!erroNovaSenha}
-              />
-              {erroNovaSenha && (
-                <span role="alert" className="text-sm text-red-600">{erroNovaSenha}</span>
-              )}
+      <div className="login-page">
+        <Background />
+        <div className="login-center">
+          <div className="w-full" style={{ maxWidth: '384px' }}>
+            <div className="mb-8 text-center login-anim-1">
+              <h1 className="text-2xl font-bold text-white tracking-tight">Nova senha</h1>
+              <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                Digite a sua nova senha de acesso
+              </p>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="confirmar-senha" className="text-sm font-medium text-zinc-700">
-                Confirmar senha
-              </label>
-              <CampoSenha
-                id="confirmar-senha"
-                autoComplete="new-password"
-                value={confirmarSenha}
-                onChange={(e) => setConfirmarSenha(e.target.value)}
-                disabled={salvandoSenha}
-                placeholder="Repita a senha"
-                erro={!!erroConfirmarSenha}
-              />
-              {erroConfirmarSenha && (
-                <span role="alert" className="text-sm text-red-600">{erroConfirmarSenha}</span>
-              )}
-            </div>
+            <div className="login-card login-anim-2">
+              <form onSubmit={handleSalvarNovaSenha} noValidate className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1 login-anim-3">
+                  <label htmlFor="nova-senha" className="login-label">Nova senha</label>
+                  <CampoSenha
+                    id="nova-senha"
+                    autoComplete="new-password"
+                    value={novaSenha}
+                    onChange={(e) => setNovaSenha(e.target.value)}
+                    disabled={salvandoSenha}
+                    placeholder="Mínimo 6 caracteres"
+                    erro={!!erroNovaSenha}
+                    glass
+                  />
+                  {erroNovaSenha && (
+                    <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                      {erroNovaSenha}
+                    </span>
+                  )}
+                </div>
 
-            <button
-              type="submit"
-              disabled={salvandoSenha}
-              className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {salvandoSenha ? 'Salvando…' : 'Salvar nova senha'}
-            </button>
-          </form>
+                <div className="flex flex-col gap-1 login-anim-4">
+                  <label htmlFor="confirmar-senha" className="login-label">Confirmar senha</label>
+                  <CampoSenha
+                    id="confirmar-senha"
+                    autoComplete="new-password"
+                    value={confirmarSenha}
+                    onChange={(e) => setConfirmarSenha(e.target.value)}
+                    disabled={salvandoSenha}
+                    placeholder="Repita a senha"
+                    erro={!!erroConfirmarSenha}
+                    glass
+                  />
+                  {erroConfirmarSenha && (
+                    <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                      {erroConfirmarSenha}
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={salvandoSenha}
+                  className="login-btn login-anim-5"
+                >
+                  {salvandoSenha ? 'Salvando…' : 'Salvar nova senha'}
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -193,23 +210,30 @@ export default function LoginPage() {
   // ── link enviado ──────────────────────────────────────────────────
   if (tela === 'link_enviado') {
     return (
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <p className="text-5xl">📧</p>
-          <h1 className="mt-3 text-xl font-bold text-zinc-900">Verifique seu e-mail</h1>
-        </div>
+      <div className="login-page">
+        <Background />
+        <div className="login-center">
+          <div className="w-full" style={{ maxWidth: '384px' }}>
+            <div className="mb-8 text-center login-anim-1">
+              <h1 className="text-2xl font-bold text-white tracking-tight">Verifique seu e-mail</h1>
+              <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                Um link de recuperação foi enviado
+              </p>
+            </div>
 
-        <div className="rounded-2xl bg-white px-6 py-8 shadow-lg">
-          <p className="text-sm leading-relaxed text-zinc-600">
-            Enviamos um link de recuperação para o seu e-mail. O e-mail virá do Supabase — verifique também sua caixa de spam.
-          </p>
+            <div className="login-card login-anim-2">
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                Enviamos um link de recuperação para o seu e-mail. O e-mail virá do Supabase — verifique também sua caixa de spam.
+              </p>
 
-          <button
-            onClick={() => { setTela('login'); setEmailRecuperacao('') }}
-            className="mt-6 h-12 w-full rounded-xl border border-zinc-300 font-semibold text-zinc-700 transition hover:bg-zinc-50 active:bg-zinc-100"
-          >
-            Voltar para o login
-          </button>
+              <button
+                onClick={() => { setTela('login'); setEmailRecuperacao('') }}
+                className="login-btn mt-6"
+              >
+                Voltar para o login
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -218,54 +242,56 @@ export default function LoginPage() {
   // ── esqueci minha senha ───────────────────────────────────────────
   if (tela === 'esqueci') {
     return (
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <p className="text-5xl">💅</p>
-          <h1 className="mt-3 text-xl font-bold text-zinc-900">Recuperar senha</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Enviaremos um link de recuperação para o seu e-mail
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white px-6 py-8 shadow-lg">
-          <form onSubmit={handleEnviarRecuperacao} noValidate className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="email-recuperacao" className="text-sm font-medium text-zinc-700">
-                E-mail
-              </label>
-              <input
-                id="email-recuperacao"
-                type="email"
-                autoComplete="email"
-                value={emailRecuperacao}
-                onChange={(e) => setEmailRecuperacao(e.target.value)}
-                disabled={enviandoRecuperacao}
-                placeholder="seu@email.com"
-                className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                  erroEmailRecuperacao ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-                }`}
-              />
-              {erroEmailRecuperacao && (
-                <span role="alert" className="text-sm text-red-600">{erroEmailRecuperacao}</span>
-              )}
+      <div className="login-page">
+        <Background />
+        <div className="login-center">
+          <div className="w-full" style={{ maxWidth: '384px' }}>
+            <div className="mb-8 text-center login-anim-1">
+              <h1 className="text-2xl font-bold text-white tracking-tight">Recuperar senha</h1>
+              <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                Enviaremos um link de recuperação para o seu e-mail
+              </p>
             </div>
 
-            <button
-              type="submit"
-              disabled={enviandoRecuperacao}
-              className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {enviandoRecuperacao ? 'Enviando…' : 'Enviar link de recuperação'}
-            </button>
+            <div className="login-card login-anim-2">
+              <form onSubmit={handleEnviarRecuperacao} noValidate className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1 login-anim-3">
+                  <label htmlFor="email-recuperacao" className="login-label">E-mail</label>
+                  <input
+                    id="email-recuperacao"
+                    type="email"
+                    autoComplete="email"
+                    value={emailRecuperacao}
+                    onChange={(e) => setEmailRecuperacao(e.target.value)}
+                    disabled={enviandoRecuperacao}
+                    placeholder="seu@email.com"
+                    className={`login-input${erroEmailRecuperacao ? ' login-input-erro' : ''}`}
+                  />
+                  {erroEmailRecuperacao && (
+                    <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                      {erroEmailRecuperacao}
+                    </span>
+                  )}
+                </div>
 
-            <button
-              type="button"
-              onClick={() => { setTela('login'); setErroEmailRecuperacao('') }}
-              className="h-10 text-sm text-zinc-500 transition hover:text-zinc-700"
-            >
-              Voltar para o login
-            </button>
-          </form>
+                <button
+                  type="submit"
+                  disabled={enviandoRecuperacao}
+                  className="login-btn login-anim-4"
+                >
+                  {enviandoRecuperacao ? 'Enviando…' : 'Enviar link de recuperação'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setTela('login'); setErroEmailRecuperacao('') }}
+                  className="login-link-btn login-anim-5"
+                >
+                  Voltar para o login
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -273,82 +299,96 @@ export default function LoginPage() {
 
   // ── login ─────────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-8 text-center">
-        <p className="text-5xl">💅</p>
-        <h1 className="mt-3 text-xl font-bold text-zinc-900">Gestão de Clientes</h1>
-        <p className="mt-1 text-sm text-zinc-500">Acesso exclusivo para a dona(o) do negócio</p>
-      </div>
-
-      <div className="rounded-2xl bg-white px-6 py-8 shadow-lg">
-        {sessaoExpirada && (
-          <p role="alert" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Sua sessão expirou, faça login novamente.
-          </p>
-        )}
-
-        <form onSubmit={handleLogin} noValidate className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="text-sm font-medium text-zinc-700">
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={enviando}
-              placeholder="seu@email.com"
-              className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
-                erroEmail ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-              }`}
-            />
-            {erroEmail && (
-              <span role="alert" className="text-sm text-red-600">{erroEmail}</span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="senha" className="text-sm font-medium text-zinc-700">
-              Senha
-            </label>
-            <CampoSenha
-              id="senha"
-              autoComplete="current-password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              disabled={enviando}
-              placeholder="••••••••"
-              erro={!!erroSenha}
-            />
-            {erroSenha && (
-              <span role="alert" className="text-sm text-red-600">{erroSenha}</span>
-            )}
-          </div>
-
-          {erroCredenciais && (
-            <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {erroCredenciais}
+    <div className="login-page">
+      <Background />
+      <div className="login-center">
+        <div className="w-full" style={{ maxWidth: '384px' }}>
+          <div className="mb-8 text-center">
+            <span
+              className="login-emoji text-5xl login-anim-1"
+              role="img"
+              aria-label="unhas"
+            >
+              💅
+            </span>
+            <h1 className="mt-4 text-2xl font-bold text-white tracking-tight login-anim-2">
+              Gestão de Clientes
+            </h1>
+            <p className="mt-2 text-sm login-anim-3" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Acesso exclusivo para a dona(o) do negócio
             </p>
-          )}
+          </div>
 
-          <button
-            type="submit"
-            disabled={enviando}
-            className="mt-1 h-12 rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {enviando ? 'Entrando…' : 'Entrar'}
-          </button>
+          <div className="login-card login-anim-4">
+            {sessaoExpirada && (
+              <div role="alert" className="login-alert login-alert-aviso mb-5">
+                Sua sessão expirou, faça login novamente.
+              </div>
+            )}
 
-          <button
-            type="button"
-            onClick={() => { setTela('esqueci'); setErroCredenciais('') }}
-            className="h-10 text-sm text-zinc-500 transition hover:text-zinc-700"
-          >
-            Esqueci minha senha
-          </button>
-        </form>
+            <form onSubmit={handleLogin} noValidate className="flex flex-col gap-5">
+              <div className="flex flex-col gap-1 login-anim-5">
+                <label htmlFor="email" className="login-label">E-mail</label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={enviando}
+                  placeholder="seu@email.com"
+                  className={`login-input${erroEmail ? ' login-input-erro' : ''}`}
+                />
+                {erroEmail && (
+                  <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                    {erroEmail}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1 login-anim-6">
+                <label htmlFor="senha" className="login-label">Senha</label>
+                <CampoSenha
+                  id="senha"
+                  autoComplete="current-password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  disabled={enviando}
+                  placeholder="••••••••"
+                  erro={!!erroSenha}
+                  glass
+                />
+                {erroSenha && (
+                  <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                    {erroSenha}
+                  </span>
+                )}
+              </div>
+
+              {erroCredenciais && (
+                <div role="alert" className="login-alert login-alert-erro">
+                  {erroCredenciais}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={enviando}
+                className="login-btn login-anim-7"
+              >
+                {enviando ? 'Entrando…' : 'Entrar'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setTela('esqueci'); setErroCredenciais('') }}
+                className="login-link-btn"
+              >
+                Esqueci minha senha
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   )

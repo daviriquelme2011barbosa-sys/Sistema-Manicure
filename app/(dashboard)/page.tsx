@@ -298,16 +298,10 @@ export default function DashboardPage() {
       <div className={`bg-gradient-to-br ${gradiente} px-5 py-7`}>
         <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           {cumprimento}
-          {nome ? `, ${nome}` : ''}!{' '}
-          <span role="img" aria-label="brilhos">
-            ✨
-          </span>
+          {nome ? `, ${nome}` : ''}!
         </p>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Aqui está o resumo do seu salão hoje{' '}
-          <span role="img" aria-label="unhas">
-            💅
-          </span>
+          Aqui está o resumo do seu salão hoje
         </p>
       </div>
 

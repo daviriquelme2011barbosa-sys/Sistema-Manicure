@@ -11,6 +11,7 @@ type Props = {
   placeholder?: string
   autoComplete?: string
   erro?: boolean
+  glass?: boolean
 }
 
 export function CampoSenha({
@@ -21,8 +22,35 @@ export function CampoSenha({
   placeholder,
   autoComplete,
   erro,
+  glass,
 }: Props) {
   const [mostrar, setMostrar] = useState(false)
+
+  if (glass) {
+    return (
+      <div className="login-campo-senha">
+        <input
+          id={id}
+          type={mostrar ? 'text' : 'password'}
+          autoComplete={autoComplete}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          placeholder={placeholder}
+          className={`login-input login-input-senha${erro ? ' login-input-erro' : ''}`}
+        />
+        <button
+          type="button"
+          onClick={() => setMostrar((v) => !v)}
+          disabled={disabled}
+          aria-label={mostrar ? 'Ocultar senha' : 'Mostrar senha'}
+          className="login-campo-senha-toggle"
+        >
+          {mostrar ? <IconeOlhoFechado /> : <IconeOlho />}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="relative">

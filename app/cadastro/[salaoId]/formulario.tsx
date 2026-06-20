@@ -130,9 +130,8 @@ export default function FormularioCadastroPublico({
   if (sucesso) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
-        <p className="text-5xl" style={{ color: corPrimaria }}>💗</p>
-        <h2 className="mt-4 text-lg font-semibold" style={{ color: corPrimaria }}>
-          Obrigado pelo seu cadastro! 💗
+        <h2 className="text-lg font-semibold" style={{ color: corPrimaria }}>
+          Obrigado pelo seu cadastro!
         </h2>
         <p className="mt-2 text-sm text-zinc-500">
           Seus dados foram registrados. Até a próxima visita!
@@ -195,7 +194,7 @@ export default function FormularioCadastroPublico({
             )}
           </div>
           <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-            Olá! Faça seu cadastro e entre para a lista de clientes da {nomeManicure ?? nomeSalao} 💅
+            Olá! Faça seu cadastro e entre para a lista de clientes da {nomeManicure ?? nomeSalao}
           </h1>
         </div>
       </header>

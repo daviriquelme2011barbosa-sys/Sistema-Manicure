@@ -39,8 +39,7 @@ export default async function CadastroPublicoPage({
   if (!salao) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
-        <p className="text-5xl">💅</p>
-        <h1 className="mt-4 text-xl font-semibold text-zinc-800">
+        <h1 className="text-xl font-semibold text-zinc-800">
           Salão não encontrado
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
