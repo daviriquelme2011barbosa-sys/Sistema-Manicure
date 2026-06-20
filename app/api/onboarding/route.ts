@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     user_id: authData.user.id,
     nome_salao: nomeSalao.trim(),
     cor_primaria: '#ec4899',
-    plano: 'sub-master',
+    plano: 'basic',
   })
 
   if (erroConfig) {

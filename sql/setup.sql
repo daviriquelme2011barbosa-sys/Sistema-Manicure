@@ -34,6 +34,7 @@ create table if not exists public.salao_config (
   nome_manicure text,
   cor_primaria  text        not null default '#ec4899',
   foto_url      text,
+  plano         text        not null default 'basic' check (plano in ('basic', 'profissional', 'master')),
   criado_em     timestamptz not null default now()
 );
 
