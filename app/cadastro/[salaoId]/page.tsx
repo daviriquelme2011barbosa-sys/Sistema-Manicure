@@ -8,6 +8,7 @@ type SalaoConfig = {
   cor_primaria: string
   foto_url: string | null
   nome_manicure: string | null
+  genero: string
 }
 
 async function buscarSalao(salaoId: string): Promise<SalaoConfig | null> {
@@ -20,7 +21,7 @@ async function buscarSalao(salaoId: string): Promise<SalaoConfig | null> {
 
   const { data, error } = await supabase
     .from('salao_config')
-    .select('id, nome_salao, cor_primaria, foto_url, nome_manicure')
+    .select('id, nome_salao, cor_primaria, foto_url, nome_manicure, genero')
     .eq('id', salaoId)
     .maybeSingle()
 
@@ -58,6 +59,7 @@ export default async function CadastroPublicoPage({
       corPrimaria={salao.cor_primaria ?? '#ec4899'}
       fotoUrl={fotoUrl}
       nomeManicure={salao.nome_manicure}
+      genero={salao.genero ?? 'nao_informar'}
     />
   )
 }

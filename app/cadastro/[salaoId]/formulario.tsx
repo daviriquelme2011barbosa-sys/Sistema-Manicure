@@ -19,6 +19,7 @@ type Props = {
   corPrimaria: string
   fotoUrl?: string | null
   nomeManicure?: string | null
+  genero?: string | null
 }
 
 export default function FormularioCadastroPublico({
@@ -27,6 +28,7 @@ export default function FormularioCadastroPublico({
   corPrimaria,
   fotoUrl,
   nomeManicure,
+  genero,
 }: Props) {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
@@ -227,7 +229,7 @@ export default function FormularioCadastroPublico({
             )}
           </div>
           <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-            Olá! Faça seu cadastro e entre para a lista de clientes da {nomeManicure ?? nomeSalao} 💅
+            Olá! Faça seu cadastro e entre para a lista de clientes {genero === 'feminino' ? 'da ' : genero === 'masculino' ? 'do ' : ''}{nomeManicure ?? nomeSalao} 💅
           </h1>
         </div>
       </header>

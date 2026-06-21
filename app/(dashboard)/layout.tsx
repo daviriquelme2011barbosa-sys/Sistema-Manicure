@@ -66,6 +66,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [removendoFoto, setRemovendoFoto] = useState(false)
   const [confirmandoRemoverFoto, setConfirmandoRemoverFoto] = useState(false)
   const [salvandoCor, setSalvandoCor] = useState(false)
+  const [genero, setGenero] = useState<'feminino' | 'masculino' | 'nao_informar'>('nao_informar')
+  const [salvandoGenero, setSalvandoGenero] = useState(false)
   const [opcoesFotoAbertas, setOpcoesFotoAbertas] = useState(false)
   const [submenuSaibaMaisAberto, setSubmenuSaibaMaisAberto] = useState(false)
   const [modalSaibaMais, setModalSaibaMais] = useState<ModalSaibaMais>(null)
@@ -120,7 +122,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       const { data: config } = await supabase
         .from('salao_config')
-        .select('id, nome_salao, foto_url, cor_primaria')
+        .select('id, nome_salao, foto_url, cor_primaria, genero')
         .single()
 
       if (config) {
@@ -133,6 +135,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         const corInicial = (config.cor_primaria as string | null) ?? '#ec4899'
         setCorPrimaria(corInicial)
         setCorSelecionada(corInicial)
+        const generoInicial = (config.genero as 'feminino' | 'masculino' | 'nao_informar' | null) ?? 'nao_informar'
+        setGenero(generoInicial)
 
         const agoraISO = new Date().toISOString()
         const ultimoChangelog = localStorage.getItem('ultimo_acesso_changelog')
@@ -296,6 +300,22 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       mostrarToast('Cor salva com sucesso', 'sucesso')
     }
     setSalvandoCor(false)
+  }
+
+  async function salvarGenero(novoGenero: 'feminino' | 'masculino' | 'nao_informar') {
+    if (!idSalao || novoGenero === genero) return
+    setSalvandoGenero(true)
+    const { error } = await supabase
+      .from('salao_config')
+      .update({ genero: novoGenero })
+      .eq('id', idSalao)
+    if (error) {
+      mostrarToast('Não foi possível salvar. Tente novamente.', 'erro')
+    } else {
+      setGenero(novoGenero)
+      mostrarToast('Gênero salvo com sucesso', 'sucesso')
+    }
+    setSalvandoGenero(false)
   }
 
   async function fazerLogout() {
@@ -565,6 +585,29 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     {salvandoNome ? '…' : 'Salvar'}
                   </button>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="config-genero"
+                  className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+                >
+                  Gênero do profissional
+                </label>
+                <select
+                  id="config-genero"
+                  value={genero}
+                  onChange={(e) => salvarGenero(e.target.value as 'feminino' | 'masculino' | 'nao_informar')}
+                  disabled={salvandoGenero}
+                  className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:disabled:bg-zinc-900/50"
+                >
+                  <option value="feminino">Feminino</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="nao_informar">Prefiro não informar</option>
+                </select>
+                {salvandoGenero && (
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Salvando…</p>
+                )}
               </div>
 
               {linkFormulario && (
