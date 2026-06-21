@@ -511,6 +511,17 @@ html.dark .dash-card:hover {
 .dash-anim-5 { animation-delay: 320ms; }
 .dash-anim-6 { animation-delay: 400ms; }
 .dash-anim-7 { animation-delay: 480ms; }
+.dash-anim-8 { animation-delay: 560ms; }
+
+/* Chart CSS variables — adaptam automaticamente ao tema */
+:root {
+  --chart-grid: rgba(0, 0, 0, 0.06);
+  --chart-tick: #94a3b8;
+}
+html.dark {
+  --chart-grid: rgba(255, 255, 255, 0.07);
+  --chart-tick: #64748b;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .dash-page { animation: none !important; }

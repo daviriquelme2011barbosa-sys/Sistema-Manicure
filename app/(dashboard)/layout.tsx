@@ -401,7 +401,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
                 <IconeLista />
               </MenuItem>
-              <MenuItem href="/cadastros" label="Cadastrados" ativo={pathname === '/cadastros'}>
+              <MenuItem href="/cadastrados" label="Cadastrados" ativo={pathname === '/cadastrados'}>
                 <IconePessoa />
               </MenuItem>
               <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'}>

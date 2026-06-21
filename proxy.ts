@@ -13,7 +13,7 @@ export const config = {
     '/',
     '/clientes/:path*',
     '/cadastro',
-    '/cadastros/:path*',
+    '/cadastrados/:path*',
     '/reativar/:path*',
     '/historico/:path*',
     '/aniversariantes/:path*',

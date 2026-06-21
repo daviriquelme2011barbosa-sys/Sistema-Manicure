@@ -3,6 +3,24 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+
+type DadosMes = {
+  mes: string
+  clientesNovos: number
+  clientesAtivas: number
+  reativacoesBemsucedidas: number
+  agendamentos: number
+  faturamento: number
+}
 
 type DadosDashboard = {
   clientesAtivas: number
@@ -12,6 +30,8 @@ type DadosDashboard = {
   faturamentoDoMes: number
   totalClientes: number
   movimentacoesHoje: number
+  dadosMeses: DadosMes[]
+  plano: string
 }
 
 function saudacao(): string {
@@ -39,6 +59,74 @@ function formatarMoedaCompacta(valor: number): string {
     currency: 'BRL',
     maximumFractionDigits: 0,
   }).format(valor)
+}
+
+const MESES_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+
+function gerarEstruturaMeses(qtd: number): { chave: string; label: string }[] {
+  const agora = new Date()
+  return Array.from({ length: qtd }, (_, i) => {
+    const d = new Date(agora.getFullYear(), agora.getMonth() - (qtd - 1 - i), 1)
+    return {
+      chave: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+      label: MESES_PT[d.getMonth()],
+    }
+  })
+}
+
+function contarPorMes(
+  items: { criado_em: string }[],
+  estrutura: { chave: string; label: string }[],
+): Record<string, number> {
+  const contagem: Record<string, number> = {}
+  for (const m of estrutura) contagem[m.chave] = 0
+  for (const item of items) {
+    const chave = item.criado_em.slice(0, 7)
+    if (chave in contagem) contagem[chave]++
+  }
+  return contagem
+}
+
+function calcularVariacao(atual: number, anterior: number): number | null {
+  if (anterior === 0) return null
+  return Math.round(((atual - anterior) / anterior) * 100)
+}
+
+function contarAtivosDistintosPorMes(
+  atendimentos: { cliente_id: string; data_atendimento: string }[],
+  estrutura: { chave: string; label: string }[],
+): Record<string, number> {
+  const sets: Record<string, Set<string>> = {}
+  for (const m of estrutura) sets[m.chave] = new Set()
+  for (const a of atendimentos) {
+    const chave = a.data_atendimento.slice(0, 7)
+    if (chave in sets) sets[chave].add(a.cliente_id)
+  }
+  const resultado: Record<string, number> = {}
+  for (const m of estrutura) resultado[m.chave] = sets[m.chave].size
+  return resultado
+}
+
+function contarReativacoesBemsucedidas(
+  reativacoes: { cliente_id: string; criado_em: string }[],
+  atendimentos: { cliente_id: string; data_atendimento: string }[],
+  estrutura: { chave: string; label: string }[],
+): Record<string, number> {
+  const atendPorCliente: Record<string, string[]> = {}
+  for (const a of atendimentos) {
+    if (!atendPorCliente[a.cliente_id]) atendPorCliente[a.cliente_id] = []
+    atendPorCliente[a.cliente_id].push(a.data_atendimento)
+  }
+  const contagem: Record<string, number> = {}
+  for (const m of estrutura) contagem[m.chave] = 0
+  for (const r of reativacoes) {
+    const chave = r.criado_em.slice(0, 7)
+    if (!(chave in contagem)) continue
+    const dataReativacao = r.criado_em.slice(0, 10)
+    const voltou = (atendPorCliente[r.cliente_id] ?? []).some((d) => d >= dataReativacao)
+    if (voltou) contagem[chave]++
+  }
+  return contagem
 }
 
 function SkeletonCard() {
@@ -212,6 +300,227 @@ function IcTotal() {
   )
 }
 
+/* ── Gráfico ─────────────────────────────────────── */
+
+type TooltipEntrada = { name?: string; value?: number; color?: string }
+
+function TooltipDoGrafico({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean
+  payload?: TooltipEntrada[]
+  label?: string
+}) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-xl border border-zinc-200/80 bg-white/95 px-3 py-2.5 shadow-lg backdrop-blur-sm dark:border-zinc-700/50 dark:bg-zinc-900/95">
+      <p className="mb-1.5 text-xs font-semibold text-zinc-400 dark:text-zinc-500">{label}</p>
+      {payload.map((p, i) => (
+        <p key={i} className="text-sm font-medium" style={{ color: p.color }}>
+          {p.name}:{' '}
+          <span className="font-bold">{p.value ?? 0}</span>
+        </p>
+      ))}
+    </div>
+  )
+}
+
+function BadgeVariacao({ valor, rotulo }: { valor: number | null; rotulo: string }) {
+  if (valor === null) return null
+  const positivo = valor >= 0
+  return (
+    <span
+      className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
+        positivo
+          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400'
+          : 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400'
+      }`}
+    >
+      {positivo ? '↑' : '↓'} {Math.abs(valor)}% {rotulo}
+    </span>
+  )
+}
+
+function GraficoDashboard({ dados, plano }: { dados: DadosMes[]; plano: string }) {
+  const n = dados.length
+  const varNovos =
+    n >= 2 ? calcularVariacao(dados[n - 1].clientesNovos, dados[n - 2].clientesNovos) : null
+  const varAtivas =
+    n >= 2 ? calcularVariacao(dados[n - 1].clientesAtivas, dados[n - 2].clientesAtivas) : null
+  const varBemsucedidas =
+    n >= 2
+      ? calcularVariacao(dados[n - 1].reativacoesBemsucedidas, dados[n - 2].reativacoesBemsucedidas)
+      : null
+
+  const mostrarAgendamentos = plano === 'profissional' || plano === 'master'
+  const mostrarFaturamento = plano === 'master'
+
+  return (
+    <div className="dash-card dash-anim-8 col-span-2 bg-white ring-2 ring-zinc-100 dark:ring-0 lg:col-span-3">
+      {/* Cabeçalho */}
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+            Evolução nos últimos 6 meses
+          </p>
+          <p className="mt-0.5 text-xs text-zinc-400">Novas, ativas e reativações efetivas</p>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          <BadgeVariacao valor={varNovos} rotulo="novas" />
+          <BadgeVariacao valor={varAtivas} rotulo="ativas" />
+          <BadgeVariacao valor={varBemsucedidas} rotulo="reativações" />
+        </div>
+      </div>
+
+      {/* Legenda */}
+      <div className="mb-4 flex flex-wrap items-center gap-4">
+        <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ec4899]" />
+          Novas clientes
+        </span>
+        <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
+          Clientes ativas
+        </span>
+        <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#9333ea]" />
+          Reativações efetivas
+        </span>
+        {mostrarAgendamentos && (
+          <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#3b82f6]" />
+            Agendamentos
+          </span>
+        )}
+        {mostrarFaturamento && (
+          <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
+            Faturamento
+          </span>
+        )}
+      </div>
+
+      {/* Área do gráfico */}
+      <ResponsiveContainer width="100%" height={160}>
+        <AreaChart data={dados} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+          <defs>
+            <linearGradient id="gcClientes" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="gcAtivas" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="gcReativacoes" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#9333ea" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#9333ea" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="gcAgendamentos" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="gcFaturamento" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--chart-grid)"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="mes"
+            tick={{ fontSize: 10, fill: 'var(--chart-tick)' }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: 'var(--chart-tick)' }}
+            axisLine={false}
+            tickLine={false}
+            allowDecimals={false}
+          />
+          <Tooltip
+            content={(props) => (
+              <TooltipDoGrafico
+                active={props.active}
+                label={props.label !== undefined ? String(props.label) : undefined}
+                payload={
+                  props.payload?.map((p) => ({
+                    name: p.name !== undefined ? String(p.name) : undefined,
+                    value: typeof p.value === 'number' ? p.value : undefined,
+                    color: p.color,
+                  })) ?? []
+                }
+              />
+            )}
+          />
+          <Area
+            type="monotone"
+            dataKey="clientesNovos"
+            name="Novas clientes"
+            stroke="#ec4899"
+            strokeWidth={2}
+            fill="url(#gcClientes)"
+            dot={false}
+            activeDot={{ r: 4, strokeWidth: 0, fill: '#ec4899' }}
+          />
+          <Area
+            type="monotone"
+            dataKey="clientesAtivas"
+            name="Clientes ativas"
+            stroke="#10b981"
+            strokeWidth={2}
+            fill="url(#gcAtivas)"
+            dot={false}
+            activeDot={{ r: 4, strokeWidth: 0, fill: '#10b981' }}
+          />
+          <Area
+            type="monotone"
+            dataKey="reativacoesBemsucedidas"
+            name="Reativações efetivas"
+            stroke="#9333ea"
+            strokeWidth={2}
+            fill="url(#gcReativacoes)"
+            dot={false}
+            activeDot={{ r: 4, strokeWidth: 0, fill: '#9333ea' }}
+          />
+          {mostrarAgendamentos && (
+            <Area
+              type="monotone"
+              dataKey="agendamentos"
+              name="Agendamentos"
+              stroke="#3b82f6"
+              strokeWidth={2}
+              fill="url(#gcAgendamentos)"
+              dot={false}
+              activeDot={{ r: 4, strokeWidth: 0, fill: '#3b82f6' }}
+            />
+          )}
+          {mostrarFaturamento && (
+            <Area
+              type="monotone"
+              dataKey="faturamento"
+              name="Faturamento"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              fill="url(#gcFaturamento)"
+              dot={false}
+              activeDot={{ r: 4, strokeWidth: 0, fill: '#f59e0b' }}
+            />
+          )}
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
+/* ── Página principal ────────────────────────────── */
+
 export default function DashboardPage() {
   const [carregando, setCarregando] = useState(true)
   const [nome, setNome] = useState('')
@@ -224,8 +533,10 @@ export default function DashboardPage() {
         .toISOString()
         .slice(0, 10)
       const mesAtual = agora.getMonth() + 1
-
       const cutoff24hISO = new Date(agora.getTime() - 24 * 60 * 60 * 1000).toISOString()
+      const inicioGrafico = new Date(agora.getFullYear(), agora.getMonth() - 5, 1)
+        .toISOString()
+        .slice(0, 10)
 
       const [
         { data: config },
@@ -235,20 +546,42 @@ export default function DashboardPage() {
         { data: cadastros24h },
         { data: atendimentos24h },
         { data: reativacoes24h },
+        { data: clientesGrafico },
+        { data: atendimentosGrafico },
+        { data: reavivacoesGrafico },
       ] = await Promise.all([
-        supabase.from('salao_config').select('nome_salao, nome_manicure').single(),
+        supabase.from('salao_config').select('nome_salao, nome_manicure, plano').single(),
         supabase.from('clientes_status').select('status'),
         supabase.from('clientes').select('data_nascimento').not('data_nascimento', 'is', null),
         supabase.from('atendimentos').select('preco').gte('data_atendimento', inicioMes),
-        supabase.from('clientes').select('id').eq('origem', 'formulario').gte('criado_em', cutoff24hISO),
+        supabase
+          .from('clientes')
+          .select('id')
+          .eq('origem', 'formulario')
+          .gte('criado_em', cutoff24hISO),
         supabase.from('atendimentos').select('id').gte('criado_em', cutoff24hISO),
         supabase.from('reativacoes').select('id').gte('criado_em', cutoff24hISO),
+        supabase.from('clientes').select('criado_em').gte('criado_em', inicioGrafico),
+        supabase
+          .from('atendimentos')
+          .select('cliente_id, data_atendimento')
+          .gte('data_atendimento', inicioGrafico),
+        supabase
+          .from('reativacoes')
+          .select('cliente_id, criado_em')
+          .gte('criado_em', inicioGrafico),
       ])
 
+      let planoDoSalao = 'basic'
       if (config) {
-        const cfg = config as { nome_salao: string; nome_manicure?: string | null }
+        const cfg = config as {
+          nome_salao: string
+          nome_manicure?: string | null
+          plano?: string | null
+        }
         const nomeBase = cfg.nome_manicure || cfg.nome_salao
         setNome(nomeBase.split(' ')[0])
+        planoDoSalao = cfg.plano ?? 'basic'
       }
 
       const clientes = (statusList ?? []) as { status: string }[]
@@ -273,6 +606,25 @@ export default function DashboardPage() {
         (atendimentos24h?.length ?? 0) +
         (reativacoes24h?.length ?? 0)
 
+      // Dados do gráfico
+      const estruturaMeses = gerarEstruturaMeses(6)
+      const cliItems = (clientesGrafico ?? []) as { criado_em: string }[]
+      const atendItems = (atendimentosGrafico ?? []) as { cliente_id: string; data_atendimento: string }[]
+      const reavItems = (reavivacoesGrafico ?? []) as { cliente_id: string; criado_em: string }[]
+
+      const cliPorMes = contarPorMes(cliItems, estruturaMeses)
+      const ativosPorMes = contarAtivosDistintosPorMes(atendItems, estruturaMeses)
+      const bemsucedidasPorMes = contarReativacoesBemsucedidas(reavItems, atendItems, estruturaMeses)
+
+      const dadosMeses: DadosMes[] = estruturaMeses.map(({ chave, label }) => ({
+        mes: label,
+        clientesNovos: cliPorMes[chave],
+        clientesAtivas: ativosPorMes[chave],
+        reativacoesBemsucedidas: bemsucedidasPorMes[chave],
+        agendamentos: 0,
+        faturamento: 0,
+      }))
+
       setDados({
         clientesAtivas: ativas,
         clientesSumidas: sumidas,
@@ -281,6 +633,8 @@ export default function DashboardPage() {
         faturamentoDoMes: faturamento,
         totalClientes: total,
         movimentacoesHoje,
+        dadosMeses,
+        plano: planoDoSalao,
       })
       setCarregando(false)
     }
@@ -308,10 +662,15 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Grid de resumo */}
+        {/* Grid de resumo + gráfico */}
         <div className="grid grid-cols-2 gap-3 p-4 lg:grid-cols-3">
           {carregando ? (
-            Array.from({ length: 7 }).map((_, i) => <SkeletonCard key={i} />)
+            <>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+              <div className="shimmer col-span-2 h-52 rounded-2xl bg-zinc-100 dark:bg-zinc-800 lg:col-span-3" />
+            </>
           ) : dados ? (
             <>
               <CartaoDado
@@ -363,7 +722,7 @@ export default function DashboardPage() {
                 icone={<IcTotal />}
                 numero={dados.totalClientes}
                 rotulo="Total de clientes"
-                href="/clientes"
+                href="/cadastrados"
                 classeBadge="bg-pink-500 text-white dark:bg-pink-500/20 dark:text-pink-400"
                 classeFundo="bg-white ring-2 ring-pink-300 dark:ring-0"
                 animClass="dash-anim-6"
@@ -377,6 +736,7 @@ export default function DashboardPage() {
                 classeFundo="bg-white ring-2 ring-teal-300 dark:ring-0"
                 animClass="dash-anim-7"
               />
+              <GraficoDashboard dados={dados.dadosMeses} plano={dados.plano} />
             </>
           ) : null}
         </div>
