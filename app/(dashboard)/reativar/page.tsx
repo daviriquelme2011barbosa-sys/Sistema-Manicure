@@ -30,8 +30,6 @@ export default function ReativarPage() {
   const [salaoId, setSalaoId] = useState<string | null>(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState<string | null>(null)
-
   useEffect(() => {
     async function carregar() {
       const [{ data: statusData, error: statusError }, { data: configData }] =
@@ -60,17 +58,6 @@ export default function ReativarPage() {
 
     carregar()
   }, [])
-
-  async function handleReativar(cliente: ClienteReativar) {
-    if (salaoId) {
-      setEnviando(cliente.id)
-      await supabase
-        .from('reativacoes')
-        .insert({ salao_id: salaoId, cliente_id: cliente.id })
-      setEnviando(null)
-    }
-    window.open(montarLinkWhatsApp(cliente), '_blank', 'noopener,noreferrer')
-  }
 
   const totalSumidas = clientes.filter((c) => c.status === 'vermelho').length
 
@@ -140,14 +127,22 @@ export default function ReativarPage() {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleReativar(cliente)}
-                  disabled={enviando === cliente.id}
-                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+                <a
+                  href={montarLinkWhatsApp(cliente)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    if (salaoId) {
+                      void supabase
+                        .from('reativacoes')
+                        .insert({ salao_id: salaoId, cliente_id: cliente.id })
+                    }
+                  }}
+                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98]"
                 >
                   <IconeWhatsApp />
-                  {enviando === cliente.id ? 'Abrindo…' : 'Mandar mensagem'}
-                </button>
+                  Mandar mensagem
+                </a>
               </li>
             ))}
           </ul>
