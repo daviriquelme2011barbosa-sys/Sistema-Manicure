@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { normalizarWhatsApp } from '@/lib/formatters'
 
 function hexToRgba(hex: string, alpha: number): string {
@@ -41,6 +41,12 @@ export default function FormularioCadastroPublico({
   const [erros, setErros] = useState<Record<string, string>>({})
   const [avisoWhatsApp, setAvisoWhatsApp] = useState('')
   const [toast, setToast] = useState<Toast>(null)
+
+  useEffect(() => {
+    if (localStorage.getItem(`cadastrado_${salaoId}`)) {
+      setSucesso(true)
+    }
+  }, [salaoId])
 
   function mostrarToast(mensagem: string, tipo: 'sucesso' | 'erro') {
     setToast({ mensagem, tipo })
@@ -114,6 +120,7 @@ export default function FormularioCadastroPublico({
         return
       }
 
+      localStorage.setItem(`cadastrado_${salaoId}`, '1')
       setSucesso(true)
       setNome('')
       setWhatsapp('')
