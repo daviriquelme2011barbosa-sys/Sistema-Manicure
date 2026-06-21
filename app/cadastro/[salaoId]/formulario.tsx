@@ -127,22 +127,51 @@ export default function FormularioCadastroPublico({
     }
   }
 
+  const auroraBackground = `
+    radial-gradient(ellipse 85% 55% at 50% -5%, ${hexToRgba(corPrimaria, 0.2)}, transparent 65%),
+    radial-gradient(ellipse 55% 40% at 88% 95%, ${hexToRgba(corPrimaria, 0.1)}, transparent 55%)
+  `
+
+  const estiloConteiner: React.CSSProperties = {
+    position: 'fixed',
+    inset: 0,
+    overflowY: 'auto',
+    backgroundColor: '#fdfbff',
+  }
+
   if (sucesso) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
-        <p className="text-5xl" style={{ color: corPrimaria }}>💗</p>
-        <h2 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-          Obrigado pelo seu cadastro! 💗
-        </h2>
-        <p className="mt-2 text-sm text-zinc-500">
-          Seus dados foram registrados. Até a próxima visita!
-        </p>
+      <div style={estiloConteiner}>
+        <div
+          aria-hidden="true"
+          className="aurora-bg-salao pointer-events-none absolute inset-0"
+          style={{ zIndex: 0, background: auroraBackground }}
+        />
+        <div
+          className="relative flex min-h-full flex-col items-center justify-center px-6 text-center"
+          style={{ zIndex: 1 }}
+        >
+          <p className="text-5xl" style={{ color: corPrimaria }}>💗</p>
+          <h2 className="text-lg font-semibold" style={{ color: corPrimaria }}>
+            Obrigado pelo seu cadastro! 💗
+          </h2>
+          <p className="mt-2 text-sm text-zinc-500">
+            Seus dados foram registrados. Até a próxima visita!
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50">
+    <div style={estiloConteiner}>
+      {/* Aurora absoluta dentro do container fixo — z-index 0 visível acima do fundo */}
+      <div
+        aria-hidden="true"
+        className="aurora-bg-salao pointer-events-none absolute inset-0"
+        style={{ zIndex: 0, background: auroraBackground }}
+      />
+
       {/* Toast */}
       {toast && (
         <div
@@ -155,6 +184,9 @@ export default function FormularioCadastroPublico({
           {toast.mensagem}
         </div>
       )}
+
+      {/* Conteúdo acima da aurora */}
+      <div className="relative flex min-h-full flex-col" style={{ zIndex: 1 }}>
 
       {/* Cabeçalho */}
       <header
@@ -207,7 +239,7 @@ export default function FormularioCadastroPublico({
           className="flex flex-col gap-6"
         >
           {/* Nome */}
-          <div className="flex flex-col gap-1">
+          <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '60ms' }}>
             <label htmlFor="nome" className="text-sm font-medium text-zinc-700">
               Nome <span aria-hidden="true" className="text-red-500">*</span>
             </label>
@@ -235,7 +267,7 @@ export default function FormularioCadastroPublico({
           </div>
 
           {/* WhatsApp */}
-          <div className="flex flex-col gap-1">
+          <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '140ms' }}>
             <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
               WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
             </label>
@@ -271,7 +303,7 @@ export default function FormularioCadastroPublico({
           </div>
 
           {/* E-mail */}
-          <div className="flex flex-col gap-1">
+          <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '220ms' }}>
             <label htmlFor="email" className="text-sm font-medium text-zinc-700">
               E-mail <span aria-hidden="true" className="text-red-500">*</span>
             </label>
@@ -295,7 +327,7 @@ export default function FormularioCadastroPublico({
           </div>
 
           {/* Data de nascimento */}
-          <div className="flex flex-col gap-1">
+          <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '300ms' }}>
             <label htmlFor="data_nascimento" className="text-sm font-medium text-zinc-700">
               Data de nascimento
               <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
@@ -311,7 +343,7 @@ export default function FormularioCadastroPublico({
           </div>
 
           {/* Observações */}
-          <div className="flex flex-col gap-1">
+          <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '380ms' }}>
             <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700">
               Observações
               <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
@@ -328,7 +360,7 @@ export default function FormularioCadastroPublico({
           </div>
 
           {/* Consentimento LGPD */}
-          <label className="flex cursor-pointer items-start gap-3">
+          <label className="campo-formulario flex cursor-pointer items-start gap-3" style={{ animationDelay: '460ms' }}>
             <input
               type="checkbox"
               checked={autorizaContato}
@@ -352,8 +384,8 @@ export default function FormularioCadastroPublico({
           <button
             type="submit"
             disabled={enviando || !autorizaContato}
-            className="h-12 rounded-lg font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}` }}
+            className="campo-formulario h-12 rounded-lg font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}`, animationDelay: '540ms' }}
           >
             {enviando ? 'Enviando…' : 'Enviar'}
           </button>
@@ -365,6 +397,8 @@ export default function FormularioCadastroPublico({
           </p>
         </form>
       </main>
+
+      </div>{/* fim conteúdo */}
     </div>
   )
 }
