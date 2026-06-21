@@ -83,7 +83,7 @@ export default function MovimentacaoPage() {
           .gte('criado_em', cutoff),
         supabase
           .from('reativacoes')
-          .select('id, criado_em, clientes(nome)')
+          .select('id, criado_em, cliente_id, clientes(nome)')
           .eq('salao_id', salaoId)
           .gte('criado_em', cutoff),
         supabase
@@ -129,22 +129,51 @@ export default function MovimentacaoPage() {
         })
       }
 
-      for (const r of reativacoesData ?? []) {
-        const row = (r as unknown) as {
-          id: string
-          criado_em: string
-          clientes: { nome: string } | { nome: string }[] | null
+      type RowReativacao = {
+        id: string
+        criado_em: string
+        cliente_id: string
+        clientes: { nome: string } | { nome: string }[] | null
+      }
+
+      const todasReativacoes = (reativacoesData ?? []) as unknown as RowReativacao[]
+
+      if (todasReativacoes.length > 0) {
+        const idsClientes = [...new Set(todasReativacoes.map((r) => r.cliente_id))]
+        const dataMinima = todasReativacoes
+          .reduce((min, r) => (r.criado_em < min ? r.criado_em : min), todasReativacoes[0].criado_em)
+          .split('T')[0]
+
+        const { data: atendimentosRetornoData } = await supabase
+          .from('atendimentos')
+          .select('cliente_id, data_atendimento')
+          .eq('salao_id', salaoId)
+          .in('cliente_id', idsClientes)
+          .gte('data_atendimento', dataMinima)
+
+        const atendimentosRetorno = (atendimentosRetornoData ?? []) as {
+          cliente_id: string
+          data_atendimento: string
+        }[]
+
+        const reativacoesFiltradas = todasReativacoes.filter((r) =>
+          atendimentosRetorno.some(
+            (a) => a.cliente_id === r.cliente_id && a.data_atendimento >= r.criado_em.split('T')[0]
+          )
+        )
+
+        for (const row of reativacoesFiltradas) {
+          const clienteNome = Array.isArray(row.clientes)
+            ? row.clientes[0]?.nome
+            : row.clientes?.nome
+          const nomeCliente = clienteNome ?? 'Cliente'
+          resultado.push({
+            id: `reativacao-${row.id}`,
+            tipo: 'reativacao',
+            descricao: `Reativação enviada para ${nomeCliente}`,
+            criado_em: row.criado_em,
+          })
         }
-        const clienteNome = Array.isArray(row.clientes)
-          ? row.clientes[0]?.nome
-          : row.clientes?.nome
-        const nomeCliente = clienteNome ?? 'Cliente'
-        resultado.push({
-          id: `reativacao-${row.id}`,
-          tipo: 'reativacao',
-          descricao: `Reativação enviada para ${nomeCliente}`,
-          criado_em: row.criado_em,
-        })
       }
 
       const todosAniversariantes = (aniversariantesData ?? []) as {
