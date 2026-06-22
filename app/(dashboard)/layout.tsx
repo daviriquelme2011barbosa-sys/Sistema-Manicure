@@ -27,8 +27,10 @@ import {
   IconeDocumento,
   IconeEscudo,
   IconeChevronBaixo,
+  IconeLivro,
 } from '@/components/icons'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
+import { TutorialCarrossel } from '@/components/TutorialCarrossel'
 import QRCode from 'qrcode'
 
 type Tema = 'claro' | 'escuro'
@@ -71,6 +73,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [opcoesFotoAbertas, setOpcoesFotoAbertas] = useState(false)
   const [submenuSaibaMaisAberto, setSubmenuSaibaMaisAberto] = useState(false)
   const [modalSaibaMais, setModalSaibaMais] = useState<ModalSaibaMais>(null)
+  const [tutorialAberto, setTutorialAberto] = useState(false)
   const inputCameraRef = useRef<HTMLInputElement>(null)
   const inputGaleriaRef = useRef<HTMLInputElement>(null)
   const inputUploadRef = useRef<HTMLInputElement>(null)
@@ -96,6 +99,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       document.body.style.overflow = ''
     }
   }, [menuAberto])
+
+  useEffect(() => {
+    if (tutorialAberto) document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [tutorialAberto])
 
   useEffect(() => {
     const temaSalvo = localStorage.getItem('tema')
@@ -442,6 +452,19 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <MenuItem href="/changelog" label="Novidades" ativo={pathname === '/changelog'} badge={badgeChangelog}>
                 <IconeEstrela />
               </MenuItem>
+
+              <button
+                onClick={() => {
+                  setMenuAberto(false)
+                  setTutorialAberto(true)
+                }}
+                className="flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
+                  <IconeLivro />
+                </span>
+                Tutorial
+              </button>
 
               <hr className="my-2 border-zinc-100 dark:border-zinc-800" />
 
@@ -830,6 +853,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
+      )}
+
+      {tutorialAberto && (
+        <TutorialCarrossel onFechar={() => setTutorialAberto(false)} />
       )}
 
       <div className="pt-14">{children}</div>
