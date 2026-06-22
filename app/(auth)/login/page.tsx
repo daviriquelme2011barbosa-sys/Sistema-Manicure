@@ -304,14 +304,7 @@ export default function LoginPage() {
       <div className="login-center">
         <div className="w-full" style={{ maxWidth: '384px' }}>
           <div className="mb-8 text-center">
-            <span
-              className="login-emoji text-5xl login-anim-1"
-              role="img"
-              aria-label="unhas"
-            >
-              💅
-            </span>
-            <h1 className="mt-4 text-2xl font-bold text-white tracking-tight login-anim-2">
+            <h1 className="text-2xl font-bold text-white tracking-tight login-anim-1">
               Gestão de Clientes
             </h1>
             <p className="mt-2 text-sm login-anim-3" style={{ color: 'rgba(255,255,255,0.45)' }}>
