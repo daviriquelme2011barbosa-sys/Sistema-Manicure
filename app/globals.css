@@ -69,6 +69,27 @@ body {
     transform: none;
   }
 }
+@keyframes toast-lifecycle {
+  /* entrada: 0 → 0.3 s (0–10%) */
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  10% {
+    opacity: 1;
+    transform: none;
+  }
+  /* hold: 0.3 → 2.6 s (10–87%) */
+  87% {
+    opacity: 1;
+    transform: none;
+  }
+  /* saída: 2.6 → 3 s (87–100%) */
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
 @keyframes dot-pulse {
   0%,
   100% {
@@ -99,7 +120,7 @@ body {
   animation: drawer-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 .animar-toast {
-  animation: toast-in 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation: toast-lifecycle 3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
 }
 .animar-dot {
   animation: dot-pulse 1.8s ease-in-out infinite;
