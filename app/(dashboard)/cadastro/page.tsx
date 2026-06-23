@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { dataHoje, parsearPreco } from '@/lib/formatters'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
@@ -97,15 +98,23 @@ export default function CadastroPage() {
   const [erros, setErros] = useState<Record<string, string>>({})
   const { toast, mostrarToast } = useToast()
   const { definirAcaoVoltar } = useHeader()
+  const router = useRouter()
 
   useEffect(() => {
     async function inicializar() {
       const [configResult, clientesResult] = await Promise.all([
-        supabase.from('salao_config').select('id').single(),
+        supabase.from('salao_config').select('id, plano').single(),
         supabase.from('clientes').select('id, nome, whatsapp').order('nome'),
       ])
 
-      if (configResult.data) setSalaoId(configResult.data.id)
+      if (configResult.data) {
+        const plano = (configResult.data.plano as string | null) ?? 'basic'
+        if (plano === 'profissional' || plano === 'master') {
+          router.replace('/agenda')
+          return
+        }
+        setSalaoId(configResult.data.id)
+      }
       setTodasClientes((clientesResult.data ?? []) as ClienteBusca[])
       setCarregandoClientes(false)
     }

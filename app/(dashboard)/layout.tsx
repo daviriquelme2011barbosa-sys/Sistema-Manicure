@@ -496,9 +496,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <IconeAgenda />
                 </MenuItem>
               )}
-              <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'}>
-                <IconeMais />
-              </MenuItem>
+              {plano !== 'profissional' && plano !== 'master' && (
+                <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'}>
+                  <IconeMais />
+                </MenuItem>
+              )}
               <MenuItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'}>
                 <IconeCoracao />
               </MenuItem>
