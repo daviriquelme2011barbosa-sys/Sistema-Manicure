@@ -87,6 +87,12 @@ const SLIDES_BASE: Slide[] = [
   },
 ]
 
+const SLIDE_AGENDA: Slide = {
+  emoji: '🗓️',
+  titulo: 'Agenda',
+  texto: 'Configure seus horários (dias, entrada, saída, pausa e duração de serviço) e visualize agendamentos. O sistema gera um link único para suas clientes escolherem o horário — elas fazem login com e-mail e senha do cadastro, ou se cadastram antes de agendar. Cada agendamento tem dois botões: Compareceu (registra o atendimento) ou Faltou (aparece em Faltaram com atalho no WhatsApp para remarcar).',
+}
+
 const SLIDE_FALTARAM: Slide = {
   emoji: '😔',
   titulo: 'Faltaram',
@@ -96,9 +102,16 @@ const SLIDE_FALTARAM: Slide = {
 function computarSlides(plano: string): Slide[] {
   const ehPro = plano === 'profissional' || plano === 'master'
   if (!ehPro) return SLIDES_BASE
-  return SLIDES_BASE.map((slide) =>
-    slide.titulo === 'Registrar Atendimento' ? SLIDE_FALTARAM : slide
-  )
+
+  const resultado: Slide[] = []
+  for (const slide of SLIDES_BASE) {
+    if (slide.titulo === 'Registrar Atendimento') {
+      resultado.push(SLIDE_AGENDA, SLIDE_FALTARAM)
+    } else {
+      resultado.push(slide)
+    }
+  }
+  return resultado
 }
 
 interface Props {
