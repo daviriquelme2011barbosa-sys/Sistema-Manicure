@@ -821,7 +821,7 @@ export default function FormularioAgendamento({
                 )}
               </div>
               <h1 className="text-base font-semibold" style={{ color: corPrimaria }}>
-                Agendar horário {pronome}{nomeExibido} 😊
+                Agendar horário com {nomeExibido} 😊
               </h1>
             </div>
           </header>
