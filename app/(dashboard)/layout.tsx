@@ -28,6 +28,7 @@ import {
   IconeEscudo,
   IconeChevronBaixo,
   IconeLivro,
+  IconeAgenda,
 } from '@/components/icons'
 import { normalizarWhatsApp } from '@/lib/formatters'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
@@ -61,6 +62,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [whatsapp, setWhatsapp] = useState('')
   const [novoWhatsapp, setNovoWhatsapp] = useState('')
   const [salvandoWhatsapp, setSalvandoWhatsapp] = useState(false)
+  const [plano, setPlano] = useState<string>('basic')
+  const [badgeAgenda, setBadgeAgenda] = useState(0)
   const [copiado, setCopiado] = useState(false)
   const [linkFormulario, setLinkFormulario] = useState('')
   const [badgeChangelog, setBadgeChangelog] = useState(0)
@@ -97,6 +100,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     }
     if (pathname === '/cadastrados') {
       setBadgeCadastrados(0)
+    }
+    if (pathname === '/agenda') {
+      setBadgeAgenda(0)
     }
   }, [pathname])
 
@@ -140,7 +146,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       const { data: config } = await supabase
         .from('salao_config')
-        .select('id, nome_salao, foto_url, cor_primaria, genero, whatsapp')
+        .select('id, nome_salao, foto_url, cor_primaria, genero, whatsapp, plano')
         .single()
 
       if (config) {
@@ -158,6 +164,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         const whatsappInicial = (config.whatsapp as string | null) ?? ''
         setWhatsapp(whatsappInicial)
         setNovoWhatsapp(whatsappInicial)
+
+        const planoConfig = (config.plano as string | null) ?? 'basic'
+        setPlano(planoConfig)
 
         const agoraISO = new Date().toISOString()
         const ultimoChangelog = localStorage.getItem('ultimo_acesso_changelog')
@@ -201,6 +210,20 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         }
         if (pathname !== '/cadastrados') {
           setBadgeCadastrados(cPendentes ?? 0)
+        }
+
+        if (
+          (planoConfig === 'profissional' || planoConfig === 'master') &&
+          pathname !== '/agenda'
+        ) {
+          const hoje = new Date().toISOString().split('T')[0]
+          const { count: cAgenda } = await supabase
+            .from('agendamentos')
+            .select('*', { count: 'exact', head: true })
+            .eq('salao_id', salaoId)
+            .eq('status', 'pendente')
+            .gte('data', hoje)
+          setBadgeAgenda(cAgenda ?? 0)
         }
       }
 
@@ -468,6 +491,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <MenuItem href="/cadastrados" label="Cadastrados" ativo={pathname === '/cadastrados'} badge={badgeCadastrados}>
                 <IconePessoa />
               </MenuItem>
+              {(plano === 'profissional' || plano === 'master') && (
+                <MenuItem href="/agenda" label="Agenda" ativo={pathname === '/agenda'} badge={badgeAgenda}>
+                  <IconeAgenda />
+                </MenuItem>
+              )}
               <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'}>
                 <IconeMais />
               </MenuItem>
