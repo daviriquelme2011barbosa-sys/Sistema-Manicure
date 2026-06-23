@@ -142,7 +142,7 @@ Se já existe uma cliente com aquele **número de WhatsApp**, o sistema **atuali
 **Mecanismo:** o botão usa link `https://wa.me/<numero>?text=<mensagem>` para abrir a conversa direto no WhatsApp da dona, com o texto pré-escrito. A dona só revisa e aperta enviar.
 
 **Exemplo de mensagem template:**
-> Oi {nome}! 💅 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊
+> Oi {nome}! 😊 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊
 
 **Critérios de aceite:**
 - Clicar no botão abre o WhatsApp com o número certo e o texto preenchido com o nome da cliente.

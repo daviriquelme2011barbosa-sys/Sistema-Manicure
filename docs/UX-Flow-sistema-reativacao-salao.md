@@ -193,7 +193,7 @@ https://wa.me/<whatsapp>?text=<mensagem_codificada>
 
 **Template padrão da mensagem:**
 ```
-Oi {nome}! 💅 Senti sua falta aqui no salão.
+Oi {nome}! 😊 Senti sua falta aqui no salão.
 Faz um tempinho que você não aparece — bora marcar um horário
 pra deixar essas unhas em dia? 😊
 ```

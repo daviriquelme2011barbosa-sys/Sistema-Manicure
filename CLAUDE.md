@@ -124,7 +124,7 @@ sem atendimento   → sem_atendimento (não entra na tela de reativação)
 
 ```typescript
 const diasSemVir = // calcular conforme seção 6
-const mensagem = `Oi ${cliente.nome.split(' ')[0]}! 💅 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊`
+const mensagem = `Oi ${cliente.nome.split(' ')[0]}! 😊 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊`
 const link = `https://wa.me/55${cliente.whatsapp}?text=${encodeURIComponent(mensagem)}`
 ```
 

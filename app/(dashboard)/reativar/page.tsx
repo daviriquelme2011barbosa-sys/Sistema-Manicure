@@ -21,7 +21,7 @@ function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
 
 function montarLinkWhatsApp(cliente: ClienteReativar): string {
   const primeiroNome = cliente.nome.split(' ')[0]
-  const mensagem = `Oi ${primeiroNome}! 💅 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊`
+  const mensagem = `Oi ${primeiroNome}! 😊 Senti sua falta aqui no salão. Faz um tempinho que você não aparece — bora marcar um horário pra deixar essas unhas em dia? 😊`
   return linkWhatsApp(cliente.whatsapp, mensagem)
 }
 

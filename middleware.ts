@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   if (!request.cookies.get('sb-logged-in')) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
@@ -20,5 +20,9 @@ export const config = {
     '/movimentacao/:path*',
     '/changelog/:path*',
     '/configuracoes/:path*',
+    '/agenda/:path*',
+    // /agendar/:path* é rota pública — intencionalmente ausente
+    // /cadastro/[salaoId] é formulário público — intencionalmente ausente
+    // /onboarding é rota pública — intencionalmente ausente
   ],
 }

@@ -77,7 +77,7 @@ Checkbox obrigatório (acima do botão):
 - Card: `rounded-2xl bg-white px-6 py-8 shadow-lg`
 - Inputs: `h-12 rounded-xl border` com `focus:ring-2 focus:ring-pink-500`
 - Botão principal: `bg-pink-500 text-white h-12 rounded-xl`
-- Emoji 💅 + título "Criar sua conta" no topo
+- Emoji 😊 + título "Criar sua conta" no topo
 - Mobile-first, `max-w-sm` centralizado
 
 ---

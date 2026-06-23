@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { normalizarWhatsApp } from '@/lib/formatters'
+import { CampoSenha } from '@/components/CampoSenha'
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -35,6 +36,8 @@ export default function FormularioCadastroPublico({
   const [email, setEmail] = useState('')
   const [dataNascimento, setDataNascimento] = useState('')
   const [observacoes, setObservacoes] = useState('')
+  const [senha, setSenha] = useState('')
+  const [confirmarSenha, setConfirmarSenha] = useState('')
   const [autorizaContato, setAutorizaContato] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [sucesso, setSucesso] = useState(false)
@@ -75,6 +78,18 @@ export default function FormularioCadastroPublico({
       novosErros.email = 'Digite um e-mail válido (ex: nome@email.com)'
     }
 
+    if (!senha) {
+      novosErros.senha = 'Crie uma senha para acessar o agendamento online'
+    } else if (senha.length < 6) {
+      novosErros.senha = 'A senha deve ter pelo menos 6 caracteres'
+    }
+
+    if (!confirmarSenha) {
+      novosErros.confirmarSenha = 'Confirme sua senha'
+    } else if (senha && confirmarSenha !== senha) {
+      novosErros.confirmarSenha = 'As senhas não coincidem'
+    }
+
     return novosErros
   }
 
@@ -97,6 +112,7 @@ export default function FormularioCadastroPublico({
           nome: nome.trim(),
           whatsapp,
           email: email.trim() || null,
+          senha,
           dataNascimento: dataNascimento || null,
           observacoes: observacoes.trim() || null,
           autorizaContato,
@@ -125,6 +141,8 @@ export default function FormularioCadastroPublico({
       setNome('')
       setWhatsapp('')
       setEmail('')
+      setSenha('')
+      setConfirmarSenha('')
       setDataNascimento('')
       setObservacoes('')
       setAutorizaContato(false)
@@ -236,7 +254,7 @@ export default function FormularioCadastroPublico({
               )}
             </div>
             <h1 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-              Olá! Faça seu cadastro e entre para a lista de clientes {genero === 'feminino' ? 'da ' : genero === 'masculino' ? 'do ' : ''}{nomeManicure ?? nomeSalao} 💅
+              Olá! Faça seu cadastro e entre para a lista de clientes {genero === 'feminino' ? 'da ' : genero === 'masculino' ? 'do ' : ''}{nomeManicure ?? nomeSalao} 😊
             </h1>
           </div>
         </header>
@@ -368,8 +386,53 @@ export default function FormularioCadastroPublico({
               />
             </div>
 
+            {/* Senha */}
+            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '460ms' }}>
+              <label htmlFor="senha" className="text-sm font-medium text-zinc-700">
+                Senha <span aria-hidden="true" className="text-red-500">*</span>
+              </label>
+              <CampoSenha
+                id="senha"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                disabled={enviando}
+                placeholder="Mínimo 6 caracteres"
+                autoComplete="new-password"
+                erro={!!erros.senha}
+              />
+              <p className="text-sm text-zinc-400">
+                Você usará essa senha para agendar horários online
+              </p>
+              {erros.senha && (
+                <span role="alert" className="text-sm text-red-600">
+                  {erros.senha}
+                </span>
+              )}
+            </div>
+
+            {/* Confirmar senha */}
+            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '540ms' }}>
+              <label htmlFor="confirmar_senha" className="text-sm font-medium text-zinc-700">
+                Confirmar senha <span aria-hidden="true" className="text-red-500">*</span>
+              </label>
+              <CampoSenha
+                id="confirmar_senha"
+                value={confirmarSenha}
+                onChange={(e) => setConfirmarSenha(e.target.value)}
+                disabled={enviando}
+                placeholder="Repita a senha"
+                autoComplete="new-password"
+                erro={!!erros.confirmarSenha}
+              />
+              {erros.confirmarSenha && (
+                <span role="alert" className="text-sm text-red-600">
+                  {erros.confirmarSenha}
+                </span>
+              )}
+            </div>
+
             {/* Consentimento LGPD */}
-            <label className="campo-formulario flex cursor-pointer items-start gap-3" style={{ animationDelay: '460ms' }}>
+            <label className="campo-formulario flex cursor-pointer items-start gap-3" style={{ animationDelay: '620ms' }}>
               <input
                 type="checkbox"
                 checked={autorizaContato}
@@ -394,7 +457,7 @@ export default function FormularioCadastroPublico({
               type="submit"
               disabled={enviando || !autorizaContato}
               className="campo-formulario h-12 rounded-lg font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}`, animationDelay: '540ms' }}
+              style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}`, animationDelay: '700ms' }}
             >
               {enviando ? 'Enviando…' : 'Enviar'}
             </button>

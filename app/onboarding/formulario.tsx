@@ -322,7 +322,7 @@ export default function FormularioOnboarding({ token }: Props) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
-            <p className="text-5xl">💅</p>
+            <p className="text-5xl">😊</p>
             <h1 className="text-xl font-bold text-zinc-900">Criar sua conta</h1>
             <p className="mt-1 text-sm text-zinc-500">Preencha os dados para acessar o sistema</p>
           </div>

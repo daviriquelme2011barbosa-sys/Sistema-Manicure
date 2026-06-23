@@ -10,7 +10,7 @@ import type { Aniversariante } from '@/types'
 
 function montarLinkWhatsApp(cliente: Aniversariante): string {
   const primeiroNome = cliente.nome.split(' ')[0]
-  const mensagem = `Oi ${primeiroNome}! 🎂 Hoje é um dia especial — feliz aniversário! Que tal comemorar com as unhas em dia? Adoraria te ver aqui no salão! 💅😊`
+  const mensagem = `Oi ${primeiroNome}! 🎂 Hoje é um dia especial — feliz aniversário! Que tal comemorar com as unhas em dia? Adoraria te ver aqui no salão! 😊`
   return linkWhatsApp(cliente.whatsapp, mensagem)
 }
 
