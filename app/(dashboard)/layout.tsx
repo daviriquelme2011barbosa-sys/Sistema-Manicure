@@ -29,6 +29,7 @@ import {
   IconeChevronBaixo,
   IconeLivro,
   IconeAgenda,
+  IconeAusente,
 } from '@/components/icons'
 import { normalizarWhatsApp } from '@/lib/formatters'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
@@ -494,6 +495,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               {(plano === 'profissional' || plano === 'master') && (
                 <MenuItem href="/agenda" label="Agenda" ativo={pathname === '/agenda'} badge={badgeAgenda}>
                   <IconeAgenda />
+                </MenuItem>
+              )}
+              {(plano === 'profissional' || plano === 'master') && (
+                <MenuItem href="/faltaram" label="Faltaram" ativo={pathname === '/faltaram'}>
+                  <IconeAusente />
                 </MenuItem>
               )}
               {plano !== 'profissional' && plano !== 'master' && (
