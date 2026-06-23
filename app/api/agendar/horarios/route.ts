@@ -124,6 +124,7 @@ export async function GET(request: NextRequest) {
   const agendadosHorarios = (agendamentos ?? [])
     .map((a) => a.horario as string | null)
     .filter((h): h is string => typeof h === 'string')
+    .map((h) => h.slice(0, 5))
 
   const slots = gerarSlots(inicio, fim, duracao, intervalo, pausaInicio, pausaFim, agendadosHorarios)
 
