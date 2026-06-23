@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { IconeFechar } from '@/components/icons'
 
 interface Slide {
@@ -9,7 +9,7 @@ interface Slide {
   texto: string
 }
 
-const SLIDES: Slide[] = [
+const SLIDES_BASE: Slide[] = [
   {
     emoji: '🔐',
     titulo: 'Login',
@@ -87,31 +87,46 @@ const SLIDES: Slide[] = [
   },
 ]
 
-const TOTAL = SLIDES.length
+const SLIDE_FALTARAM: Slide = {
+  emoji: '😔',
+  titulo: 'Faltaram',
+  texto: 'Aqui ficam as clientes que tinham horário agendado mas não compareceram. Use o botão de WhatsApp para entrar em contato rapidamente e remarcar',
+}
+
+function computarSlides(plano: string): Slide[] {
+  const ehPro = plano === 'profissional' || plano === 'master'
+  if (!ehPro) return SLIDES_BASE
+  return SLIDES_BASE.map((slide) =>
+    slide.titulo === 'Registrar Atendimento' ? SLIDE_FALTARAM : slide
+  )
+}
 
 interface Props {
+  plano: string
   onFechar: () => void
 }
 
-export function TutorialCarrossel({ onFechar }: Props) {
+export function TutorialCarrossel({ plano, onFechar }: Props) {
+  const slides = useMemo(() => computarSlides(plano), [plano])
+  const total = slides.length
   const [indice, setIndice] = useState(0)
   const touchInicioX = useRef<number | null>(null)
   const touchInicioY = useRef<number | null>(null)
 
   const irPara = useCallback((novoIndice: number) => {
-    if (novoIndice < 0 || novoIndice >= TOTAL) return
+    if (novoIndice < 0 || novoIndice >= total) return
     setIndice(novoIndice)
-  }, [])
+  }, [total])
 
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if (e.key === 'Escape') onFechar()
-      else if (e.key === 'ArrowRight') setIndice((i) => Math.min(i + 1, TOTAL - 1))
+      else if (e.key === 'ArrowRight') setIndice((i) => Math.min(i + 1, total - 1))
       else if (e.key === 'ArrowLeft') setIndice((i) => Math.max(i - 1, 0))
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [onFechar])
+  }, [onFechar, total])
 
   function onTouchStart(e: React.TouchEvent) {
     touchInicioX.current = e.touches[0].clientX
@@ -129,8 +144,8 @@ export function TutorialCarrossel({ onFechar }: Props) {
     touchInicioY.current = null
   }
 
-  const progresso = ((indice + 1) / TOTAL) * 100
-  const ehUltimo = indice === TOTAL - 1
+  const progresso = ((indice + 1) / total) * 100
+  const ehUltimo = indice === total - 1
 
   return (
     <div
@@ -179,7 +194,7 @@ export function TutorialCarrossel({ onFechar }: Props) {
             TUTORIAL
           </span>
           <span className="tabular-nums text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            {indice + 1} de {TOTAL}
+            {indice + 1} de {total}
           </span>
         </div>
 
@@ -193,7 +208,7 @@ export function TutorialCarrossel({ onFechar }: Props) {
             className="carrossel-faixa flex"
             style={{ transform: `translateX(-${indice * 100}%)` }}
           >
-            {SLIDES.map((slide, i) => (
+            {slides.map((slide, i) => (
               <div
                 key={i}
                 className="min-w-full px-6 pb-2 pt-6"
@@ -239,7 +254,7 @@ export function TutorialCarrossel({ onFechar }: Props) {
 
           {/* Dots */}
           <div className="flex flex-1 flex-wrap items-center justify-center gap-1.5">
-            {SLIDES.map((_, i) => (
+            {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => irPara(i)}

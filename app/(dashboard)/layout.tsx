@@ -957,7 +957,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       {tutorialAberto && (
-        <TutorialCarrossel onFechar={() => setTutorialAberto(false)} />
+        <TutorialCarrossel plano={plano} onFechar={() => setTutorialAberto(false)} />
       )}
 
       <div className="pt-14">{children}</div>
