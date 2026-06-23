@@ -42,6 +42,11 @@ const SLIDES: Slide[] = [
   },
   {
     emoji: '✅',
+    titulo: 'Aprovação de clientes',
+    texto: "Quando uma cliente se cadastrar pelo seu formulário público, ela vai aparecer em 'Aguardando aprovação' na aba Cadastrados. Você decide: clique em Aprovar para confirmar que a conhece, ou em Não conheço para remover o cadastro permanentemente. Só clientes aprovadas aparecem no sistema.",
+  },
+  {
+    emoji: '✅',
     titulo: 'Registrar Atendimento',
     texto: 'Aqui você registra os atendimentos. Todos os clientes cadastrados aparecem aqui. Clique na cliente e preencha o formulário',
   },

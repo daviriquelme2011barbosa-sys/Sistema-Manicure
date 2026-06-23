@@ -22,6 +22,7 @@ export default function CadastrosPage() {
   const [busca, setBusca] = useState('')
   const [carregando, setCarregando] = useState(true)
   const [processando, setProcessando] = useState<Record<string, boolean>>({})
+  const [confirmarRemoverId, setConfirmarRemoverId] = useState<string | null>(null)
   const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
@@ -178,7 +179,7 @@ export default function CadastrosPage() {
                           {processando[cliente.id] ? '…' : '✅ Aprovar'}
                         </button>
                         <button
-                          onClick={() => remover(cliente.id)}
+                          onClick={() => setConfirmarRemoverId(cliente.id)}
                           disabled={processando[cliente.id]}
                           className="flex h-9 flex-1 items-center justify-center rounded-lg border border-red-200 bg-white text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/40 dark:bg-transparent dark:text-red-400 dark:hover:bg-red-950/30"
                         >
@@ -244,6 +245,47 @@ export default function CadastrosPage() {
           </>
         )}
       </main>
+
+      {confirmarRemoverId && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dialog-titulo"
+          className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-6 sm:items-center"
+          style={{ background: 'rgba(9,9,11,0.7)', backdropFilter: 'blur(4px)' }}
+        >
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+            <h2
+              id="dialog-titulo"
+              className="text-base font-semibold text-zinc-900 dark:text-zinc-100"
+            >
+              Tem certeza?
+            </h2>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              Esta ação é permanente e não pode ser desfeita. A cliente será removida do sistema.
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => setConfirmarRemoverId(null)}
+                className="flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  const id = confirmarRemoverId
+                  setConfirmarRemoverId(null)
+                  remover(id)
+                }}
+                disabled={processando[confirmarRemoverId]}
+                className="flex h-11 flex-1 items-center justify-center rounded-lg bg-red-600 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {processando[confirmarRemoverId] ? '…' : 'Sim, remover'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
