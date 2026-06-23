@@ -29,6 +29,7 @@ import {
   IconeChevronBaixo,
   IconeLivro,
 } from '@/components/icons'
+import { normalizarWhatsApp } from '@/lib/formatters'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
 import { TutorialCarrossel } from '@/components/TutorialCarrossel'
 import QRCode from 'qrcode'
@@ -57,6 +58,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [novoNomeSalao, setNovoNomeSalao] = useState('')
   const [idSalao, setIdSalao] = useState<string | null>(null)
   const [salvandoNome, setSalvandoNome] = useState(false)
+  const [whatsapp, setWhatsapp] = useState('')
+  const [novoWhatsapp, setNovoWhatsapp] = useState('')
+  const [salvandoWhatsapp, setSalvandoWhatsapp] = useState(false)
   const [copiado, setCopiado] = useState(false)
   const [linkFormulario, setLinkFormulario] = useState('')
   const [badgeChangelog, setBadgeChangelog] = useState(0)
@@ -136,7 +140,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       const { data: config } = await supabase
         .from('salao_config')
-        .select('id, nome_salao, foto_url, cor_primaria, genero')
+        .select('id, nome_salao, foto_url, cor_primaria, genero, whatsapp')
         .single()
 
       if (config) {
@@ -151,6 +155,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setCorSelecionada(corInicial)
         const generoInicial = (config.genero as 'feminino' | 'masculino' | 'nao_informar' | null) ?? 'nao_informar'
         setGenero(generoInicial)
+        const whatsappInicial = (config.whatsapp as string | null) ?? ''
+        setWhatsapp(whatsappInicial)
+        setNovoWhatsapp(whatsappInicial)
 
         const agoraISO = new Date().toISOString()
         const ultimoChangelog = localStorage.getItem('ultimo_acesso_changelog')
@@ -226,6 +233,23 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       mostrarToast('Nome do salão atualizado', 'sucesso')
     }
     setSalvandoNome(false)
+  }
+
+  async function salvarWhatsapp() {
+    const normalizado = normalizarWhatsApp(novoWhatsapp)
+    if (normalizado.length < 10 || normalizado === whatsapp || !idSalao) return
+    setSalvandoWhatsapp(true)
+    const { error } = await supabase
+      .from('salao_config')
+      .update({ whatsapp: normalizado })
+      .eq('id', idSalao)
+    if (error) {
+      mostrarToast('Não foi possível salvar. Tente novamente.', 'erro')
+    } else {
+      setWhatsapp(normalizado)
+      mostrarToast('WhatsApp atualizado', 'sucesso')
+    }
+    setSalvandoWhatsapp(false)
   }
 
   async function baixarQrCode() {
@@ -556,7 +580,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         >
           <div
             className="animar-overlay absolute inset-0 bg-black/40"
-            onClick={() => !salvandoNome && setPainelAberto(false)}
+            onClick={() => !salvandoNome && !salvandoWhatsapp && setPainelAberto(false)}
           />
 
           <div className="animar-sheet relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
@@ -567,8 +591,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 Configurações
               </h2>
               <button
-                onClick={() => !salvandoNome && setPainelAberto(false)}
-                disabled={salvandoNome}
+                onClick={() => !salvandoNome && !salvandoWhatsapp && setPainelAberto(false)}
+                disabled={salvandoNome || salvandoWhatsapp}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800"
                 aria-label="Fechar"
               >
@@ -616,6 +640,37 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     className="h-11 flex-shrink-0 rounded-lg bg-pink-500 px-4 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {salvandoNome ? '…' : 'Salvar'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="config-whatsapp"
+                  className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+                >
+                  WhatsApp do profissional
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="config-whatsapp"
+                    type="tel"
+                    value={novoWhatsapp}
+                    onChange={(e) => setNovoWhatsapp(e.target.value)}
+                    disabled={salvandoWhatsapp}
+                    placeholder="(11) 99999-9999"
+                    className="h-11 min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:disabled:bg-zinc-900/50"
+                  />
+                  <button
+                    onClick={salvarWhatsapp}
+                    disabled={
+                      salvandoWhatsapp ||
+                      normalizarWhatsApp(novoWhatsapp).length < 10 ||
+                      normalizarWhatsApp(novoWhatsapp) === whatsapp
+                    }
+                    className="h-11 flex-shrink-0 rounded-lg bg-pink-500 px-4 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {salvandoWhatsapp ? '…' : 'Salvar'}
                   </button>
                 </div>
               </div>

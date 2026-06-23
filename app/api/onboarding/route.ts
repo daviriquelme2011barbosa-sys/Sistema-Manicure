@@ -27,15 +27,20 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let token: string, nomeSalao: string, email: string, senha: string
+  let token: string, nomeSalao: string, email: string, senha: string, whatsapp: string
   try {
-    ;({ token, nomeSalao, email, senha } = await request.json())
+    ;({ token, nomeSalao, email, senha, whatsapp } = await request.json())
   } catch {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
   if (!token || !nomeSalao?.trim() || !email?.trim() || !senha) {
     return NextResponse.json({ erro: 'Preencha todos os campos.' }, { status: 400 })
+  }
+
+  const whatsappNormalizado = whatsapp?.replace(/\D/g, '') ?? ''
+  if (whatsappNormalizado.length < 10) {
+    return NextResponse.json({ erro: 'WhatsApp inválido.' }, { status: 400 })
   }
 
   const admin = criarClienteAdmin()
@@ -81,6 +86,7 @@ export async function POST(request: NextRequest) {
   const { error: erroConfig } = await admin.from('salao_config').insert({
     user_id: authData.user.id,
     nome_salao: nomeSalao.trim(),
+    whatsapp: whatsappNormalizado,
     cor_primaria: '#ec4899',
     plano: 'basic',
   })

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { CampoSenha } from '@/components/CampoSenha'
+import { normalizarWhatsApp } from '@/lib/formatters'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
@@ -24,6 +25,7 @@ export default function FormularioOnboarding({ token }: Props) {
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null)
 
   const [nomeSalao, setNomeSalao] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [confirmarSenha, setConfirmarSenha] = useState('')
@@ -55,6 +57,7 @@ export default function FormularioOnboarding({ token }: Props) {
   function validar(): Record<string, string> {
     const e: Record<string, string> = {}
     if (!nomeSalao.trim()) e.nomeSalao = 'Informe seu nome'
+    if (normalizarWhatsApp(whatsapp).length < 10) e.whatsapp = 'WhatsApp inválido — mínimo 10 dígitos'
     if (!email.trim()) e.email = 'Informe o e-mail'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = 'E-mail inválido'
     if (!senha) e.senha = 'Crie uma senha'
@@ -78,7 +81,7 @@ export default function FormularioOnboarding({ token }: Props) {
       const resposta = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, nomeSalao, email, senha }),
+        body: JSON.stringify({ token, nomeSalao, whatsapp: normalizarWhatsApp(whatsapp), email, senha }),
       })
 
       const dados = await resposta.json()
@@ -346,6 +349,27 @@ export default function FormularioOnboarding({ token }: Props) {
                 />
                 {erros.nomeSalao && (
                   <span role="alert" className="text-sm text-red-600">{erros.nomeSalao}</span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
+                  WhatsApp
+                </label>
+                <input
+                  id="whatsapp"
+                  type="tel"
+                  autoComplete="tel"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  disabled={salvando}
+                  placeholder="(11) 99999-9999"
+                  className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
+                    erros.whatsapp ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
+                  }`}
+                />
+                {erros.whatsapp && (
+                  <span role="alert" className="text-sm text-red-600">{erros.whatsapp}</span>
                 )}
               </div>
 
