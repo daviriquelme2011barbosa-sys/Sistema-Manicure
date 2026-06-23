@@ -119,6 +119,7 @@ export async function POST(request: NextRequest) {
     autoriza_contato: true,
     origem: 'formulario',
     salao_id: salaoId,
+    status_cadastro: 'pendente',
   })
 
   if (erroCliente) {

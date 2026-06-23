@@ -75,6 +75,7 @@ export default function MovimentacaoPage() {
           .select('id, nome, criado_em')
           .eq('salao_id', salaoId)
           .eq('origem', 'formulario')
+          .eq('status_cadastro', 'aprovado')
           .gte('criado_em', cutoff),
         supabase
           .from('atendimentos')

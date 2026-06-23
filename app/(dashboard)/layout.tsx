@@ -61,6 +61,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [linkFormulario, setLinkFormulario] = useState('')
   const [badgeChangelog, setBadgeChangelog] = useState(0)
   const [badgeMovimentacao, setBadgeMovimentacao] = useState(0)
+  const [badgeCadastrados, setBadgeCadastrados] = useState(0)
   const [fotoUrl, setFotoUrl] = useState('')
   const [corPrimaria, setCorPrimaria] = useState('#ec4899')
   const [corSelecionada, setCorSelecionada] = useState('#ec4899')
@@ -89,6 +90,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     if (pathname === '/movimentacao') {
       localStorage.setItem('ultimo_acesso_movimentacao', agora)
       setBadgeMovimentacao(0)
+    }
+    if (pathname === '/cadastrados') {
+      setBadgeCadastrados(0)
     }
   }, [pathname])
 
@@ -165,14 +169,17 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           { count: cCadastros },
           { count: cAtendimentos },
           { count: cReativacoes },
+          { count: cPendentes },
         ] = await Promise.all([
           changelogQuery,
           supabase.from('clientes').select('*', { count: 'exact', head: true })
-            .eq('salao_id', salaoId).eq('origem', 'formulario').gt('criado_em', corteMovimentacao),
+            .eq('salao_id', salaoId).eq('origem', 'formulario').eq('status_cadastro', 'aprovado').gt('criado_em', corteMovimentacao),
           supabase.from('atendimentos').select('*', { count: 'exact', head: true })
             .eq('salao_id', salaoId).gt('criado_em', corteMovimentacao),
           supabase.from('reativacoes').select('*', { count: 'exact', head: true })
             .eq('salao_id', salaoId).gt('criado_em', corteMovimentacao),
+          supabase.from('clientes').select('*', { count: 'exact', head: true })
+            .eq('salao_id', salaoId).eq('origem', 'formulario').eq('status_cadastro', 'pendente'),
         ])
 
         if (pathname !== '/changelog') {
@@ -184,6 +191,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           setBadgeMovimentacao((cCadastros ?? 0) + (cAtendimentos ?? 0) + (cReativacoes ?? 0))
         } else {
           localStorage.setItem('ultimo_acesso_movimentacao', agoraISO)
+        }
+        if (pathname !== '/cadastrados') {
+          setBadgeCadastrados(cPendentes ?? 0)
         }
       }
 
@@ -431,7 +441,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
                 <IconeLista />
               </MenuItem>
-              <MenuItem href="/cadastrados" label="Cadastrados" ativo={pathname === '/cadastrados'}>
+              <MenuItem href="/cadastrados" label="Cadastrados" ativo={pathname === '/cadastrados'} badge={badgeCadastrados}>
                 <IconePessoa />
               </MenuItem>
               <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'}>

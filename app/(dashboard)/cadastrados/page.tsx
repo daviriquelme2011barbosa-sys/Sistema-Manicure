@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { formatarData, formatarWhatsApp, normalizarWhatsApp } from '@/lib/formatters'
+import { useToast } from '@/hooks/useToast'
+import { ToastView } from '@/components/Toast'
 
 type ClienteCadastrado = {
   id: string
@@ -12,18 +14,21 @@ type ClienteCadastrado = {
   data_nascimento: string | null
   observacoes: string | null
   autoriza_contato: boolean
+  status_cadastro: 'pendente' | 'aprovado'
 }
 
 export default function CadastrosPage() {
   const [clientes, setClientes] = useState<ClienteCadastrado[]>([])
   const [busca, setBusca] = useState('')
   const [carregando, setCarregando] = useState(true)
+  const [processando, setProcessando] = useState<Record<string, boolean>>({})
+  const { toast, mostrarToast } = useToast()
 
   useEffect(() => {
     async function buscar() {
       const { data } = await supabase
         .from('clientes')
-        .select('id, nome, whatsapp, email, data_nascimento, observacoes, autoriza_contato')
+        .select('id, nome, whatsapp, email, data_nascimento, observacoes, autoriza_contato, status_cadastro')
         .eq('origem', 'formulario')
         .order('nome')
 
@@ -33,18 +38,62 @@ export default function CadastrosPage() {
     buscar()
   }, [])
 
-  const clientesFiltrados = busca.trim()
-    ? clientes.filter((c) => {
-        const termo = busca.trim().toLowerCase()
-        return (
-          c.nome.toLowerCase().includes(termo) ||
-          normalizarWhatsApp(c.whatsapp).includes(normalizarWhatsApp(termo))
+  async function aprovar(id: string) {
+    setProcessando((prev) => ({ ...prev, [id]: true }))
+    const { error } = await supabase
+      .from('clientes')
+      .update({ status_cadastro: 'aprovado' })
+      .eq('id', id)
+
+    if (error) {
+      mostrarToast('Não foi possível aprovar. Tente novamente.', 'erro')
+      setProcessando((prev) => ({ ...prev, [id]: false }))
+      return
+    }
+
+    setClientes((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, status_cadastro: 'aprovado' as const } : c))
+    )
+    mostrarToast('Cliente aprovada', 'sucesso')
+    setProcessando((prev) => ({ ...prev, [id]: false }))
+  }
+
+  async function remover(id: string) {
+    setProcessando((prev) => ({ ...prev, [id]: true }))
+    const { error } = await supabase
+      .from('clientes')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      mostrarToast('Não foi possível remover. Tente novamente.', 'erro')
+      setProcessando((prev) => ({ ...prev, [id]: false }))
+      return
+    }
+
+    setClientes((prev) => prev.filter((c) => c.id !== id))
+    mostrarToast('Cliente removida', 'sucesso')
+    setProcessando((prev) => ({ ...prev, [id]: false }))
+  }
+
+  const termo = busca.trim().toLowerCase()
+  const filtrar = (lista: ClienteCadastrado[]) =>
+    termo
+      ? lista.filter(
+          (c) =>
+            c.nome.toLowerCase().includes(termo) ||
+            normalizarWhatsApp(c.whatsapp).includes(normalizarWhatsApp(termo))
         )
-      })
-    : clientes
+      : lista
+
+  const pendentes = filtrar(clientes.filter((c) => c.status_cadastro === 'pendente'))
+  const aprovadas = filtrar(clientes.filter((c) => c.status_cadastro === 'aprovado'))
+  const totalAprovadas = clientes.filter((c) => c.status_cadastro === 'aprovado').length
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 pb-24 dark:bg-zinc-950">
+      <ToastView toast={toast} />
+
       <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
         <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Cadastrados</h1>
         <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
@@ -66,13 +115,10 @@ export default function CadastrosPage() {
         {carregando ? (
           <div className="flex flex-col gap-3">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="shimmer h-28 rounded-xl bg-zinc-200 dark:bg-zinc-800"
-              />
+              <div key={i} className="shimmer h-28 rounded-xl bg-zinc-200 dark:bg-zinc-800" />
             ))}
           </div>
-        ) : clientesFiltrados.length === 0 ? (
+        ) : pendentes.length === 0 && aprovadas.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center">
             <p className="text-4xl">🎉</p>
             <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
@@ -82,46 +128,120 @@ export default function CadastrosPage() {
             </p>
           </div>
         ) : (
-          <ul className="flex flex-col gap-3">
-            {clientesFiltrados.map((cliente) => (
-              <li
-                key={cliente.id}
-                className="rounded-xl border border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <p className="font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
-
-                <div className="mt-2 flex flex-col gap-1">
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    📱 {formatarWhatsApp(cliente.whatsapp)}
-                  </p>
-
-                  {cliente.email && (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      ✉️ {cliente.email}
-                    </p>
-                  )}
-
-                  {cliente.data_nascimento && (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      🎂 {formatarData(cliente.data_nascimento)}
-                    </p>
-                  )}
-
-                  {cliente.observacoes && (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      📝 {cliente.observacoes}
-                    </p>
-                  )}
-
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {cliente.autoriza_contato
-                      ? '✅ Autoriza contato via WhatsApp'
-                      : '❌ Não autoriza contato via WhatsApp'}
-                  </p>
+          <>
+            {pendentes.length > 0 && (
+              <section className="mb-6">
+                <div className="mb-3 flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    Aguardando aprovação
+                  </h2>
+                  <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-amber-400 px-1.5 text-[10px] font-bold text-white">
+                    {pendentes.length}
+                  </span>
                 </div>
-              </li>
-            ))}
-          </ul>
+
+                <ul className="flex flex-col gap-3">
+                  {pendentes.map((cliente) => (
+                    <li
+                      key={cliente.id}
+                      className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-900/30 dark:bg-amber-950/20"
+                    >
+                      <p className="font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+
+                      <div className="mt-2 flex flex-col gap-1">
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          📱 {formatarWhatsApp(cliente.whatsapp)}
+                        </p>
+                        {cliente.email && (
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            ✉️ {cliente.email}
+                          </p>
+                        )}
+                        {cliente.data_nascimento && (
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            🎂 {formatarData(cliente.data_nascimento)}
+                          </p>
+                        )}
+                        {cliente.observacoes && (
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            📝 {cliente.observacoes}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => aprovar(cliente.id)}
+                          disabled={processando[cliente.id]}
+                          className="flex h-9 flex-1 items-center justify-center rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {processando[cliente.id] ? '…' : '✅ Aprovar'}
+                        </button>
+                        <button
+                          onClick={() => remover(cliente.id)}
+                          disabled={processando[cliente.id]}
+                          className="flex h-9 flex-1 items-center justify-center rounded-lg border border-red-200 bg-white text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/40 dark:bg-transparent dark:text-red-400 dark:hover:bg-red-950/30"
+                        >
+                          {processando[cliente.id] ? '…' : '❌ Não conheço'}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {totalAprovadas > 0 && (
+              <section>
+                <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  Cadastradas
+                </h2>
+
+                {aprovadas.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-zinc-400 dark:text-zinc-500">
+                    Nenhuma cliente encontrada com essa busca.
+                  </p>
+                ) : (
+                  <ul className="flex flex-col gap-3">
+                    {aprovadas.map((cliente) => (
+                      <li
+                        key={cliente.id}
+                        className="rounded-xl border border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900"
+                      >
+                        <p className="font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+
+                        <div className="mt-2 flex flex-col gap-1">
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            📱 {formatarWhatsApp(cliente.whatsapp)}
+                          </p>
+                          {cliente.email && (
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              ✉️ {cliente.email}
+                            </p>
+                          )}
+                          {cliente.data_nascimento && (
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              🎂 {formatarData(cliente.data_nascimento)}
+                            </p>
+                          )}
+                          {cliente.observacoes && (
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              📝 {cliente.observacoes}
+                            </p>
+                          )}
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            {cliente.autoriza_contato
+                              ? '✅ Autoriza contato via WhatsApp'
+                              : '❌ Não autoriza contato via WhatsApp'}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+          </>
         )}
       </main>
     </div>
