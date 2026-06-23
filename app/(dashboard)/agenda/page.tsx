@@ -88,6 +88,11 @@ function formatarDataBR(data: string): string {
   return `${dia}/${mes}/${ano}`
 }
 
+function formatarPreco(digits: string): string {
+  const centavos = parseInt(digits || '0', 10)
+  return (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
 export default function AgendaPage() {
   const [idSalao, setIdSalao] = useState<string | null>(null)
   const [plano, setPlano] = useState<string>('basic')
@@ -103,6 +108,8 @@ export default function AgendaPage() {
 
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([])
   const [processando, setProcessando] = useState<Record<string, boolean>>({})
+  const [modalCompareceu, setModalCompareceu] = useState<Agendamento | null>(null)
+  const [precoInput, setPrecoInput] = useState('')
 
   const { toast, mostrarToast } = useToast()
 
@@ -198,7 +205,7 @@ export default function AgendaPage() {
     setSalvandoConfig(false)
   }
 
-  async function marcarCompareceu(ag: Agendamento) {
+  async function marcarCompareceu(ag: Agendamento, preco: number | null) {
     if (!idSalao) return
     setProcessando((prev) => ({ ...prev, [ag.id]: true }))
 
@@ -213,7 +220,7 @@ export default function AgendaPage() {
         servico: ag.servico ?? '',
         data_atendimento: ag.data,
         horario: ag.horario,
-        preco: null,
+        preco,
       }),
     ])
 
@@ -568,7 +575,7 @@ export default function AgendaPage() {
                           </div>
                           <div className="mt-3 flex gap-2">
                             <button
-                              onClick={() => marcarCompareceu(ag)}
+                              onClick={() => { setModalCompareceu(ag); setPrecoInput('') }}
                               disabled={processando[ag.id]}
                               className="flex h-9 flex-1 items-center justify-center rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
                             >
@@ -634,6 +641,63 @@ export default function AgendaPage() {
           </div>
         )}
       </main>
+
+      {modalCompareceu && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:px-4 sm:pb-4"
+          onClick={() => setModalCompareceu(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-t-2xl bg-white p-6 dark:bg-zinc-900 sm:rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              Registrar atendimento
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              {modalCompareceu.clientes?.nome ?? '—'}
+            </p>
+            <div className="mt-4 flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Valor do serviço (opcional)
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoFocus
+                value={precoInput ? formatarPreco(precoInput) : ''}
+                placeholder="R$ 0,00"
+                onChange={(e) => setPrecoInput(e.target.value.replace(/\D/g, ''))}
+                className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+              />
+            </div>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => {
+                  const ag = modalCompareceu
+                  setModalCompareceu(null)
+                  marcarCompareceu(ag, null)
+                }}
+                className="flex h-11 flex-1 items-center justify-center rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                Pular
+              </button>
+              <button
+                onClick={() => {
+                  const ag = modalCompareceu
+                  const preco = precoInput ? parseInt(precoInput, 10) / 100 : null
+                  setModalCompareceu(null)
+                  setPrecoInput('')
+                  marcarCompareceu(ag, preco)
+                }}
+                className="flex h-11 flex-1 items-center justify-center rounded-xl bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
