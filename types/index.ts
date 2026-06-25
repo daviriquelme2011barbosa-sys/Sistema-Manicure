@@ -75,6 +75,7 @@ export type AtendimentoHistorico = {
   servico: string
   preco: number | null
   horario: string | null
+  forma_pagamento: string | null
   clientes: {
     nome: string
     whatsapp: string

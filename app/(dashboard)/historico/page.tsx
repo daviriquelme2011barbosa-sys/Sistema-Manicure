@@ -6,6 +6,13 @@ import { SkeletonLista } from '@/components/SkeletonLista'
 import { formatarData, formatarPreco } from '@/lib/formatters'
 import type { AtendimentoHistorico } from '@/types'
 
+const FORMA_PAGAMENTO_LABEL: Record<string, string> = {
+  pix: 'Pix',
+  dinheiro: 'Dinheiro',
+  debito: 'Cartão de débito',
+  credito: 'Cartão de crédito',
+}
+
 const MESES = [
   'Janeiro',
   'Fevereiro',
@@ -59,7 +66,7 @@ export default function HistoricoPage() {
 
       const { data, error } = await supabase
         .from('atendimentos')
-        .select('id, data_atendimento, servico, preco, horario, clientes(nome, whatsapp)')
+        .select('id, data_atendimento, servico, preco, horario, forma_pagamento, clientes(nome, whatsapp)')
         .gte('data_atendimento', inicio)
         .lt('data_atendimento', proximoMes)
         .order('data_atendimento', { ascending: false })
@@ -157,6 +164,11 @@ export default function HistoricoPage() {
                     {atendimento.preco !== null && (
                       <p className="mt-0.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                         {formatarPreco(atendimento.preco)}
+                      </p>
+                    )}
+                    {atendimento.forma_pagamento && (
+                      <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+                        {FORMA_PAGAMENTO_LABEL[atendimento.forma_pagamento] ?? atendimento.forma_pagamento}
                       </p>
                     )}
                   </div>
