@@ -154,6 +154,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         .select('id, nome_salao, foto_url, cor_primaria, genero, whatsapp, plano, primeira_vez')
         .single()
 
+      if (!config) {
+        // Usuário autenticado sem salão — provavelmente cliente com conta Auth de salão pro/master.
+        await supabase.auth.signOut()
+        document.cookie = 'sb-logged-in=; path=/; Max-Age=0'
+        router.replace('/login')
+        return
+      }
+
       if (config) {
         setNomeSalao(config.nome_salao)
         setNovoNomeSalao(config.nome_salao)

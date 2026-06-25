@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { normalizarWhatsApp } from '@/lib/formatters'
 
@@ -67,6 +68,8 @@ export default function FormularioAgendamento({
   genero,
   whatsappManicure,
 }: Props) {
+  const router = useRouter()
+
   const [supabaseLocal] = useState(() =>
     createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
@@ -136,7 +139,12 @@ export default function FormularioAgendamento({
         return
       }
 
-      if (resultado.status === 'aprovado') {
+      if (resultado.status === 'is_owner') {
+        // Manicure tentou acessar o agendamento — redireciona para o dashboard
+        await supabaseLocal.auth.signOut()
+        router.replace('/')
+        return
+      } else if (resultado.status === 'aprovado') {
         setCliente({ id: resultado.clienteId, nome: resultado.clienteNome })
         setDiasAtivos(new Set<number>(resultado.diasAtivos as number[]))
         setEtapa('calendario')

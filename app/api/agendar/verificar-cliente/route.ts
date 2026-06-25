@@ -52,6 +52,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Sessão inválida.' }, { status: 401 })
   }
 
+  // Bloqueia manicures: dono de salão não deve acessar a página de agendamento
+  const { data: salaoOwner } = await admin
+    .from('salao_config')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (salaoOwner) {
+    return NextResponse.json({ status: 'is_owner' })
+  }
+
   const { data: cliente, error: erroCliente } = await admin
     .from('clientes')
     .select('id, nome, status_cadastro')

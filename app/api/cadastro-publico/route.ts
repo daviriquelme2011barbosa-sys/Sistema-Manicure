@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, email, dataNascimento, observacoes, autorizaContato } = body
+  const { salaoId, nome, whatsapp, email, dataNascimento, observacoes, autorizaContato, senha } = body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
@@ -63,12 +63,23 @@ export async function POST(request: NextRequest) {
 
   const { data: salao, error: erroSalao } = await supabase
     .from('salao_config')
-    .select('id')
+    .select('id, plano')
     .eq('id', salaoId)
     .maybeSingle()
 
   if (erroSalao || !salao) {
     return NextResponse.json({ erro: 'Salão não encontrado.' }, { status: 404 })
+  }
+
+  const ehPro = salao.plano === 'profissional' || salao.plano === 'master'
+
+  if (ehPro) {
+    if (typeof senha !== 'string' || senha.length < 8) {
+      return NextResponse.json(
+        { erro: 'A senha deve ter pelo menos 8 caracteres.', campo: 'senha' },
+        { status: 400 },
+      )
+    }
   }
 
   const { data: clienteExistente, error: erroConsulta } = await supabase
@@ -107,9 +118,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Clientes NÃO criam conta no Supabase Auth — são apenas registros na tabela clientes.
-  // Nunca adicionar createUser/signUp aqui.
-  const { error: erroCliente } = await supabase.from('clientes').insert({
+  const dadosCliente = {
     nome: nome.trim(),
     whatsapp: whatsappNormalizado,
     email: (email as string).trim(),
@@ -122,13 +131,46 @@ export async function POST(request: NextRequest) {
     origem: 'formulario',
     salao_id: salaoId,
     status_cadastro: 'pendente',
-  })
+  }
 
-  if (erroCliente) {
-    return NextResponse.json(
-      { erro: 'Erro interno. Tente novamente.' },
-      { status: 500 },
-    )
+  if (ehPro) {
+    // Planos Profissional e Master: cria conta Auth para a cliente acessar o agendamento.
+    // Auth criado antes do insert para evitar registro sem acesso ao agendamento.
+    const { error: erroAuth } = await supabase.auth.admin.createUser({
+      email: (email as string).trim(),
+      password: senha as string,
+      email_confirm: true,
+    })
+
+    // Ignora "email já cadastrado" — a cliente pode ter conta de outro salão
+    const emailJaExiste =
+      erroAuth?.message?.toLowerCase().includes('already') ||
+      erroAuth?.code === 'email_exists'
+
+    if (erroAuth && !emailJaExiste) {
+      return NextResponse.json(
+        { erro: 'Erro ao criar conta de acesso. Tente novamente.' },
+        { status: 500 },
+      )
+    }
+
+    const { error: erroCliente } = await supabase.from('clientes').insert(dadosCliente)
+    if (erroCliente) {
+      return NextResponse.json(
+        { erro: 'Erro interno. Tente novamente.' },
+        { status: 500 },
+      )
+    }
+  } else {
+    // Plano Basic: clientes NÃO criam conta no Supabase Auth.
+    // Nunca adicionar createUser/signUp aqui para o plano basic.
+    const { error: erroCliente } = await supabase.from('clientes').insert(dadosCliente)
+    if (erroCliente) {
+      return NextResponse.json(
+        { erro: 'Erro interno. Tente novamente.' },
+        { status: 500 },
+      )
+    }
   }
 
   return NextResponse.json({ sucesso: true })
