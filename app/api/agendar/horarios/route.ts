@@ -32,6 +32,24 @@ function toHorario(min: number): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
+function agoraSaoPaulo(): { dataISO: string; minutosAtual: number } {
+  const agora = new Date()
+  const dataISO = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(agora)
+  const timeStr = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(agora)
+  const [h, m] = timeStr.split(':').map(Number)
+  return { dataISO, minutosAtual: h * 60 + m }
+}
+
 function gerarSlots(
   inicio: string,
   fim: string,
@@ -128,5 +146,11 @@ export async function GET(request: NextRequest) {
 
   const slots = gerarSlots(inicio, fim, duracao, intervalo, pausaInicio, pausaFim, agendadosHorarios)
 
-  return NextResponse.json({ horarios: slots })
+  // Se a data pedida é hoje (São Paulo), ocultar horários que já passaram
+  const { dataISO: hoje, minutosAtual } = agoraSaoPaulo()
+  const slotsFinais = data === hoje
+    ? slots.filter((h) => toMin(h) > minutosAtual)
+    : slots
+
+  return NextResponse.json({ horarios: slotsFinais })
 }
