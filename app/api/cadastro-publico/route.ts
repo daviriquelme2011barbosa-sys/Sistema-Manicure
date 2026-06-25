@@ -135,23 +135,32 @@ export async function POST(request: NextRequest) {
 
   if (ehPro) {
     // Planos Profissional e Master: cria conta Auth para a cliente acessar o agendamento.
-    // Auth criado antes do insert para evitar registro sem acesso ao agendamento.
-    const { error: erroAuth } = await supabase.auth.admin.createUser({
-      email: (email as string).trim(),
+    // signUp (não admin.createUser) define a senha corretamente para login via e-mail+senha.
+    const emailTrimmed = (email as string).trim()
+    const { data: authData, error: erroAuth } = await supabase.auth.signUp({
+      email: emailTrimmed,
       password: senha as string,
-      email_confirm: true,
     })
 
-    // Ignora "email já cadastrado" — a cliente pode ter conta de outro salão
-    const emailJaExiste =
-      erroAuth?.message?.toLowerCase().includes('already') ||
-      erroAuth?.code === 'email_exists'
+    if (erroAuth) {
+      // Ignora "email já cadastrado" — a cliente pode ter conta de outro salão
+      const emailJaExiste =
+        erroAuth.message?.toLowerCase().includes('already') ||
+        erroAuth.code === 'email_exists'
 
-    if (erroAuth && !emailJaExiste) {
-      return NextResponse.json(
-        { erro: 'Erro ao criar conta de acesso. Tente novamente.' },
-        { status: 500 },
-      )
+      if (!emailJaExiste) {
+        return NextResponse.json(
+          { erro: 'Erro ao criar conta de acesso. Tente novamente.' },
+          { status: 500 },
+        )
+      }
+    }
+
+    // Nova conta criada (identities preenchidas): confirma e-mail para login imediato sem verificação
+    if (authData?.user && (authData.user.identities?.length ?? 0) > 0) {
+      await supabase.auth.admin.updateUserById(authData.user.id, {
+        email_confirm: true,
+      })
     }
 
     const { error: erroCliente } = await supabase.from('clientes').insert(dadosCliente)

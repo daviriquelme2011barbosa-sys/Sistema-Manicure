@@ -110,6 +110,7 @@ export default function AgendaPage() {
   const [processando, setProcessando] = useState<Record<string, boolean>>({})
   const [modalCompareceu, setModalCompareceu] = useState<Agendamento | null>(null)
   const [precoInput, setPrecoInput] = useState('')
+  const [formaPagamentoModal, setFormaPagamentoModal] = useState('')
 
   const { toast, mostrarToast } = useToast()
 
@@ -205,7 +206,7 @@ export default function AgendaPage() {
     setSalvandoConfig(false)
   }
 
-  async function marcarCompareceu(ag: Agendamento, preco: number | null) {
+  async function marcarCompareceu(ag: Agendamento, preco: number | null, formaPagamento: string | null) {
     if (!idSalao) return
     setProcessando((prev) => ({ ...prev, [ag.id]: true }))
 
@@ -221,6 +222,7 @@ export default function AgendaPage() {
         data_atendimento: ag.data,
         horario: ag.horario,
         preco,
+        forma_pagamento: formaPagamento,
       }),
     ])
 
@@ -578,7 +580,7 @@ export default function AgendaPage() {
                           </div>
                           <div className="mt-3 flex gap-2">
                             <button
-                              onClick={() => { setModalCompareceu(ag); setPrecoInput('') }}
+                              onClick={() => { setModalCompareceu(ag); setPrecoInput(''); setFormaPagamentoModal('') }}
                               disabled={processando[ag.id]}
                               className="flex h-9 flex-1 items-center justify-center rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
                             >
@@ -660,26 +662,44 @@ export default function AgendaPage() {
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               {modalCompareceu.clientes?.nome ?? '—'}
             </p>
-            <div className="mt-4 flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                Valor do serviço (opcional)
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                autoFocus
-                value={precoInput ? formatarPreco(precoInput) : ''}
-                placeholder="R$ 0,00"
-                onChange={(e) => setPrecoInput(e.target.value.replace(/\D/g, ''))}
-                className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-              />
+            <div className="mt-4 flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  Valor do serviço (opcional)
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoFocus
+                  value={precoInput ? formatarPreco(precoInput) : ''}
+                  placeholder="R$ 0,00"
+                  onChange={(e) => setPrecoInput(e.target.value.replace(/\D/g, ''))}
+                  className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  Forma de pagamento (opcional)
+                </label>
+                <select
+                  value={formaPagamentoModal}
+                  onChange={(e) => setFormaPagamentoModal(e.target.value)}
+                  className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                >
+                  <option value="">Selecionar…</option>
+                  <option value="pix">Pix</option>
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="debito">Cartão de débito</option>
+                  <option value="credito">Cartão de crédito</option>
+                </select>
+              </div>
             </div>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={() => {
                   const ag = modalCompareceu
                   setModalCompareceu(null)
-                  marcarCompareceu(ag, null)
+                  marcarCompareceu(ag, null, null)
                 }}
                 className="flex h-11 flex-1 items-center justify-center rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               >
@@ -689,9 +709,11 @@ export default function AgendaPage() {
                 onClick={() => {
                   const ag = modalCompareceu
                   const preco = precoInput ? parseInt(precoInput, 10) / 100 : null
+                  const fp = formaPagamentoModal || null
                   setModalCompareceu(null)
                   setPrecoInput('')
-                  marcarCompareceu(ag, preco)
+                  setFormaPagamentoModal('')
+                  marcarCompareceu(ag, preco, fp)
                 }}
                 className="flex h-11 flex-1 items-center justify-center rounded-xl bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600"
               >

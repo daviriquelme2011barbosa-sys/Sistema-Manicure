@@ -94,6 +94,7 @@ export default function CadastroPage() {
   const [dataAtendimento, setDataAtendimento] = useState(dataHoje)
   const [horario, setHorario] = useState('')
   const [preco, setPreco] = useState('')
+  const [formaPagamento, setFormaPagamento] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [erros, setErros] = useState<Record<string, string>>({})
   const { toast, mostrarToast } = useToast()
@@ -128,6 +129,7 @@ export default function CadastroPage() {
     setDataAtendimento(dataHoje)
     setHorario('')
     setPreco('')
+    setFormaPagamento('')
     setErros({})
   }, [])
 
@@ -161,6 +163,7 @@ export default function CadastroPage() {
       data_atendimento: dataAtendimento,
       horario: horario || null,
       preco: precoNum,
+      forma_pagamento: formaPagamento || null,
       salao_id: salaoId,
     })
 
@@ -320,6 +323,30 @@ export default function CadastroPage() {
                     {erros.preco}
                   </span>
                 )}
+              </div>
+
+              {/* Forma de pagamento */}
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="formaPagamento"
+                  className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Forma de pagamento
+                  <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+                </label>
+                <select
+                  id="formaPagamento"
+                  value={formaPagamento}
+                  onChange={(e) => setFormaPagamento(e.target.value)}
+                  disabled={salvando}
+                  className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                >
+                  <option value="">Selecionar…</option>
+                  <option value="pix">Pix</option>
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="debito">Cartão de débito</option>
+                  <option value="credito">Cartão de crédito</option>
+                </select>
               </div>
 
               <button
