@@ -120,14 +120,24 @@ export default function CadastrosPage() {
             ))}
           </div>
         ) : pendentes.length === 0 && aprovadas.length === 0 ? (
-          <div className="flex flex-col items-center py-16 text-center">
-            <p className="text-4xl">🎉</p>
-            <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-              {busca.trim()
-                ? 'Nenhuma cliente encontrada com essa busca.'
-                : 'Nenhuma cliente cadastrada pelo formulário ainda.'}
-            </p>
-          </div>
+          busca.trim() ? (
+            <div className="flex flex-col items-center py-16 text-center">
+              <p className="text-4xl">🔍</p>
+              <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                Nenhuma cliente encontrada com essa busca.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-8 flex flex-col items-center gap-2 text-center px-4">
+              <span className="text-4xl" aria-hidden="true">📋</span>
+              <p className="font-medium text-zinc-700 dark:text-zinc-300">
+                Nenhum cadastro ainda
+              </p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                Quando uma cliente preencher o formulário público, ela aparecerá aqui aguardando sua aprovação.
+              </p>
+            </div>
+          )
         ) : (
           <>
             {pendentes.length > 0 && (

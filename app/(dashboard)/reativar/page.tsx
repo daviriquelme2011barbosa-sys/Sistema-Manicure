@@ -98,15 +98,13 @@ export default function ReativarPage() {
             {erro}
           </p>
         ) : clientes.length === 0 ? (
-          <div className="mt-16 flex flex-col items-center gap-2 text-center">
-            <span className="text-4xl" aria-hidden="true">
-              🎉
-            </span>
+          <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
+            <span className="text-4xl" aria-hidden="true">🎉</span>
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
               Nenhuma cliente sumida no momento
             </p>
             <p className="text-sm text-zinc-400 dark:text-zinc-500">
-              Todas as suas clientes estão em dia!
+              Continue registrando os atendimentos para manter o controle!
             </p>
           </div>
         ) : (

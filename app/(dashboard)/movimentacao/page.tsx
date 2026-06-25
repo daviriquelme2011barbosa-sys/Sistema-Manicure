@@ -267,15 +267,13 @@ export default function MovimentacaoPage() {
             {erro}
           </p>
         ) : itens.length === 0 && !cardResumoMes ? (
-          <div className="mt-16 flex flex-col items-center gap-2 text-center">
-            <span className="text-4xl" aria-hidden="true">
-              🔍
-            </span>
+          <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
+            <span className="text-4xl" aria-hidden="true">🔍</span>
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
-              Nenhuma atividade neste período
+              Nenhuma movimentação ainda
             </p>
             <p className="text-sm text-zinc-400 dark:text-zinc-500">
-              Registre um atendimento ou reative uma cliente para aparecer aqui.
+              As ações do sistema aparecerão aqui automaticamente.
             </p>
           </div>
         ) : (

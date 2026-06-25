@@ -149,11 +149,21 @@ export default function ClientesPage() {
             {erro}
           </p>
         ) : clientesFiltrados.length === 0 ? (
-          <p className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            {busca || filtro !== 'todos'
-              ? 'Nenhuma cliente encontrada para essa busca.'
-              : 'Nenhuma cliente cadastrada ainda.'}
-          </p>
+          busca || filtro !== 'todos' ? (
+            <p className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+              Nenhuma cliente encontrada para essa busca.
+            </p>
+          ) : (
+            <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
+              <span className="text-4xl" aria-hidden="true">👥</span>
+              <p className="font-medium text-zinc-700 dark:text-zinc-300">
+                Nenhuma cliente ainda
+              </p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                Suas clientes aparecerão aqui depois de se cadastrarem pelo formulário ou após você registrar um atendimento. Compartilhe o link do formulário com elas!
+              </p>
+            </div>
+          )
         ) : (
           <ul className="flex flex-col gap-3">
             {clientesFiltrados.map((cliente) => (

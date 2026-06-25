@@ -74,13 +74,13 @@ export default function FaltaramPage() {
             ))}
           </div>
         ) : faltaram.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-4xl">🎉</p>
-            <p className="mt-3 text-base font-semibold text-zinc-700 dark:text-zinc-200">
-              Nenhuma falta registrada
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+            <span className="text-4xl" aria-hidden="true">✅</span>
+            <p className="mt-3 font-medium text-zinc-700 dark:text-zinc-300">
+              Nenhuma cliente faltou ainda
             </p>
             <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
-              Boa notícia! Todas as clientes compareceram.
+              Quando uma cliente não comparecer ao horário marcado, ela aparecerá aqui.
             </p>
           </div>
         ) : (

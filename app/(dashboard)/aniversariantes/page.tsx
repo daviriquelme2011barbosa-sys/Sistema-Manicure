@@ -92,10 +92,13 @@ export default function AniversariantesPage() {
             {erro}
           </p>
         ) : semNenhum ? (
-          <div className="mt-16 flex flex-col items-center gap-2 text-center">
-            <span className="text-4xl" aria-hidden="true">🎉</span>
+          <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
+            <span className="text-4xl" aria-hidden="true">🎂</span>
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
               Nenhum aniversariante este mês
+            </p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              As clientes precisam informar a data de nascimento no formulário de cadastro.
             </p>
           </div>
         ) : (

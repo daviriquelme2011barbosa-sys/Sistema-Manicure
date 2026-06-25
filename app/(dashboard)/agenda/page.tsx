@@ -535,10 +535,13 @@ export default function AgendaPage() {
         {aba === 'agendamentos' && (
           <div className="flex flex-col gap-4">
             {agendamentos.length === 0 ? (
-              <div className="flex flex-col items-center py-16 text-center">
-                <p className="text-4xl">📅</p>
-                <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-                  Nenhum agendamento para hoje ou nos próximos dias.
+              <div className="flex flex-col items-center py-16 text-center px-4">
+                <span className="text-4xl" aria-hidden="true">📅</span>
+                <p className="mt-4 font-medium text-zinc-700 dark:text-zinc-300">
+                  Nenhum agendamento ainda
+                </p>
+                <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
+                  Configure seus horários de trabalho acima e compartilhe o link de agendamento com suas clientes. Os agendamentos marcados aparecerão aqui.
                 </p>
               </div>
             ) : (

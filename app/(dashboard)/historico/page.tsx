@@ -120,9 +120,15 @@ export default function HistoricoPage() {
             {erro}
           </p>
         ) : atendimentos.length === 0 ? (
-          <p className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Nenhum atendimento registrado em {MESES[mes - 1]} {ano}.
-          </p>
+          <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
+            <span className="text-4xl" aria-hidden="true">📋</span>
+            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+              Nenhum atendimento em {MESES[mes - 1]} {ano}
+            </p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              Registre atendimentos para visualizar o histórico aqui.
+            </p>
+          </div>
         ) : (
           <ul className="animar-lista flex flex-col gap-3">
             {atendimentos.map((atendimento) => (
