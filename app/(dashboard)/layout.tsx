@@ -83,6 +83,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [submenuSaibaMaisAberto, setSubmenuSaibaMaisAberto] = useState(false)
   const [modalSaibaMais, setModalSaibaMais] = useState<ModalSaibaMais>(null)
   const [tutorialAberto, setTutorialAberto] = useState(false)
+  const [modalPrimeirosPassosAberto, setModalPrimeirosPassosAberto] = useState(false)
+  const [linkAgendamento, setLinkAgendamento] = useState('')
+  const [copiadoFormularioModal, setCopiadoFormularioModal] = useState(false)
+  const [copiadoAgendamentoModal, setCopiadoAgendamentoModal] = useState(false)
   const inputCameraRef = useRef<HTMLInputElement>(null)
   const inputGaleriaRef = useRef<HTMLInputElement>(null)
   const inputUploadRef = useRef<HTMLInputElement>(null)
@@ -147,7 +151,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       const { data: config } = await supabase
         .from('salao_config')
-        .select('id, nome_salao, foto_url, cor_primaria, genero, whatsapp, plano')
+        .select('id, nome_salao, foto_url, cor_primaria, genero, whatsapp, plano, primeira_vez')
         .single()
 
       if (config) {
@@ -155,6 +159,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setNovoNomeSalao(config.nome_salao)
         setIdSalao(config.id)
         setLinkFormulario(`${window.location.origin}/cadastro/${config.id}`)
+        setLinkAgendamento(`${window.location.origin}/agendar/${config.id}`)
         const fotoRaw = (config.foto_url as string | null) ?? ''
         setFotoUrl(fotoRaw ? `${fotoRaw}?t=${Date.now()}` : '')
         const corInicial = (config.cor_primaria as string | null) ?? '#ec4899'
@@ -228,6 +233,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         }
       }
 
+      if (config?.primeira_vez === true) {
+        setModalPrimeirosPassosAberto(true)
+      }
+
       setVerificando(false)
     }
 
@@ -288,6 +297,27 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     await navigator.clipboard.writeText(linkFormulario)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
+  }
+
+  async function fecharModalPrimeirosPassos() {
+    setModalPrimeirosPassosAberto(false)
+    if (!idSalao) return
+    await supabase
+      .from('salao_config')
+      .update({ primeira_vez: false })
+      .eq('id', idSalao)
+  }
+
+  async function copiarLinkFormularioModal() {
+    await navigator.clipboard.writeText(linkFormulario)
+    setCopiadoFormularioModal(true)
+    setTimeout(() => setCopiadoFormularioModal(false), 2000)
+  }
+
+  async function copiarLinkAgendamentoModal() {
+    await navigator.clipboard.writeText(linkAgendamento)
+    setCopiadoAgendamentoModal(true)
+    setTimeout(() => setCopiadoAgendamentoModal(false), 2000)
   }
 
   async function uploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -960,6 +990,19 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         <TutorialCarrossel plano={plano} onFechar={() => setTutorialAberto(false)} />
       )}
 
+      {modalPrimeirosPassosAberto && (
+        <ModalPrimeirosPassos
+          plano={plano}
+          linkFormulario={linkFormulario}
+          linkAgendamento={linkAgendamento}
+          copiadoFormulario={copiadoFormularioModal}
+          copiadoAgendamento={copiadoAgendamentoModal}
+          onCopiarFormulario={copiarLinkFormularioModal}
+          onCopiarAgendamento={copiarLinkAgendamentoModal}
+          onFechar={fecharModalPrimeirosPassos}
+        />
+      )}
+
       <div className="pt-14">{children}</div>
     </>
   )
@@ -1089,6 +1132,117 @@ function ConteudoSobre() {
       <br />
       Contato: 📧 davi.riquelme2011barbosa@gmail.com | 📱 +55(12)99227-0163
     </p>
+  )
+}
+
+function BlocoLink({
+  rotulo,
+  link,
+  copiado,
+  onCopiar,
+}: {
+  rotulo: string
+  link: string
+  copiado: boolean
+  onCopiar: () => void
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{rotulo}</p>
+      <div className="flex items-center gap-2 rounded-xl bg-zinc-50 px-3 py-3 dark:bg-zinc-800">
+        <span className="min-w-0 flex-1 break-all text-xs text-zinc-500 dark:text-zinc-400">
+          {link}
+        </span>
+        <button
+          onClick={onCopiar}
+          className="flex-shrink-0 rounded-lg bg-pink-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+        >
+          {copiado ? 'Copiado!' : 'Copiar'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ModalPrimeirosPassos({
+  plano,
+  linkFormulario,
+  linkAgendamento,
+  copiadoFormulario,
+  copiadoAgendamento,
+  onCopiarFormulario,
+  onCopiarAgendamento,
+  onFechar,
+}: {
+  plano: string
+  linkFormulario: string
+  linkAgendamento: string
+  copiadoFormulario: boolean
+  copiadoAgendamento: boolean
+  onCopiarFormulario: () => void
+  onCopiarAgendamento: () => void
+  onFechar: () => void
+}) {
+  const temAgendamento = plano === 'profissional' || plano === 'master'
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Primeiros passos"
+      className="fixed inset-0 z-50 flex flex-col justify-end sm:items-center sm:justify-center"
+    >
+      <div className="animar-overlay absolute inset-0 bg-black/50" />
+
+      <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+        <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
+
+        <div className="flex-shrink-0 px-5 pb-2 pt-4">
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-2xl" aria-hidden="true">🚀</span>
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Primeiros passos
+            </h2>
+          </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Guarde estes links — você vai precisar deles para divulgar o sistema para suas clientes.
+          </p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 pb-2 pt-4">
+          <div className="flex flex-col gap-4">
+            <BlocoLink
+              rotulo="Link do Formulário de Cadastro"
+              link={linkFormulario}
+              copiado={copiadoFormulario}
+              onCopiar={onCopiarFormulario}
+            />
+
+            {temAgendamento && (
+              <BlocoLink
+                rotulo="Link de Agendamento Online"
+                link={linkAgendamento}
+                copiado={copiadoAgendamento}
+                onCopiar={onCopiarAgendamento}
+              />
+            )}
+
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">
+              Você também encontra esses links nas Configurações a qualquer momento.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex-shrink-0 border-t border-zinc-100 px-5 pb-6 pt-4 dark:border-zinc-800">
+          <button
+            onClick={onFechar}
+            className="h-11 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+          >
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
 

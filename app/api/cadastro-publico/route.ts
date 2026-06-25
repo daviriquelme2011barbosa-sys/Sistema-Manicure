@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, email, senha, dataNascimento, observacoes, autorizaContato } = body
+  const { salaoId, nome, whatsapp, email, dataNascimento, observacoes, autorizaContato } = body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
@@ -107,33 +107,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (typeof senha !== 'string' || senha.length < 6) {
-    return NextResponse.json(
-      { erro: 'A senha deve ter pelo menos 6 caracteres.', campo: 'senha' },
-      { status: 400 },
-    )
-  }
-
-  const { data: authData, error: erroAuth } = await supabase.auth.admin.createUser({
-    email: (email as string).trim(),
-    password: senha,
-    email_confirm: true,
-  })
-
-  if (erroAuth) {
-    const mensagem = erroAuth.message?.toLowerCase() ?? ''
-    if (mensagem.includes('already registered') || mensagem.includes('already been registered')) {
-      return NextResponse.json(
-        { erro: 'Este e-mail já possui cadastro. Use outro e-mail ou entre em contato com o salão.', campo: 'email' },
-        { status: 409 },
-      )
-    }
-    return NextResponse.json(
-      { erro: 'Erro interno. Tente novamente.' },
-      { status: 500 },
-    )
-  }
-
+  // Clientes NÃO criam conta no Supabase Auth — são apenas registros na tabela clientes.
+  // Nunca adicionar createUser/signUp aqui.
   const { error: erroCliente } = await supabase.from('clientes').insert({
     nome: nome.trim(),
     whatsapp: whatsappNormalizado,
@@ -150,7 +125,6 @@ export async function POST(request: NextRequest) {
   })
 
   if (erroCliente) {
-    await supabase.auth.admin.deleteUser(authData.user.id)
     return NextResponse.json(
       { erro: 'Erro interno. Tente novamente.' },
       { status: 500 },
