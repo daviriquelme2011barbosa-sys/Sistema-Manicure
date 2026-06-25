@@ -92,6 +92,7 @@ export type TipoMovimentacao =
   | 'reativacao'
   | 'aniversario'
   | 'resumo_mes'
+  | 'cancelamento'
 
 export type ItemMovimentacao = {
   id: string

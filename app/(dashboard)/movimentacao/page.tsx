@@ -29,6 +29,7 @@ function iconeParaTipo(tipo: TipoMovimentacao): string {
     reativacao: '💬',
     aniversario: '🎂',
     resumo_mes: '📅',
+    cancelamento: '❌',
   }
   return mapa[tipo]
 }
@@ -199,6 +200,38 @@ export default function MovimentacaoPage() {
           criado_em: agora.toISOString(),
           href: '/aniversariantes',
         })
+      }
+
+      // Cancelamentos de agendamento pela cliente (requer coluna cancelado_em — ignorado se ausente)
+      const cancelamentosResult = await supabase
+        .from('agendamentos')
+        .select('id, data, horario, cancelado_em, clientes(nome)')
+        .eq('salao_id', salaoId)
+        .eq('status', 'cancelado')
+        .not('cancelado_em', 'is', null)
+        .gte('cancelado_em', cutoff)
+
+      if (!cancelamentosResult.error) {
+        type RowCancelamento = {
+          id: string
+          data: string
+          horario: string | null
+          cancelado_em: string
+          clientes: { nome: string } | { nome: string }[] | null
+        }
+        for (const c of (cancelamentosResult.data ?? []) as unknown as RowCancelamento[]) {
+          const nomeCliente = Array.isArray(c.clientes)
+            ? (c.clientes[0]?.nome ?? 'Cliente')
+            : (c.clientes?.nome ?? 'Cliente')
+          const dataFormatada = c.data.split('-').reverse().join('/')
+          const horario = c.horario ? ` às ${c.horario}` : ''
+          resultado.push({
+            id: `cancelamento-${c.id}`,
+            tipo: 'cancelamento',
+            descricao: `${nomeCliente} cancelou o agendamento do dia ${dataFormatada}${horario}`,
+            criado_em: c.cancelado_em,
+          })
+        }
       }
 
       resultado.sort((a, b) => b.criado_em.localeCompare(a.criado_em))

@@ -6,9 +6,7 @@ type SalaoConfig = {
   id: string
   nome_salao: string
   cor_primaria: string
-  foto_url: string | null
   nome_manicure: string | null
-  genero: string
   plano: string | null
   whatsapp: string | null
 }
@@ -23,7 +21,7 @@ async function buscarSalao(salaoId: string): Promise<SalaoConfig | null> {
 
   const { data, error } = await supabase
     .from('salao_config')
-    .select('id, nome_salao, cor_primaria, foto_url, nome_manicure, genero, plano, whatsapp')
+    .select('id, nome_salao, cor_primaria, nome_manicure, plano, whatsapp')
     .eq('id', salaoId)
     .maybeSingle()
 
@@ -65,16 +63,12 @@ export default async function AgendarPage({
     )
   }
 
-  const fotoUrl = salao.foto_url ? `${salao.foto_url}?t=${Date.now()}` : null
-
   return (
     <FormularioAgendamento
       salaoId={salao.id}
       nomeSalao={salao.nome_salao}
       corPrimaria={salao.cor_primaria ?? '#ec4899'}
-      fotoUrl={fotoUrl}
       nomeManicure={salao.nome_manicure}
-      genero={salao.genero ?? 'nao_informar'}
       whatsappManicure={salao.whatsapp}
     />
   )

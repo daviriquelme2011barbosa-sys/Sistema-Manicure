@@ -299,6 +299,7 @@ export default function AgendaPage() {
   const agendamentosProcessados = agendamentos.filter(
     (a) => a.status === 'compareceu' || a.status === 'faltou',
   )
+  const agendamentosCancelados = agendamentos.filter((a) => a.status === 'cancelado')
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 pb-24 dark:bg-zinc-950">
@@ -632,6 +633,42 @@ export default function AgendaPage() {
                             </p>
                             {ag.servico && (
                               <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                ✂️ {ag.servico}
+                              </p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {agendamentosCancelados.length > 0 && (
+                  <section>
+                    <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                      Cancelados pela cliente
+                    </h2>
+                    <ul className="flex flex-col gap-3">
+                      {agendamentosCancelados.map((ag) => (
+                        <li
+                          key={ag.id}
+                          className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-4 opacity-75 dark:border-zinc-700 dark:bg-zinc-900/50"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-medium text-zinc-500 line-through dark:text-zinc-400">
+                              {ag.clientes?.nome ?? '—'}
+                            </p>
+                            <span className="mt-0.5 flex-shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400">
+                              Cancelado
+                            </span>
+                          </div>
+                          <div className="mt-1.5 flex flex-col gap-0.5">
+                            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                              📅 {formatarDataBR(ag.data)}
+                              {ag.horario ? ` às ${ag.horario}` : ''}
+                            </p>
+                            {ag.servico && (
+                              <p className="text-sm text-zinc-400 dark:text-zinc-500">
                                 ✂️ {ag.servico}
                               </p>
                             )}
