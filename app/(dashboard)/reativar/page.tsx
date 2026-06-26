@@ -69,22 +69,22 @@ export default function ReativarPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
         <div className="flex items-center gap-3">
           <Link
             href="/clientes"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
             aria-label="Voltar para lista de clientes"
           >
             <IconeVoltar />
           </Link>
           <div>
-            <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
               Clientes para reativar
             </h1>
             {!carregando && !erro && (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">{subtitulo()}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{subtitulo()}</p>
             )}
           </div>
         </div>
@@ -100,10 +100,10 @@ export default function ReativarPage() {
         ) : clientes.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
             <span className="text-4xl" aria-hidden="true">🎉</span>
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            <p className="font-medium text-slate-700 dark:text-slate-300">
               Nenhuma cliente sumida no momento
             </p>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+            <p className="text-sm text-slate-400 dark:text-slate-500">
               Continue registrando os atendimentos para manter o controle!
             </p>
           </div>
@@ -112,15 +112,15 @@ export default function ReativarPage() {
             {clientes.map((cliente) => (
               <li
                 key={cliente.id}
-                className="rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-800"
+                className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800"
               >
                 <div className="flex gap-3">
                   <BadgeStatus status={cliente.status} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">
+                    <p className="truncate font-medium text-slate-900 dark:text-slate-100">
                       {cliente.nome}
                     </p>
-                    <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
                       {textoSemAparecer(cliente.dias_desde_ultima_visita)}
                     </p>
                   </div>

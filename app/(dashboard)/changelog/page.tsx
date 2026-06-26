@@ -34,10 +34,10 @@ export default function ChangelogPage() {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 pb-24 dark:bg-zinc-950">
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Novidades</h1>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+    <div className="flex min-h-screen flex-col bg-slate-50 pb-24 dark:bg-slate-900">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Novidades</h1>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
           Atualizações e melhorias do sistema
         </p>
       </header>
@@ -46,11 +46,11 @@ export default function ChangelogPage() {
         {carregando ? (
           <div className="flex flex-col gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="shimmer flex flex-col gap-2 rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-900">
-                <div className="h-3 w-24 rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-3 w-full rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-3 w-5/6 rounded bg-zinc-200 dark:bg-zinc-700" />
+              <div key={i} className="shimmer flex flex-col gap-2 rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800">
+                <div className="h-3 w-24 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-4 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-3 w-full rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-3 w-5/6 rounded bg-slate-200 dark:bg-slate-700" />
               </div>
             ))}
           </div>
@@ -61,20 +61,20 @@ export default function ChangelogPage() {
         ) : entradas.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center">
             <span className="text-4xl" aria-hidden="true">⭐</span>
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            <p className="font-medium text-slate-700 dark:text-slate-300">
               Nenhuma atualização ainda
             </p>
           </div>
         ) : (
-          <ol className="animar-lista relative flex flex-col gap-0 border-l border-zinc-200 pl-5 dark:border-zinc-800">
+          <ol className="animar-lista relative flex flex-col gap-0 border-l border-slate-200 pl-5 dark:border-slate-700">
             {entradas.map((entrada) => (
               <li key={entrada.id} className="relative pb-6 last:pb-0">
-                <span className="absolute -left-[21px] flex h-3.5 w-3.5 items-center justify-center rounded-full bg-pink-500 ring-4 ring-zinc-50 dark:ring-zinc-950" />
-                <time className="mb-1 block text-xs font-medium text-zinc-400 dark:text-zinc-500">
+                <span className="absolute -left-[21px] flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-600 ring-4 ring-slate-100 dark:ring-slate-900" />
+                <time className="mb-1 block text-xs font-medium text-slate-400 dark:text-slate-500">
                   {formatarData(entrada.criado_em.slice(0, 10))}
                 </time>
-                <p className="font-semibold text-zinc-900 dark:text-zinc-100">{entrada.titulo}</p>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">{entrada.titulo}</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                   {entrada.descricao}
                 </p>
               </li>

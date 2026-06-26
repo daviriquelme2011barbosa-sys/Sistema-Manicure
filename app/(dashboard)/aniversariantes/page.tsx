@@ -77,9 +77,9 @@ export default function AniversariantesPage() {
   const semNenhum = deHoje.length === 0 && doMes.length === 0
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           Aniversariantes do mês
         </h1>
       </header>
@@ -94,10 +94,10 @@ export default function AniversariantesPage() {
         ) : semNenhum ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
             <span className="text-4xl" aria-hidden="true">🎂</span>
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            <p className="font-medium text-slate-700 dark:text-slate-300">
               Nenhum aniversariante este mês
             </p>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+            <p className="text-sm text-slate-400 dark:text-slate-500">
               As clientes precisam informar a data de nascimento no formulário de cadastro.
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function AniversariantesPage() {
                       <div className="flex items-center gap-3">
                         <span className="flex-shrink-0 text-2xl" aria-hidden="true">🎂</span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold text-zinc-900 dark:text-zinc-100">
+                          <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
                             {cliente.nome}
                           </p>
                           <span className="mt-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
@@ -146,17 +146,17 @@ export default function AniversariantesPage() {
               <section>
                 <button
                   onClick={() => setMesExpandido((v) => !v)}
-                  className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 shadow-sm transition hover:bg-zinc-50 active:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:active:bg-zinc-600"
+                  className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 shadow-sm transition hover:bg-slate-50 active:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-600 dark:active:bg-slate-600"
                   aria-expanded={mesExpandido}
                 >
-                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     🎁{' '}
                     {doMes.length === 1
                       ? '1 aniversariante este mês'
                       : `${doMes.length} aniversariantes este mês`}
                   </span>
                   <IconeChevronBaixo
-                    className={`flex-shrink-0 text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${mesExpandido ? 'rotate-180' : ''}`}
+                    className={`flex-shrink-0 text-slate-400 transition-transform duration-200 dark:text-slate-500 ${mesExpandido ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -165,15 +165,15 @@ export default function AniversariantesPage() {
                     {doMes.map((cliente) => (
                       <li
                         key={cliente.id}
-                        className="rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-800"
+                        className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800"
                       >
                         <div className="flex items-center gap-3">
                           <span className="flex-shrink-0 text-xl" aria-hidden="true">🎂</span>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">
+                            <p className="truncate font-medium text-slate-900 dark:text-slate-100">
                               {cliente.nome}
                             </p>
-                            <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
                               {formatarDiaMes(cliente.data_nascimento)}
                             </p>
                           </div>

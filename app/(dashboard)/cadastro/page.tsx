@@ -38,7 +38,7 @@ function BuscaCliente({
       <div>
         <label
           htmlFor="busca-cliente"
-          className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="text-sm font-medium text-slate-700 dark:text-slate-300"
         >
           Buscar cliente pelo nome
         </label>
@@ -49,7 +49,7 @@ function BuscaCliente({
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Nome da cliente…"
           autoComplete="off"
-          className="mt-1 h-12 w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 text-base text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500"
+          className="mt-1 h-12 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -58,22 +58,22 @@ function BuscaCliente({
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="shimmer h-12 rounded-xl bg-zinc-200 dark:bg-zinc-800"
+              className="shimmer h-12 rounded-xl bg-slate-200 dark:bg-slate-800"
             />
           ))}
         </div>
       ) : listaFiltrada.length === 0 ? (
-        <p className="py-4 text-center text-sm text-zinc-400 dark:text-zinc-500">
+        <p className="py-4 text-center text-sm text-slate-400 dark:text-slate-500">
           Nenhuma cliente encontrada
         </p>
       ) : (
-        <ul className="flex flex-col overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+        <ul className="flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
           {listaFiltrada.map((c) => (
-            <li key={c.id} className="border-b border-zinc-50 dark:border-zinc-800 last:border-0">
+            <li key={c.id} className="border-b border-slate-100 dark:border-slate-700 last:border-0">
               <button
                 type="button"
                 onClick={() => onSelecionar(c)}
-                className="w-full px-4 py-3 text-left text-sm font-medium text-zinc-800 dark:text-zinc-100 transition hover:bg-pink-50 dark:hover:bg-pink-950/20 active:bg-pink-100"
+                className="w-full px-4 py-3 text-left text-sm font-medium text-slate-800 dark:text-slate-100 transition hover:bg-blue-50 dark:hover:bg-blue-950/20 active:bg-blue-100"
               >
                 {c.nome}
               </button>
@@ -182,11 +182,11 @@ export default function CadastroPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
       <ToastView toast={toast} />
 
-      <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+      <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-4">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           Registrar Atendimento
         </h1>
       </header>
@@ -201,19 +201,19 @@ export default function CadastroPage() {
         ) : (
           <>
             {/* Cliente selecionado */}
-            <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
               <div>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                <p className="text-xs text-slate-400 dark:text-slate-500">
                   Registrando atendimento para
                 </p>
-                <p className="mt-0.5 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                <p className="mt-0.5 text-base font-semibold text-slate-900 dark:text-slate-100">
                   {clienteSelecionado.nome}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={limpar}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300"
                 aria-label="Trocar cliente"
               >
                 <IconeFechar />
@@ -225,7 +225,7 @@ export default function CadastroPage() {
               <div className="flex flex-col gap-1">
                 <label
                   htmlFor="servico"
-                  className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Serviço <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
@@ -237,8 +237,8 @@ export default function CadastroPage() {
                   onChange={(e) => setServico(e.target.value)}
                   disabled={salvando}
                   placeholder="Ex: Manicure, Pedicure…"
-                  className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
-                    erros.servico ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+                  className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
+                    erros.servico ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
                   }`}
                 />
                 <datalist id="lista-servicos">
@@ -258,7 +258,7 @@ export default function CadastroPage() {
                 <div className="flex flex-col gap-1">
                   <label
                     htmlFor="dataAtendimento"
-                    className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Data <span aria-hidden="true" className="text-red-500">*</span>
                   </label>
@@ -268,16 +268,16 @@ export default function CadastroPage() {
                     value={dataAtendimento}
                     onChange={(e) => setDataAtendimento(e.target.value)}
                     disabled={salvando}
-                    className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                    className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label
                     htmlFor="horario"
-                    className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Horário
-                    <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+                    <span className="ml-1 text-xs font-normal text-slate-400">(opcional)</span>
                   </label>
                   <input
                     id="horario"
@@ -285,7 +285,7 @@ export default function CadastroPage() {
                     value={horario}
                     onChange={(e) => setHorario(e.target.value)}
                     disabled={salvando}
-                    className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                    className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
                   />
                 </div>
               </div>
@@ -294,13 +294,13 @@ export default function CadastroPage() {
               <div className="flex flex-col gap-1">
                 <label
                   htmlFor="preco"
-                  className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Preço
-                  <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+                  <span className="ml-1 text-xs font-normal text-slate-400">(opcional)</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 select-none text-base text-zinc-400 dark:text-zinc-500">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 select-none text-base text-slate-400 dark:text-slate-500">
                     R$
                   </span>
                   <input
@@ -313,8 +313,8 @@ export default function CadastroPage() {
                     onChange={(e) => setPreco(e.target.value)}
                     disabled={salvando}
                     placeholder="0,00"
-                    className={`h-12 w-full rounded-lg border pl-10 pr-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
-                      erros.preco ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+                    className={`h-12 w-full rounded-lg border pl-10 pr-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
+                      erros.preco ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
                     }`}
                   />
                 </div>
@@ -329,17 +329,17 @@ export default function CadastroPage() {
               <div className="flex flex-col gap-1">
                 <label
                   htmlFor="formaPagamento"
-                  className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Forma de pagamento
-                  <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+                  <span className="ml-1 text-xs font-normal text-slate-400">(opcional)</span>
                 </label>
                 <select
                   id="formaPagamento"
                   value={formaPagamento}
                   onChange={(e) => setFormaPagamento(e.target.value)}
                   disabled={salvando}
-                  className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                  className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
                 >
                   <option value="">Selecionar…</option>
                   <option value="pix">Pix</option>
@@ -352,7 +352,7 @@ export default function CadastroPage() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 rounded-lg bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {salvando ? 'Salvando…' : 'Registrar atendimento'}
               </button>
@@ -361,7 +361,7 @@ export default function CadastroPage() {
                 type="button"
                 onClick={limpar}
                 disabled={salvando}
-                className="h-12 rounded-lg border border-zinc-300 bg-white font-semibold text-zinc-700 transition hover:bg-zinc-50 active:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="h-12 rounded-lg border border-slate-300 bg-white font-semibold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Cancelar registro
               </button>

@@ -275,20 +275,20 @@ export default function AgendaPage() {
 
   if (carregando) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-500 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
       </div>
     )
   }
 
   if (plano !== 'profissional' && plano !== 'master') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 text-center dark:bg-zinc-950">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 text-center dark:bg-slate-900">
         <p className="text-4xl">🔒</p>
-        <h1 className="mt-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+        <h1 className="mt-4 text-base font-semibold text-slate-900 dark:text-slate-100">
           Recurso exclusivo
         </h1>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           A Agenda está disponível nos planos Profissional e Master.
         </p>
       </div>
@@ -302,24 +302,24 @@ export default function AgendaPage() {
   const agendamentosCancelados = agendamentos.filter((a) => a.status === 'cancelado')
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 pb-24 dark:bg-zinc-950">
+    <div className="flex min-h-screen flex-col bg-slate-50 pb-24 dark:bg-slate-900">
       <ToastView toast={toast} />
 
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Agenda</h1>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Agenda</h1>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
           Configure seus horários e gerencie agendamentos
         </p>
       </header>
 
       {/* Abas */}
-      <div className="sticky top-14 z-10 flex border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="sticky top-14 z-10 flex border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
         <button
           onClick={() => setAba('configurar')}
           className={`flex-1 py-3 text-sm font-medium transition ${
             aba === 'configurar'
-              ? 'border-b-2 border-pink-500 text-pink-600 dark:text-pink-400'
-              : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+              ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Configurar
@@ -328,13 +328,13 @@ export default function AgendaPage() {
           onClick={() => setAba('agendamentos')}
           className={`flex-1 py-3 text-sm font-medium transition ${
             aba === 'agendamentos'
-              ? 'border-b-2 border-pink-500 text-pink-600 dark:text-pink-400'
-              : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+              ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Agendamentos
           {agendamentosPendentes.length > 0 && (
-            <span className="ml-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-bold text-white">
+            <span className="ml-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
               {agendamentosPendentes.length}
             </span>
           )}
@@ -346,20 +346,20 @@ export default function AgendaPage() {
           <div className="flex flex-col gap-5">
             {/* Link de agendamento */}
             {linkAgendamento && (
-              <div className="rounded-xl border border-zinc-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                   Link de agendamento
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                   Compartilhe para que suas clientes possam agendar online
                 </p>
-                <div className="mt-2 flex items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 dark:bg-zinc-800">
-                  <span className="min-w-0 flex-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-800">
+                  <span className="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">
                     {linkAgendamento}
                   </span>
                   <button
                     onClick={copiarLink}
-                    className="flex-shrink-0 rounded-md bg-pink-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+                    className="flex-shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
                   >
                     {copiado ? 'Copiado!' : 'Copiar'}
                   </button>
@@ -368,19 +368,19 @@ export default function AgendaPage() {
             )}
 
             {/* Configurações gerais */}
-            <div className="rounded-xl border border-zinc-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <p className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">
                 Configurações gerais
               </p>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
                     Duração do atendimento
                   </label>
                   <select
                     value={duracaoAtendimento}
                     onChange={(e) => setDuracaoAtendimento(Number(e.target.value))}
-                    className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
                     <option value={30}>30 minutos</option>
                     <option value={45}>45 minutos</option>
@@ -390,13 +390,13 @@ export default function AgendaPage() {
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
                     Intervalo entre atendimentos
                   </label>
                   <select
                     value={intervaloEntre}
                     onChange={(e) => setIntervaloEntre(Number(e.target.value))}
-                    className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
                     <option value={0}>Sem intervalo</option>
                     <option value={10}>10 minutos</option>
@@ -409,7 +409,7 @@ export default function AgendaPage() {
 
             {/* Dias da semana */}
             <div className="flex flex-col gap-3">
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                 Dias e horários
               </p>
               {DIAS.map(({ key, label }) => {
@@ -417,14 +417,14 @@ export default function AgendaPage() {
                 return (
                   <div
                     key={key}
-                    className={`rounded-xl border bg-white p-4 transition dark:bg-zinc-900 ${
+                    className={`rounded-xl border bg-white p-4 transition dark:bg-slate-800 ${
                       dia.ativo
-                        ? 'border-pink-200 dark:border-pink-900/40'
-                        : 'border-zinc-100 dark:border-zinc-800'
+                        ? 'border-blue-200 dark:border-blue-900/40'
+                        : 'border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
                         {label}
                       </span>
                       <button
@@ -432,7 +432,7 @@ export default function AgendaPage() {
                         aria-checked={dia.ativo}
                         onClick={() => atualizarDia(key, 'ativo', !dia.ativo)}
                         className={`relative flex h-6 w-11 flex-shrink-0 items-center rounded-full transition ${
-                          dia.ativo ? 'bg-pink-500' : 'bg-zinc-300 dark:bg-zinc-700'
+                          dia.ativo ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                         }`}
                       >
                         <span
@@ -447,25 +447,25 @@ export default function AgendaPage() {
                       <div className="mt-4 flex flex-col gap-4">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
                               Início
                             </label>
                             <input
                               type="time"
                               value={dia.inicio}
                               onChange={(e) => atualizarDia(key, 'inicio', e.target.value)}
-                              className="h-10 rounded-lg border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
                               Fim
                             </label>
                             <input
                               type="time"
                               value={dia.fim}
                               onChange={(e) => atualizarDia(key, 'fim', e.target.value)}
-                              className="h-10 rounded-lg border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                             />
                           </div>
                         </div>
@@ -476,7 +476,7 @@ export default function AgendaPage() {
                             aria-checked={dia.pausaAtivo}
                             onClick={() => atualizarDia(key, 'pausaAtivo', !dia.pausaAtivo)}
                             className={`relative flex h-5 w-9 flex-shrink-0 items-center rounded-full transition ${
-                              dia.pausaAtivo ? 'bg-pink-500' : 'bg-zinc-300 dark:bg-zinc-700'
+                              dia.pausaAtivo ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                             }`}
                           >
                             <span
@@ -485,7 +485,7 @@ export default function AgendaPage() {
                               }`}
                             />
                           </button>
-                          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                             Pausa / almoço
                           </span>
                         </div>
@@ -493,7 +493,7 @@ export default function AgendaPage() {
                         {dia.pausaAtivo && (
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                 Pausa início
                               </label>
                               <input
@@ -502,18 +502,18 @@ export default function AgendaPage() {
                                 onChange={(e) =>
                                   atualizarDia(key, 'pausaInicio', e.target.value)
                                 }
-                                className="h-10 rounded-lg border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               />
                             </div>
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                 Pausa fim
                               </label>
                               <input
                                 type="time"
                                 value={dia.pausaFim}
                                 onChange={(e) => atualizarDia(key, 'pausaFim', e.target.value)}
-                                className="h-10 rounded-lg border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               />
                             </div>
                           </div>
@@ -528,7 +528,7 @@ export default function AgendaPage() {
             <button
               onClick={salvarConfig}
               disabled={salvandoConfig}
-              className="flex h-12 w-full items-center justify-center rounded-xl bg-pink-500 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {salvandoConfig ? 'Salvando…' : 'Salvar configuração'}
             </button>
@@ -540,10 +540,10 @@ export default function AgendaPage() {
             {agendamentos.length === 0 ? (
               <div className="flex flex-col items-center py-16 text-center px-4">
                 <span className="text-4xl" aria-hidden="true">📅</span>
-                <p className="mt-4 font-medium text-zinc-700 dark:text-zinc-300">
+                <p className="mt-4 font-medium text-slate-700 dark:text-slate-300">
                   Nenhum agendamento ainda
                 </p>
-                <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
+                <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
                   Configure seus horários de trabalho acima e compartilhe o link de agendamento com suas clientes. Os agendamentos marcados aparecerão aqui.
                 </p>
               </div>
@@ -551,7 +551,7 @@ export default function AgendaPage() {
               <>
                 {agendamentosPendentes.length > 0 && (
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Aguardando confirmação
                     </h2>
                     <ul className="flex flex-col gap-3">
@@ -560,21 +560,21 @@ export default function AgendaPage() {
                           key={ag.id}
                           className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-900/30 dark:bg-amber-950/20"
                         >
-                          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                          <p className="font-medium text-slate-900 dark:text-slate-100">
                             {ag.clientes?.nome ?? '—'}
                           </p>
                           <div className="mt-1.5 flex flex-col gap-0.5">
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               📅 {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
-                              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              <p className="text-sm text-slate-500 dark:text-slate-400">
                                 ✂️ {ag.servico}
                               </p>
                             )}
                             {ag.observacoes && (
-                              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              <p className="text-sm text-slate-500 dark:text-slate-400">
                                 📝 {ag.observacoes}
                               </p>
                             )}
@@ -603,17 +603,17 @@ export default function AgendaPage() {
 
                 {agendamentosProcessados.length > 0 && (
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Concluídos
                     </h2>
                     <ul className="flex flex-col gap-3">
                       {agendamentosProcessados.map((ag) => (
                         <li
                           key={ag.id}
-                          className="rounded-xl border border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900"
+                          className="rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800"
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                            <p className="font-medium text-slate-900 dark:text-slate-100">
                               {ag.clientes?.nome ?? '—'}
                             </p>
                             <span
@@ -627,12 +627,12 @@ export default function AgendaPage() {
                             </span>
                           </div>
                           <div className="mt-1.5 flex flex-col gap-0.5">
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               📅 {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
-                              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              <p className="text-sm text-slate-500 dark:text-slate-400">
                                 ✂️ {ag.servico}
                               </p>
                             )}
@@ -645,30 +645,30 @@ export default function AgendaPage() {
 
                 {agendamentosCancelados.length > 0 && (
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Cancelados pela cliente
                     </h2>
                     <ul className="flex flex-col gap-3">
                       {agendamentosCancelados.map((ag) => (
                         <li
                           key={ag.id}
-                          className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-4 opacity-75 dark:border-zinc-700 dark:bg-zinc-900/50"
+                          className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 opacity-75 dark:border-slate-700 dark:bg-slate-800/50"
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="font-medium text-zinc-500 line-through dark:text-zinc-400">
+                            <p className="font-medium text-slate-500 line-through dark:text-slate-400">
                               {ag.clientes?.nome ?? '—'}
                             </p>
-                            <span className="mt-0.5 flex-shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400">
+                            <span className="mt-0.5 flex-shrink-0 rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-500 dark:bg-slate-700 dark:text-slate-400">
                               Cancelado
                             </span>
                           </div>
                           <div className="mt-1.5 flex flex-col gap-0.5">
-                            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                            <p className="text-sm text-slate-400 dark:text-slate-500">
                               📅 {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
-                              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                              <p className="text-sm text-slate-400 dark:text-slate-500">
                                 ✂️ {ag.servico}
                               </p>
                             )}
@@ -690,18 +690,18 @@ export default function AgendaPage() {
           onClick={() => setModalCompareceu(null)}
         >
           <div
-            className="w-full max-w-sm rounded-t-2xl bg-white p-6 dark:bg-zinc-900 sm:rounded-2xl"
+            className="w-full max-w-sm rounded-t-2xl bg-white p-6 dark:bg-slate-800 sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
               Registrar atendimento
             </h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               {modalCompareceu.clientes?.nome ?? '—'}
             </p>
             <div className="mt-4 flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   Valor do serviço (opcional)
                 </label>
                 <input
@@ -711,17 +711,17 @@ export default function AgendaPage() {
                   value={precoInput ? formatarPreco(precoInput) : ''}
                   placeholder="R$ 0,00"
                   onChange={(e) => setPrecoInput(e.target.value.replace(/\D/g, ''))}
-                  className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   Forma de pagamento (opcional)
                 </label>
                 <select
                   value={formaPagamentoModal}
                   onChange={(e) => setFormaPagamentoModal(e.target.value)}
-                  className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Selecionar…</option>
                   <option value="pix">Pix</option>
@@ -738,7 +738,7 @@ export default function AgendaPage() {
                   setModalCompareceu(null)
                   marcarCompareceu(ag, null, null)
                 }}
-                className="flex h-11 flex-1 items-center justify-center rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="flex h-11 flex-1 items-center justify-center rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Pular
               </button>

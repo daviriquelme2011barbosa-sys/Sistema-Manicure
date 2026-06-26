@@ -92,12 +92,12 @@ export default function CadastrosPage() {
   const totalAprovadas = clientes.filter((c) => c.status_cadastro === 'aprovado').length
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 pb-24 dark:bg-zinc-950">
+    <div className="flex min-h-screen flex-col bg-slate-50 pb-24 dark:bg-slate-900">
       <ToastView toast={toast} />
 
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Cadastrados</h1>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Cadastrados</h1>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
           Clientes cadastradas pelo formulário público
         </p>
       </header>
@@ -109,31 +109,31 @@ export default function CadastrosPage() {
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
             placeholder="Buscar por nome ou WhatsApp…"
-            className="h-11 w-full rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition focus:ring-2 focus:ring-pink-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+            className="h-11 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
           />
         </div>
 
         {carregando ? (
           <div className="flex flex-col gap-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="shimmer h-28 rounded-xl bg-zinc-200 dark:bg-zinc-800" />
+              <div key={i} className="shimmer h-28 rounded-xl bg-slate-200 dark:bg-slate-800" />
             ))}
           </div>
         ) : pendentes.length === 0 && aprovadas.length === 0 ? (
           busca.trim() ? (
             <div className="flex flex-col items-center py-16 text-center">
               <p className="text-4xl">🔍</p>
-              <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
                 Nenhuma cliente encontrada com essa busca.
               </p>
             </div>
           ) : (
             <div className="mt-8 flex flex-col items-center gap-2 text-center px-4">
               <span className="text-4xl" aria-hidden="true">📋</span>
-              <p className="font-medium text-zinc-700 dark:text-zinc-300">
+              <p className="font-medium text-slate-700 dark:text-slate-300">
                 Nenhum cadastro ainda
               </p>
-              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              <p className="text-sm text-slate-400 dark:text-slate-500">
                 Quando uma cliente preencher o formulário público, ela aparecerá aqui aguardando sua aprovação.
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function CadastrosPage() {
             {pendentes.length > 0 && (
               <section className="mb-6">
                 <div className="mb-3 flex items-center gap-2">
-                  <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Aguardando aprovação
                   </h2>
                   <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-amber-400 px-1.5 text-[10px] font-bold text-white">
@@ -157,24 +157,24 @@ export default function CadastrosPage() {
                       key={cliente.id}
                       className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-900/30 dark:bg-amber-950/20"
                     >
-                      <p className="font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100">{cliente.nome}</p>
 
                       <div className="mt-2 flex flex-col gap-1">
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                           📱 {formatarWhatsApp(cliente.whatsapp)}
                         </p>
                         {cliente.email && (
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             ✉️ {cliente.email}
                           </p>
                         )}
                         {cliente.data_nascimento && (
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             🎂 {formatarData(cliente.data_nascimento)}
                           </p>
                         )}
                         {cliente.observacoes && (
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             📝 {cliente.observacoes}
                           </p>
                         )}
@@ -204,12 +204,12 @@ export default function CadastrosPage() {
 
             {totalAprovadas > 0 && (
               <section>
-                <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Cadastradas
                 </h2>
 
                 {aprovadas.length === 0 ? (
-                  <p className="py-4 text-center text-sm text-zinc-400 dark:text-zinc-500">
+                  <p className="py-4 text-center text-sm text-slate-400 dark:text-slate-500">
                     Nenhuma cliente encontrada com essa busca.
                   </p>
                 ) : (
@@ -217,30 +217,30 @@ export default function CadastrosPage() {
                     {aprovadas.map((cliente) => (
                       <li
                         key={cliente.id}
-                        className="rounded-xl border border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900"
+                        className="rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800"
                       >
-                        <p className="font-medium text-zinc-900 dark:text-zinc-100">{cliente.nome}</p>
+                        <p className="font-medium text-slate-900 dark:text-slate-100">{cliente.nome}</p>
 
                         <div className="mt-2 flex flex-col gap-1">
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             📱 {formatarWhatsApp(cliente.whatsapp)}
                           </p>
                           {cliente.email && (
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               ✉️ {cliente.email}
                             </p>
                           )}
                           {cliente.data_nascimento && (
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               🎂 {formatarData(cliente.data_nascimento)}
                             </p>
                           )}
                           {cliente.observacoes && (
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               📝 {cliente.observacoes}
                             </p>
                           )}
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             {cliente.autoriza_contato
                               ? '✅ Autoriza contato via WhatsApp'
                               : '❌ Não autoriza contato via WhatsApp'}
@@ -264,20 +264,20 @@ export default function CadastrosPage() {
           className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-6 sm:items-center"
           style={{ background: 'rgba(9,9,11,0.7)', backdropFilter: 'blur(4px)' }}
         >
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-800">
             <h2
               id="dialog-titulo"
-              className="text-base font-semibold text-zinc-900 dark:text-zinc-100"
+              className="text-base font-semibold text-slate-900 dark:text-slate-100"
             >
               Tem certeza?
             </h2>
-            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Esta ação é permanente e não pode ser desfeita. A cliente será removida do sistema.
             </p>
             <div className="mt-5 flex gap-3">
               <button
                 onClick={() => setConfirmarRemoverId(null)}
-                className="flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                className="flex h-11 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-600"
               >
                 Cancelar
               </button>

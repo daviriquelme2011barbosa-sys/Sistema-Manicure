@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -30,6 +30,9 @@ import {
   IconeLivro,
   IconeAgenda,
   IconeAusente,
+  IconeSino,
+  IconeLupa,
+  IconeCoroa,
 } from '@/components/icons'
 import { normalizarWhatsApp } from '@/lib/formatters'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
@@ -38,6 +41,49 @@ import QRCode from 'qrcode'
 
 type Tema = 'claro' | 'escuro'
 type ModalSaibaMais = 'termos' | 'privacidade' | 'sobre' | null
+
+// Cores por módulo — usadas apenas em ícones, indicadores e destaques de navegação
+const COR_MODULO: Record<string, string> = {
+  '/': '#2563EB', // Início (Dashboard)
+  '/clientes': '#8B5CF6', // Clientes
+  '/cadastrados': '#8B5CF6',
+  '/agenda': '#14B8A6', // Agenda
+  '/faltaram': '#F59E0B',
+  '/cadastro': '#22C55E', // Registrar Atendimento
+  '/reativar': '#EF4444',
+  '/aniversariantes': '#8B5CF6',
+  '/historico': '#64748B',
+  '/movimentacao': '#3B82F6',
+  '/changelog': '#F59E0B',
+}
+
+const TITULO_PAGINA: Record<string, string> = {
+  '/': 'Início',
+  '/clientes': 'Clientes',
+  '/cadastrados': 'Cadastrados',
+  '/agenda': 'Agenda',
+  '/faltaram': 'Faltaram',
+  '/cadastro': 'Registrar Atendimento',
+  '/reativar': 'Reativar',
+  '/aniversariantes': 'Aniversariantes',
+  '/historico': 'Histórico',
+  '/movimentacao': 'Movimentação',
+  '/changelog': 'Novidades',
+}
+
+const ROTULO_PLANO: Record<string, string> = {
+  basic: 'Basic',
+  profissional: 'Profissional',
+  master: 'Master',
+}
+
+type ResultadoCliente = { id: string; nome: string; whatsapp: string | null }
+type ResultadoAgendamento = {
+  id: string
+  data: string
+  horario: string | null
+  nome: string
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -92,8 +138,33 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const inputUploadRef = useRef<HTMLInputElement>(null)
   const { toast, mostrarToast } = useToast()
 
+  // Sidebar recolhida (desktop) e dropdowns do header
+  const [sidebarRecolhida, setSidebarRecolhida] = useState(false)
+  const [notifAberto, setNotifAberto] = useState(false)
+  const [avatarAberto, setAvatarAberto] = useState(false)
+  const notifRef = useRef<HTMLDivElement>(null)
+  const avatarRef = useRef<HTMLDivElement>(null)
+
+  // Busca global
+  const [buscaGlobal, setBuscaGlobal] = useState('')
+  const [buscaAberta, setBuscaAberta] = useState(false)
+  const [buscandoGlobal, setBuscandoGlobal] = useState(false)
+  const [resClientes, setResClientes] = useState<ResultadoCliente[]>([])
+  const [resAgendamentos, setResAgendamentos] = useState<ResultadoAgendamento[]>([])
+  const buscaDesktopRef = useRef<HTMLDivElement>(null)
+  const buscaMobileRef = useRef<HTMLDivElement>(null)
+
+  const totalNotificacoes =
+    badgeCadastrados + badgeAgenda + badgeMovimentacao + badgeChangelog
+  const tituloPagina = TITULO_PAGINA[pathname] ?? nomeSalao ?? 'Início'
+  const temAgenda = plano === 'profissional' || plano === 'master'
+
   useEffect(() => {
     setMenuAberto(false)
+    setNotifAberto(false)
+    setAvatarAberto(false)
+    setBuscaAberta(false)
+    setBuscaGlobal('')
     const agora = new Date().toISOString()
     if (pathname === '/changelog') {
       localStorage.setItem('ultimo_acesso_changelog', agora)
@@ -134,6 +205,97 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     setTema(escuro ? 'escuro' : 'claro')
     document.documentElement.classList.toggle('dark', escuro)
   }, [])
+
+  useEffect(() => {
+    setSidebarRecolhida(localStorage.getItem('sidebar_recolhida') === 'true')
+  }, [])
+
+  // Fecha dropdowns ao clicar fora
+  useEffect(() => {
+    function aoClicarFora(e: MouseEvent) {
+      const alvo = e.target as Node
+      if (notifAberto && notifRef.current && !notifRef.current.contains(alvo)) {
+        setNotifAberto(false)
+      }
+      if (avatarAberto && avatarRef.current && !avatarRef.current.contains(alvo)) {
+        setAvatarAberto(false)
+      }
+      if (
+        buscaAberta &&
+        !buscaDesktopRef.current?.contains(alvo) &&
+        !buscaMobileRef.current?.contains(alvo)
+      ) {
+        setBuscaAberta(false)
+      }
+    }
+    document.addEventListener('mousedown', aoClicarFora)
+    return () => document.removeEventListener('mousedown', aoClicarFora)
+  }, [notifAberto, avatarAberto, buscaAberta])
+
+  // Busca global em tempo real (clientes + agendamentos), com debounce
+  useEffect(() => {
+    const termo = buscaGlobal.trim()
+    if (!idSalao || termo.length < 2) {
+      setResClientes([])
+      setResAgendamentos([])
+      setBuscandoGlobal(false)
+      return
+    }
+
+    let cancelado = false
+    setBuscandoGlobal(true)
+
+    const timer = setTimeout(async () => {
+      const padrao = `%${termo}%`
+      const hoje = new Date().toISOString().split('T')[0]
+
+      const [clientesRes, agendamentosRes] = await Promise.all([
+        supabase
+          .from('clientes')
+          .select('id, nome, whatsapp')
+          .eq('salao_id', idSalao)
+          .ilike('nome', padrao)
+          .order('nome')
+          .limit(5),
+        supabase
+          .from('agendamentos')
+          .select('id, data, horario, clientes!inner(nome)')
+          .eq('salao_id', idSalao)
+          .gte('data', hoje)
+          .ilike('clientes.nome', padrao)
+          .order('data')
+          .limit(5),
+      ])
+
+      if (cancelado) return
+
+      setResClientes((clientesRes.data as ResultadoCliente[]) ?? [])
+
+      type LinhaAg = {
+        id: string
+        data: string
+        horario: string | null
+        clientes: { nome: string } | { nome: string }[] | null
+      }
+      const ags = ((agendamentosRes.data as unknown) as LinhaAg[]) ?? []
+      setResAgendamentos(
+        ags.map((a) => ({
+          id: a.id,
+          data: a.data,
+          horario: a.horario,
+          nome: Array.isArray(a.clientes)
+            ? a.clientes[0]?.nome ?? 'Cliente'
+            : a.clientes?.nome ?? 'Cliente',
+        })),
+      )
+      setBuscandoGlobal(false)
+    }, 250)
+
+    return () => {
+      cancelado = true
+      clearTimeout(timer)
+    }
+  }, [buscaGlobal, idSalao])
 
   useEffect(() => {
     async function inicializar() {
@@ -257,6 +419,30 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     localStorage.setItem('tema', novoTema)
     document.documentElement.classList.toggle('dark', novoTema === 'escuro')
   }
+
+  // No desktop o hambúrguer recolhe/expande a sidebar; no mobile abre o drawer.
+  const alternarSidebar = useCallback(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
+      setSidebarRecolhida((v) => {
+        const novo = !v
+        localStorage.setItem('sidebar_recolhida', String(novo))
+        return novo
+      })
+    } else {
+      setMenuAberto(true)
+    }
+  }, [])
+
+  const irPara = useCallback(
+    (href: string) => {
+      setNotifAberto(false)
+      setAvatarAberto(false)
+      setBuscaAberta(false)
+      setMenuAberto(false)
+      router.push(href)
+    },
+    [router],
+  )
 
   async function salvarNomeSalao() {
     if (!novoNomeSalao.trim() || novoNomeSalao.trim() === nomeSalao || !idSalao) return
@@ -432,8 +618,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (verificando) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-500 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
       </div>
     )
   }
@@ -447,202 +633,388 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       <ToastView toast={toast} />
 
-      {/* Header fixo: hamburguer+voltar | nome do salão | tema */}
-      <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-zinc-100 bg-white/90 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90">
-        <div className="ml-2 flex flex-shrink-0 items-center gap-1">
+      {/* Header fixo: hamburguer + título | busca global | notificações + avatar */}
+      <header
+        className={`chrome-header fixed right-0 top-0 z-30 flex h-16 items-center gap-2 border-b border-slate-200 bg-white/85 px-2 backdrop-blur-md sm:gap-3 sm:px-4 dark:border-slate-700 dark:bg-slate-800/85 left-0 ${
+          sidebarRecolhida ? 'lg:left-[4.5rem]' : 'lg:left-64'
+        }`}
+      >
+        {/* Esquerda: hamburguer + voltar + título */}
+        <div className="flex min-w-0 flex-shrink items-center gap-1">
           <button
-            onClick={() => setMenuAberto(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
-            aria-label="Abrir menu"
-            aria-expanded={menuAberto}
+            onClick={alternarSidebar}
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            aria-label="Recolher ou expandir menu"
           >
             <IconeHamburguer />
           </button>
           {acaoVoltar && (
             <button
               onClick={acaoVoltar}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
               aria-label="Voltar"
             >
               <IconeVoltar />
             </button>
           )}
+          <h1 className="ml-1 min-w-0 truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+            {tituloPagina}
+          </h1>
         </div>
 
-        <p className="flex-1 truncate text-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          {nomeSalao}
-        </p>
-
-        <div className="mr-2 flex flex-shrink-0 items-center gap-1">
-          <button
-            onClick={alternarTema}
-            aria-label="Ativar modo escuro"
-            className={`flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-zinc-100 dark:hover:bg-zinc-700 ${
-              tema === 'escuro' ? 'text-pink-500' : 'text-zinc-300 dark:text-zinc-600'
-            }`}
-          >
-            <IconeLua />
-          </button>
-          <button
-            onClick={alternarTema}
-            aria-label="Ativar modo claro"
-            className={`flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-zinc-100 dark:hover:bg-zinc-700 ${
-              tema === 'claro' ? 'text-pink-500' : 'text-zinc-300 dark:text-zinc-600'
-            }`}
-          >
-            <IconeSol />
-          </button>
-        </div>
-      </header>
-
-      {/* Menu lateral */}
-      {menuAberto && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu de navegação"
-          className="fixed inset-0 z-40 flex"
-        >
-          <div
-            className="animar-overlay absolute inset-0 bg-black/40"
-            onClick={() => setMenuAberto(false)}
+        {/* Centro: busca global (sm+) */}
+        <div ref={buscaDesktopRef} className="relative mx-auto hidden w-full max-w-md sm:block">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+            <IconeLupa />
+          </span>
+          <input
+            type="search"
+            value={buscaGlobal}
+            onChange={(e) => setBuscaGlobal(e.target.value)}
+            onFocus={() => setBuscaAberta(true)}
+            placeholder="Buscar clientes, agendamentos..."
+            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-800"
           />
+          {buscaAberta && buscaGlobal.trim().length >= 2 && (
+            <PainelResultadosBusca
+              buscando={buscandoGlobal}
+              clientes={resClientes}
+              agendamentos={resAgendamentos}
+              onIr={irPara}
+            />
+          )}
+        </div>
 
-          <div className="animar-drawer relative flex h-screen max-h-[100dvh] w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900">
-            <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
-              <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Menu</span>
-              <button
-                onClick={() => setMenuAberto(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                aria-label="Fechar menu"
-              >
-                <IconeFechar />
-              </button>
-            </div>
+        {/* Direita: busca (mobile) + notificações + avatar */}
+        <div className="ml-auto flex flex-shrink-0 items-center gap-1 sm:ml-0 sm:gap-2">
+          <button
+            onClick={() => setBuscaAberta(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 sm:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            aria-label="Buscar"
+          >
+            <IconeLupa />
+          </button>
 
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-scroll overscroll-contain px-3 py-3">
-              <MenuItem href="/" label="Início" ativo={pathname === '/'}>
-                <IconeCasa />
-              </MenuItem>
-              <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'}>
-                <IconeLista />
-              </MenuItem>
-              <MenuItem href="/cadastrados" label="Cadastrados" ativo={pathname === '/cadastrados'} badge={badgeCadastrados}>
-                <IconePessoa />
-              </MenuItem>
-              {(plano === 'profissional' || plano === 'master') && (
-                <MenuItem href="/agenda" label="Agenda" ativo={pathname === '/agenda'} badge={badgeAgenda}>
-                  <IconeAgenda />
-                </MenuItem>
-              )}
-              {(plano === 'profissional' || plano === 'master') && (
-                <MenuItem href="/faltaram" label="Faltaram" ativo={pathname === '/faltaram'}>
-                  <IconeAusente />
-                </MenuItem>
-              )}
-              {plano !== 'profissional' && plano !== 'master' && (
-                <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'}>
-                  <IconeMais />
-                </MenuItem>
-              )}
-              <MenuItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'}>
-                <IconeCoracao />
-              </MenuItem>
-              <MenuItem href="/aniversariantes" label="Aniversariantes" ativo={pathname === '/aniversariantes'}>
-                <IconeBolo />
-              </MenuItem>
-              <MenuItem href="/historico" label="Histórico" ativo={pathname === '/historico'}>
-                <IconeRelogio />
-              </MenuItem>
-              <MenuItem href="/movimentacao" label="Movimentação" ativo={pathname === '/movimentacao'} badge={badgeMovimentacao}>
-                <IconeMovimentacao />
-              </MenuItem>
-              <MenuItem href="/changelog" label="Novidades" ativo={pathname === '/changelog'} badge={badgeChangelog}>
-                <IconeEstrela />
-              </MenuItem>
-
-              <button
-                onClick={() => {
-                  setMenuAberto(false)
-                  setTutorialAberto(true)
-                }}
-                className="flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-              >
-                <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
-                  <IconeLivro />
+          {/* Notificações */}
+          <div ref={notifRef} className="relative">
+            <button
+              onClick={() => {
+                setNotifAberto((v) => !v)
+                setAvatarAberto(false)
+              }}
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+              aria-label="Notificações"
+            >
+              <IconeSino />
+              {totalNotificacoes > 0 && (
+                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
+                  {totalNotificacoes > 9 ? '9+' : totalNotificacoes}
                 </span>
-                Tutorial
-              </button>
-
-              <hr className="my-2 border-zinc-100 dark:border-zinc-800" />
-
-              <button
-                onClick={() => {
-                  setMenuAberto(false)
-                  setPainelAberto(true)
-                }}
-                className="flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-              >
-                <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
-                  <IconeEngrenagem />
-                </span>
-                Configurações
-              </button>
-
-              <div>
-                <button
-                  onClick={() => setSubmenuSaibaMaisAberto((v) => !v)}
-                  className="flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                >
-                  <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
-                    <IconeInfo />
-                  </span>
-                  Saiba Mais
-                  <span
-                    className={`ml-auto text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${
-                      submenuSaibaMaisAberto ? 'rotate-180' : ''
-                    }`}
-                  >
-                    <IconeChevronBaixo />
-                  </span>
-                </button>
-
-                {submenuSaibaMaisAberto && (
-                  <div className="ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-zinc-100 pl-3 dark:border-zinc-800">
-                    <button
-                      onClick={() => { setMenuAberto(false); setModalSaibaMais('termos') }}
-                      className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                    >
-                      <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
-                        <IconeDocumento />
-                      </span>
-                      Termos de Uso
-                    </button>
-                    <button
-                      onClick={() => { setMenuAberto(false); setModalSaibaMais('privacidade') }}
-                      className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                    >
-                      <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
-                        <IconeEscudo />
-                      </span>
-                      Política de Privacidade
-                    </button>
-                    <button
-                      onClick={() => { setMenuAberto(false); setModalSaibaMais('sobre') }}
-                      className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                    >
-                      <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500">
-                        <IconeInfo />
-                      </span>
-                      Sobre o Sistema
-                    </button>
-                  </div>
-                )}
+              )}
+            </button>
+            {notifAberto && (
+              <div className="chrome-pop absolute right-0 top-12 z-40 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    Notificações
+                  </p>
+                </div>
+                <div className="max-h-80 overflow-y-auto py-1">
+                  {totalNotificacoes === 0 ? (
+                    <p className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+                      Tudo em dia ✨
+                    </p>
+                  ) : (
+                    <>
+                      {badgeCadastrados > 0 && (
+                        <NotifItem
+                          cor="#8B5CF6"
+                          texto={`${badgeCadastrados} ${badgeCadastrados === 1 ? 'cliente aguardando' : 'clientes aguardando'} aprovação`}
+                          onClick={() => irPara('/cadastrados')}
+                        >
+                          <IconePessoa />
+                        </NotifItem>
+                      )}
+                      {temAgenda && badgeAgenda > 0 && (
+                        <NotifItem
+                          cor="#14B8A6"
+                          texto={`${badgeAgenda} ${badgeAgenda === 1 ? 'agendamento pendente' : 'agendamentos pendentes'}`}
+                          onClick={() => irPara('/agenda')}
+                        >
+                          <IconeAgenda />
+                        </NotifItem>
+                      )}
+                      {badgeMovimentacao > 0 && (
+                        <NotifItem
+                          cor="#3B82F6"
+                          texto={`${badgeMovimentacao} ${badgeMovimentacao === 1 ? 'nova atividade' : 'novas atividades'}`}
+                          onClick={() => irPara('/movimentacao')}
+                        >
+                          <IconeMovimentacao />
+                        </NotifItem>
+                      )}
+                      {badgeChangelog > 0 && (
+                        <NotifItem
+                          cor="#F59E0B"
+                          texto={`${badgeChangelog} ${badgeChangelog === 1 ? 'novidade no sistema' : 'novidades no sistema'}`}
+                          onClick={() => irPara('/changelog')}
+                        >
+                          <IconeEstrela />
+                        </NotifItem>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
-            </nav>
+            )}
+          </div>
+
+          {/* Avatar + dropdown */}
+          <div ref={avatarRef} className="relative">
+            <button
+              onClick={() => {
+                setAvatarAberto((v) => !v)
+                setNotifAberto(false)
+              }}
+              className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-1 transition hover:bg-slate-100 sm:pr-2 dark:hover:bg-slate-800"
+              aria-label="Abrir menu da conta"
+            >
+              <Avatar fotoUrl={fotoUrl} nome={nomeSalao} />
+              <span className="hidden min-w-0 flex-col items-start leading-tight sm:flex">
+                <span className="max-w-[10rem] truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  {nomeSalao || 'Minha conta'}
+                </span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">Administrador</span>
+              </span>
+              <span className="hidden text-slate-400 sm:block dark:text-slate-500">
+                <IconeChevronBaixo />
+              </span>
+            </button>
+            {avatarAberto && (
+              <div className="chrome-pop absolute right-0 top-14 z-40 w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3 dark:border-slate-700">
+                  <Avatar fotoUrl={fotoUrl} nome={nomeSalao} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      {nomeSalao || 'Minha conta'}
+                    </p>
+                    <p className="truncate text-xs text-slate-400 dark:text-slate-500">{email}</p>
+                  </div>
+                </div>
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setAvatarAberto(false)
+                      setPainelAberto(true)
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                  >
+                    <span className="text-slate-400 dark:text-slate-500">
+                      <IconeEngrenagem />
+                    </span>
+                    Configurações
+                  </button>
+                  <button
+                    onClick={alternarTema}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                  >
+                    <span className="text-slate-400 dark:text-slate-500">
+                      {tema === 'claro' ? <IconeLua /> : <IconeSol />}
+                    </span>
+                    {tema === 'claro' ? 'Modo escuro' : 'Modo claro'}
+                  </button>
+                  <hr className="my-1 border-slate-100 dark:border-slate-700" />
+                  <button
+                    onClick={fazerLogout}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                  >
+                    <IconeSair />
+                    Sair
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Busca mobile expandida */}
+        {buscaAberta && (
+          <div
+            ref={buscaMobileRef}
+            className="chrome-pop absolute inset-x-2 top-[4.25rem] z-40 sm:hidden"
+          >
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+                <IconeLupa />
+              </span>
+              <input
+                type="search"
+                autoFocus
+                value={buscaGlobal}
+                onChange={(e) => setBuscaGlobal(e.target.value)}
+                placeholder="Buscar clientes, agendamentos..."
+                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 shadow-lg outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+              />
+            </div>
+            {buscaGlobal.trim().length >= 2 && (
+              <PainelResultadosBusca
+                buscando={buscandoGlobal}
+                clientes={resClientes}
+                agendamentos={resAgendamentos}
+                onIr={irPara}
+              />
+            )}
+          </div>
+        )}
+      </header>
+
+      {/* Overlay do drawer (apenas mobile) */}
+      {menuAberto && (
+        <div
+          className="animar-overlay fixed inset-0 z-30 bg-slate-900/50 lg:hidden"
+          onClick={() => setMenuAberto(false)}
+          aria-hidden="true"
+        />
       )}
+
+      {/* Sidebar — drawer no mobile, fixa e recolhível no desktop */}
+      <aside
+        className={`chrome-sidebar fixed left-0 top-0 z-40 flex h-[100dvh] w-72 max-w-[80vw] flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 lg:max-w-none lg:translate-x-0 ${
+          menuAberto ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        } ${sidebarRecolhida ? 'lg:w-[4.5rem]' : 'lg:w-64'}`}
+        aria-label="Menu de navegação"
+      >
+        {/* Marca + fechar (mobile) */}
+        <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-700">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 text-sm font-bold text-white shadow-sm">
+            {(nomeSalao || 'F').charAt(0).toUpperCase()}
+          </div>
+          <span
+            className={`chrome-label min-w-0 flex-1 truncate text-base font-semibold text-slate-900 dark:text-slate-100 ${
+              sidebarRecolhida ? 'lg:hidden' : ''
+            }`}
+          >
+            {nomeSalao || 'Facilitaai'}
+          </span>
+          <button
+            onClick={() => setMenuAberto(false)}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800"
+            aria-label="Fechar menu"
+          >
+            <IconeFechar />
+          </button>
+        </div>
+
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto overscroll-contain px-3 py-3">
+          <MenuItem href="/" label="Início" ativo={pathname === '/'} cor={COR_MODULO['/']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeCasa />
+          </MenuItem>
+          <MenuItem href="/clientes" label="Clientes" ativo={pathname === '/clientes'} cor={COR_MODULO['/clientes']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeLista />
+          </MenuItem>
+          <MenuItem href="/cadastrados" label="Cadastrados" ativo={pathname === '/cadastrados'} badge={badgeCadastrados} cor={COR_MODULO['/cadastrados']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconePessoa />
+          </MenuItem>
+          {temAgenda && (
+            <MenuItem href="/agenda" label="Agenda" ativo={pathname === '/agenda'} badge={badgeAgenda} cor={COR_MODULO['/agenda']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+              <IconeAgenda />
+            </MenuItem>
+          )}
+          {temAgenda && (
+            <MenuItem href="/faltaram" label="Faltaram" ativo={pathname === '/faltaram'} cor={COR_MODULO['/faltaram']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+              <IconeAusente />
+            </MenuItem>
+          )}
+          {!temAgenda && (
+            <MenuItem href="/cadastro" label="Registrar Atendimento" ativo={pathname === '/cadastro'} cor={COR_MODULO['/cadastro']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+              <IconeMais />
+            </MenuItem>
+          )}
+          <MenuItem href="/reativar" label="Reativar" ativo={pathname === '/reativar'} cor={COR_MODULO['/reativar']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeCoracao />
+          </MenuItem>
+          <MenuItem href="/aniversariantes" label="Aniversariantes" ativo={pathname === '/aniversariantes'} cor={COR_MODULO['/aniversariantes']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeBolo />
+          </MenuItem>
+          <MenuItem href="/historico" label="Histórico" ativo={pathname === '/historico'} cor={COR_MODULO['/historico']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeRelogio />
+          </MenuItem>
+          <MenuItem href="/movimentacao" label="Movimentação" ativo={pathname === '/movimentacao'} badge={badgeMovimentacao} cor={COR_MODULO['/movimentacao']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeMovimentacao />
+          </MenuItem>
+          <MenuItem href="/changelog" label="Novidades" ativo={pathname === '/changelog'} badge={badgeChangelog} cor={COR_MODULO['/changelog']} recolhida={sidebarRecolhida} onNavegar={() => setMenuAberto(false)}>
+            <IconeEstrela />
+          </MenuItem>
+
+          <hr className="my-2 border-slate-100 dark:border-slate-700" />
+
+          <BotaoMenu icone={<IconeLivro />} label="Tutorial" recolhida={sidebarRecolhida} onClick={() => { setMenuAberto(false); setTutorialAberto(true) }} />
+          <BotaoMenu icone={<IconeEngrenagem />} label="Configurações" recolhida={sidebarRecolhida} onClick={() => { setMenuAberto(false); setPainelAberto(true) }} />
+
+          <div>
+            <button
+              onClick={() => setSubmenuSaibaMaisAberto((v) => !v)}
+              title={sidebarRecolhida ? 'Saiba Mais' : undefined}
+              className={`flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 ${
+                sidebarRecolhida ? 'lg:justify-center lg:px-0' : ''
+              }`}
+            >
+              <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                <IconeInfo />
+              </span>
+              <span className={`chrome-label ${sidebarRecolhida ? 'lg:hidden' : ''}`}>Saiba Mais</span>
+              <span
+                className={`chrome-label ml-auto text-slate-400 transition-transform duration-200 dark:text-slate-500 ${
+                  submenuSaibaMaisAberto ? 'rotate-180' : ''
+                } ${sidebarRecolhida ? 'lg:hidden' : ''}`}
+              >
+                <IconeChevronBaixo />
+              </span>
+            </button>
+
+            {submenuSaibaMaisAberto && (
+              <div
+                className={`ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-slate-100 pl-3 dark:border-slate-700 ${
+                  sidebarRecolhida ? 'lg:hidden' : ''
+                }`}
+              >
+                <button
+                  onClick={() => { setMenuAberto(false); setModalSaibaMais('termos') }}
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                >
+                  <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                    <IconeDocumento />
+                  </span>
+                  Termos de Uso
+                </button>
+                <button
+                  onClick={() => { setMenuAberto(false); setModalSaibaMais('privacidade') }}
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                >
+                  <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                    <IconeEscudo />
+                  </span>
+                  Política de Privacidade
+                </button>
+                <button
+                  onClick={() => { setMenuAberto(false); setModalSaibaMais('sobre') }}
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                >
+                  <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                    <IconeInfo />
+                  </span>
+                  Sobre o Sistema
+                </button>
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Rodapé: card do plano */}
+        <div className="flex-shrink-0 border-t border-slate-200 p-3 dark:border-slate-700">
+          <CardPlano plano={plano} recolhida={sidebarRecolhida} />
+        </div>
+      </aside>
 
       {/* Painel de configurações */}
       {painelAberto && (
@@ -657,17 +1029,17 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={() => !salvandoNome && !salvandoWhatsapp && setPainelAberto(false)}
           />
 
-          <div className="animar-sheet relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
+          <div className="animar-sheet relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-slate-800 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden" />
 
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                 Configurações
               </h2>
               <button
                 onClick={() => !salvandoNome && !salvandoWhatsapp && setPainelAberto(false)}
                 disabled={salvandoNome || salvandoWhatsapp}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 disabled:opacity-40 dark:text-slate-400 dark:hover:bg-slate-700"
                 aria-label="Fechar"
               >
                 <IconeFechar />
@@ -675,11 +1047,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
 
             {email && (
-              <div className="mb-5 rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-800">
-                <p className="text-xs font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+              <div className="mb-5 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-700">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
                   Conta
                 </p>
-                <p className="mt-0.5 truncate text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                <p className="mt-0.5 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
                   {email}
                 </p>
               </div>
@@ -690,7 +1062,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="config-nome-salao"
-                  className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
                   Nome do profissional
                 </label>
@@ -702,7 +1074,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     value={novoNomeSalao}
                     onChange={(e) => setNovoNomeSalao(e.target.value)}
                     disabled={salvandoNome}
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:disabled:bg-zinc-900/50"
+                    className="h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:disabled:bg-slate-900/50"
                   />
                   <button
                     onClick={salvarNomeSalao}
@@ -711,7 +1083,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       !novoNomeSalao.trim() ||
                       novoNomeSalao.trim() === nomeSalao
                     }
-                    className="h-11 flex-shrink-0 rounded-lg bg-pink-500 px-4 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-11 flex-shrink-0 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {salvandoNome ? '…' : 'Salvar'}
                   </button>
@@ -721,7 +1093,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="config-whatsapp"
-                  className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
                   WhatsApp do profissional
                 </label>
@@ -733,7 +1105,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     onChange={(e) => setNovoWhatsapp(e.target.value)}
                     disabled={salvandoWhatsapp}
                     placeholder="(11) 99999-9999"
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:disabled:bg-zinc-900/50"
+                    className="h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:disabled:bg-slate-900/50"
                   />
                   <button
                     onClick={salvarWhatsapp}
@@ -742,7 +1114,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       normalizarWhatsApp(novoWhatsapp).length < 10 ||
                       normalizarWhatsApp(novoWhatsapp) === whatsapp
                     }
-                    className="h-11 flex-shrink-0 rounded-lg bg-pink-500 px-4 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-11 flex-shrink-0 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {salvandoWhatsapp ? '…' : 'Salvar'}
                   </button>
@@ -752,7 +1124,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="config-genero"
-                  className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
                   Gênero do profissional
                 </label>
@@ -761,52 +1133,52 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   value={genero}
                   onChange={(e) => salvarGenero(e.target.value as 'feminino' | 'masculino' | 'nao_informar')}
                   disabled={salvandoGenero}
-                  className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-base text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:disabled:bg-zinc-900/50"
+                  className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:disabled:bg-slate-900/50"
                 >
                   <option value="feminino">Feminino</option>
                   <option value="masculino">Masculino</option>
                   <option value="nao_informar">Prefiro não informar</option>
                 </select>
                 {salvandoGenero && (
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Salvando…</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Salvando…</p>
                 )}
               </div>
 
               {linkFormulario && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     Link do seu formulário
                   </p>
-                  <div className="flex items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 dark:bg-zinc-800">
-                    <span className="min-w-0 flex-1 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                  <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-700">
+                    <span className="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">
                       {linkFormulario}
                     </span>
                     <button
                       onClick={copiarLink}
-                      className="flex-shrink-0 rounded-md bg-pink-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+                      className="flex-shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
                     >
                       {copiado ? 'Copiado!' : 'Copiar link'}
                     </button>
                   </div>
                   <button
                     onClick={baixarQrCode}
-                    className="self-start text-sm text-pink-500 hover:text-pink-600 hover:underline dark:text-pink-400"
+                    className="self-start text-sm text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400"
                   >
                     Baixar QR Code
                   </button>
                 </div>
               )}
 
-              <hr className="border-zinc-100 dark:border-zinc-800" />
+              <hr className="border-slate-200 dark:border-slate-700" />
 
               <div className="flex flex-col gap-4">
-                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                   Personalizar formulário
                 </p>
 
                 {/* Foto */}
                 <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Foto</p>
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Foto</p>
                   {fotoUrl && (
                     <img
                       src={fotoUrl}
@@ -839,7 +1211,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                         type="button"
                         onClick={() => setConfirmandoRemoverFoto(false)}
                         disabled={removendoFoto}
-                        className="text-xs text-zinc-500 transition hover:text-zinc-700 disabled:opacity-50 dark:text-zinc-400"
+                        className="text-xs text-slate-500 transition hover:text-slate-700 disabled:opacity-50 dark:text-slate-400"
                       >
                         Cancelar
                       </button>
@@ -848,7 +1220,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <button
                     onClick={() => setOpcoesFotoAbertas((v) => !v)}
                     disabled={salvandoFoto}
-                    className={`flex h-11 items-center justify-center gap-2 rounded-lg border border-zinc-300 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 ${
+                    className={`flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 ${
                       salvandoFoto ? 'cursor-not-allowed opacity-60' : ''
                     }`}
                   >
@@ -856,12 +1228,12 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   </button>
 
                   {opcoesFotoAbertas && !salvandoFoto && (
-                    <div className="flex flex-col overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
+                    <div className="flex flex-col overflow-hidden rounded-lg border border-slate-200 dark:border-slate-600">
                       {/* câmera — apenas mobile */}
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputCameraRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:hidden"
+                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700 sm:hidden"
                       >
                         <span aria-hidden="true">📷</span> Tirar foto
                       </button>
@@ -869,7 +1241,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputGaleriaRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-zinc-100 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:hidden"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-slate-200 px-4 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 sm:hidden"
                       >
                         <span aria-hidden="true">🖼️</span> Escolher da galeria
                       </button>
@@ -877,7 +1249,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputUploadRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-zinc-100 px-4 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:border-t-0"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-slate-200 px-4 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 sm:border-t-0"
                       >
                         <span aria-hidden="true">💻</span> Fazer upload
                       </button>
@@ -887,13 +1259,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
                 {/* Cor primária */}
                 <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                     Cor primária
                   </p>
                   <div className="flex flex-col items-center gap-3">
                     <label className="relative block h-20 w-20 cursor-pointer">
                       <div
-                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-white dark:ring-zinc-800"
+                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-white dark:ring-slate-700"
                         style={{ backgroundColor: corSelecionada }}
                       />
                       <input
@@ -906,10 +1278,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     </label>
                     <div className="flex items-center gap-2">
                       <div
-                        className="h-5 w-5 rounded-full border border-zinc-200 dark:border-zinc-700"
+                        className="h-5 w-5 rounded-full border border-slate-200 dark:border-slate-600"
                         style={{ backgroundColor: corSelecionada }}
                       />
-                      <span className="font-mono text-sm text-zinc-600 dark:text-zinc-300">
+                      <span className="font-mono text-sm text-slate-600 dark:text-slate-300">
                         {corSelecionada}
                       </span>
                     </div>
@@ -917,14 +1289,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <button
                     onClick={salvarCor}
                     disabled={salvandoCor || corSelecionada === corPrimaria}
-                    className="flex h-11 items-center justify-center rounded-lg bg-pink-500 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-11 items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {salvandoCor ? 'Salvando…' : 'Salvar cor'}
                   </button>
                 </div>
               </div>
 
-              <hr className="border-zinc-100 dark:border-zinc-800" />
+              <hr className="border-slate-200 dark:border-slate-700" />
 
               <button
                 onClick={fazerLogout}
@@ -956,11 +1328,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             className="animar-overlay absolute inset-0 bg-black/40"
             onClick={() => setModalSaibaMais(null)}
           />
-          <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
-            <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
+          <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-slate-800 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+            <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden" />
 
             <div className="flex flex-shrink-0 items-center justify-between px-5 pb-4 pt-2">
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                 {modalSaibaMais === 'termos'
                   ? 'Termos de Uso'
                   : modalSaibaMais === 'privacidade'
@@ -969,7 +1341,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </h2>
               <button
                 onClick={() => setModalSaibaMais(null)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
                 aria-label="Fechar"
               >
                 <IconeFechar />
@@ -982,10 +1354,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               {modalSaibaMais === 'sobre' && <ConteudoSobre />}
             </div>
 
-            <div className="flex-shrink-0 border-t border-zinc-100 px-5 pb-6 pt-4 dark:border-zinc-800">
+            <div className="flex-shrink-0 border-t border-slate-200 px-5 pb-6 pt-4 dark:border-slate-700">
               <button
                 onClick={() => setModalSaibaMais(null)}
-                className="h-11 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+                className="h-11 w-full rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
               >
                 Fechar
               </button>
@@ -1011,7 +1383,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      <div className="pt-14">{children}</div>
+      <div
+        className={`chrome-shell min-h-screen bg-slate-50 pt-16 dark:bg-slate-900 ${
+          sidebarRecolhida ? 'lg:pl-[4.5rem]' : 'lg:pl-64'
+        }`}
+      >
+        {children}
+      </div>
     </>
   )
 }
@@ -1019,10 +1397,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 function SecaoLegal({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {titulo}
       </h3>
-      <div className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{children}</div>
+      <div className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{children}</div>
     </div>
   )
 }
@@ -1030,7 +1408,7 @@ function SecaoLegal({ titulo, children }: { titulo: string; children: React.Reac
 function ConteudoTermos() {
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">Última atualização: 19/06/2026</p>
+      <p className="text-xs text-slate-400 dark:text-slate-500">Última atualização: 19/06/2026</p>
       <SecaoLegal titulo="1. Aceitação dos Termos">
         Ao acessar e utilizar a plataforma Facilitaai, o usuário declara ter lido, compreendido e
         concordado com os presentes Termos de Uso. Caso não concorde com alguma condição, o uso da
@@ -1087,7 +1465,7 @@ function ConteudoTermos() {
 function ConteudoPrivacidade() {
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">Última atualização: 19/06/2026</p>
+      <p className="text-xs text-slate-400 dark:text-slate-500">Última atualização: 19/06/2026</p>
       <SecaoLegal titulo="Seção I — Informações Gerais">
         Esta Política de Privacidade descreve como os dados pessoais dos usuários são coletados,
         utilizados e protegidos na plataforma Facilitaai. Esta política foi elaborada em
@@ -1130,7 +1508,7 @@ function ConteudoPrivacidade() {
 
 function ConteudoSobre() {
   return (
-    <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
       A Facilitaai é uma plataforma de gestão e reativação de clientes criada para profissionais
       autônomos e pequenos negócios. Organize suas clientes, veja quem está sumindo e reconecte
       com um clique via WhatsApp.
@@ -1156,14 +1534,14 @@ function BlocoLink({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{rotulo}</p>
-      <div className="flex items-center gap-2 rounded-xl bg-zinc-50 px-3 py-3 dark:bg-zinc-800">
-        <span className="min-w-0 flex-1 break-all text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{rotulo}</p>
+      <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-700">
+        <span className="min-w-0 flex-1 break-all text-xs text-slate-500 dark:text-slate-400">
           {link}
         </span>
         <button
           onClick={onCopiar}
-          className="flex-shrink-0 rounded-lg bg-pink-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+          className="flex-shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
         >
           {copiado ? 'Copiado!' : 'Copiar'}
         </button>
@@ -1202,17 +1580,17 @@ function ModalPrimeirosPassos({
     >
       <div className="animar-overlay absolute inset-0 bg-black/50" />
 
-      <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
-        <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
+      <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-slate-800 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+        <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden" />
 
         <div className="flex-shrink-0 px-5 pb-2 pt-4">
           <div className="mb-1 flex items-center gap-2">
             <span className="text-2xl" aria-hidden="true">🚀</span>
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
               Primeiros passos
             </h2>
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Guarde estes links — você vai precisar deles para divulgar o sistema para suas clientes.
           </p>
         </div>
@@ -1235,16 +1613,16 @@ function ModalPrimeirosPassos({
               />
             )}
 
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               Você também encontra esses links nas Configurações a qualquer momento.
             </p>
           </div>
         </div>
 
-        <div className="flex-shrink-0 border-t border-zinc-100 px-5 pb-6 pt-4 dark:border-zinc-800">
+        <div className="flex-shrink-0 border-t border-slate-200 px-5 pb-6 pt-4 dark:border-slate-700">
           <button
             onClick={onFechar}
-            className="h-11 w-full rounded-xl bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700"
+            className="h-11 w-full rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
           >
             Entendido
           </button>
@@ -1254,10 +1632,124 @@ function ModalPrimeirosPassos({
   )
 }
 
-function BadgeContagem({ contagem }: { contagem: number }) {
+function Avatar({ fotoUrl, nome }: { fotoUrl: string; nome: string }) {
+  if (fotoUrl) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return (
+      <img
+        src={fotoUrl}
+        alt={nome || 'Foto da conta'}
+        className="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+      />
+    )
+  }
+  return (
+    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-teal-500 text-sm font-semibold text-white">
+      {(nome || 'A').charAt(0).toUpperCase()}
+    </div>
+  )
+}
+
+function NotifItem({
+  cor,
+  texto,
+  onClick,
+  children,
+}: {
+  cor: string
+  texto: string
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+    >
+      <span
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: `${cor}1A`, color: cor }}
+      >
+        {children}
+      </span>
+      <span className="flex-1 text-sm text-slate-700 dark:text-slate-200">{texto}</span>
+    </button>
+  )
+}
+
+function BotaoMenu({
+  icone,
+  label,
+  recolhida,
+  onClick,
+}: {
+  icone: React.ReactNode
+  label: string
+  recolhida: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={recolhida ? label : undefined}
+      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 ${
+        recolhida ? 'lg:justify-center lg:px-0' : ''
+      }`}
+    >
+      <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">{icone}</span>
+      <span className={`chrome-label ${recolhida ? 'lg:hidden' : ''}`}>{label}</span>
+    </button>
+  )
+}
+
+function CardPlano({ plano, recolhida }: { plano: string; recolhida: boolean }) {
+  const rotulo = ROTULO_PLANO[plano] ?? 'Basic'
+  const corBadge =
+    plano === 'master' ? '#14B8A6' : plano === 'profissional' ? '#2563EB' : '#64748B'
+
+  return (
+    <>
+      <div
+        className={`flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60 ${
+          recolhida ? 'lg:hidden' : ''
+        }`}
+      >
+        <span
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white"
+          style={{ backgroundColor: corBadge }}
+        >
+          <IconeCoroa />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs text-slate-400 dark:text-slate-500">Seu plano</p>
+          <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+            {rotulo}
+          </p>
+        </div>
+      </div>
+
+      <div
+        className={`hidden justify-center ${recolhida ? 'lg:flex' : ''}`}
+        title={`Plano ${rotulo}`}
+      >
+        <span
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-white"
+          style={{ backgroundColor: corBadge }}
+        >
+          <IconeCoroa />
+        </span>
+      </div>
+    </>
+  )
+}
+
+function BadgeContagem({ contagem, cor }: { contagem: number; cor: string }) {
   if (contagem === 0) return null
   return (
-    <span className="ml-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-bold text-white">
+    <span
+      className="ml-auto flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
+      style={{ backgroundColor: cor }}
+    >
       {contagem > 99 ? '99+' : contagem}
     </span>
   )
@@ -1268,32 +1760,139 @@ function MenuItem({
   label,
   ativo,
   badge,
+  cor,
+  recolhida,
+  onNavegar,
   children,
 }: {
   href: string
   label: string
   ativo: boolean
   badge?: number
+  cor: string
+  recolhida: boolean
+  onNavegar?: () => void
   children: React.ReactNode
 }) {
   return (
     <Link
       href={href}
-      className={`flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${
+      onClick={onNavegar}
+      title={recolhida ? label : undefined}
+      style={ativo ? { backgroundColor: `${cor}14`, color: cor } : undefined}
+      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
         ativo
-          ? 'bg-pink-50 text-pink-600 dark:bg-pink-950/30 dark:text-pink-400'
-          : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-      }`}
+          ? 'font-semibold'
+          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+      } ${recolhida ? 'lg:justify-center lg:px-0' : ''}`}
     >
-      <span
-        className={`flex-shrink-0 ${
-          ativo ? 'text-pink-500' : 'text-zinc-400 dark:text-zinc-500'
-        }`}
-      >
+      <span className="relative flex-shrink-0" style={{ color: cor }}>
         {children}
+        {badge ? (
+          <span
+            className={`absolute -right-1 -top-1 hidden h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-slate-900 ${
+              recolhida ? 'lg:block' : ''
+            }`}
+            style={{ backgroundColor: cor }}
+          />
+        ) : null}
       </span>
-      {label}
-      {badge ? <BadgeContagem contagem={badge} /> : null}
+      <span className={`chrome-label ${recolhida ? 'lg:hidden' : ''}`}>{label}</span>
+      {badge ? (
+        <span className={`ml-auto ${recolhida ? 'lg:hidden' : ''}`}>
+          <BadgeContagem contagem={badge} cor={cor} />
+        </span>
+      ) : null}
     </Link>
+  )
+}
+
+function formatarDataBusca(data: string): string {
+  const partes = data.split('-')
+  if (partes.length !== 3) return data
+  return `${partes[2]}/${partes[1]}`
+}
+
+function PainelResultadosBusca({
+  buscando,
+  clientes,
+  agendamentos,
+  onIr,
+}: {
+  buscando: boolean
+  clientes: ResultadoCliente[]
+  agendamentos: ResultadoAgendamento[]
+  onIr: (href: string) => void
+}) {
+  const vazio = clientes.length === 0 && agendamentos.length === 0
+
+  return (
+    <div className="chrome-pop absolute left-0 right-0 top-full z-40 mt-2 max-h-[24rem] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
+      {buscando && vazio ? (
+        <p className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+          Buscando…
+        </p>
+      ) : vazio ? (
+        <p className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+          Nada encontrado
+        </p>
+      ) : (
+        <div className="py-1">
+          {clientes.length > 0 && (
+            <>
+              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                Clientes
+              </p>
+              {clientes.map((c) => (
+                <button
+                  key={`c-${c.id}`}
+                  onClick={() => onIr(`/clientes?q=${encodeURIComponent(c.nome)}`)}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                >
+                  <span
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: '#8B5CF61A', color: '#8B5CF6' }}
+                  >
+                    <IconePessoa />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {c.nome}
+                  </span>
+                </button>
+              ))}
+            </>
+          )}
+
+          {agendamentos.length > 0 && (
+            <>
+              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                Agendamentos
+              </p>
+              {agendamentos.map((a) => (
+                <button
+                  key={`a-${a.id}`}
+                  onClick={() => onIr('/agenda')}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                >
+                  <span
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: '#14B8A61A', color: '#14B8A6' }}
+                  >
+                    <IconeAgenda />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {a.nome}
+                  </span>
+                  <span className="flex-shrink-0 text-xs text-slate-400 dark:text-slate-500">
+                    {formatarDataBusca(a.data)}
+                    {a.horario ? ` · ${a.horario}` : ''}
+                  </span>
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

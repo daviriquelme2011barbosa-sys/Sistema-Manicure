@@ -58,10 +58,10 @@ export default function FaltaramPage() {
   }, [router])
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Faltaram</h1>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
+      <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-4">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Faltaram</h1>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
           Clientes com horário marcado que não compareceram
         </p>
       </header>
@@ -70,16 +70,16 @@ export default function FaltaramPage() {
         {carregando ? (
           <div className="flex flex-col gap-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="shimmer h-20 rounded-xl bg-zinc-200 dark:bg-zinc-800" />
+              <div key={i} className="shimmer h-20 rounded-xl bg-slate-200 dark:bg-slate-800" />
             ))}
           </div>
         ) : faltaram.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">
             <span className="text-4xl" aria-hidden="true">✅</span>
-            <p className="mt-3 font-medium text-zinc-700 dark:text-zinc-300">
+            <p className="mt-3 font-medium text-slate-700 dark:text-slate-300">
               Nenhuma cliente faltou ainda
             </p>
-            <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
+            <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
               Quando uma cliente não comparecer ao horário marcado, ela aparecerá aqui.
             </p>
           </div>
@@ -91,13 +91,13 @@ export default function FaltaramPage() {
               return (
                 <li
                   key={ag.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                       {nome}
                     </p>
-                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                       {formatarData(ag.data)}
                       {ag.horario && ` às ${ag.horario.slice(0, 5)}`}
                       {ag.servico && ` · ${ag.servico}`}

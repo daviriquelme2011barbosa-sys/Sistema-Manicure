@@ -62,7 +62,7 @@ export function CampoSenha({
         onChange={onChange}
         disabled={disabled}
         placeholder={placeholder}
-        className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 ${
+        className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-zinc-100 ${
           erro ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
         }`}
       />

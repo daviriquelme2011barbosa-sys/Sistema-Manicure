@@ -85,10 +85,10 @@ export default function HistoricoPage() {
   }, [mes, ano])
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Histórico</h1>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Histórico</h1>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
           Todos os atendimentos do período
         </p>
       </header>
@@ -97,7 +97,7 @@ export default function HistoricoPage() {
         <select
           value={mes}
           onChange={(e) => setMes(Number(e.target.value))}
-          className="h-11 flex-1 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+          className="h-11 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         >
           {MESES.map((nome, i) => (
             <option key={i + 1} value={i + 1}>
@@ -109,7 +109,7 @@ export default function HistoricoPage() {
         <select
           value={ano}
           onChange={(e) => setAno(Number(e.target.value))}
-          className="h-11 w-28 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+          className="h-11 w-28 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         >
           {anos.map((a) => (
             <option key={a} value={a}>
@@ -129,10 +129,10 @@ export default function HistoricoPage() {
         ) : atendimentos.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
             <span className="text-4xl" aria-hidden="true">📋</span>
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            <p className="font-medium text-slate-700 dark:text-slate-300">
               Nenhum atendimento em {MESES[mes - 1]} {ano}
             </p>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+            <p className="text-sm text-slate-400 dark:text-slate-500">
               Registre atendimentos para visualizar o histórico aqui.
             </p>
           </div>
@@ -141,33 +141,33 @@ export default function HistoricoPage() {
             {atendimentos.map((atendimento) => (
               <li
                 key={atendimento.id}
-                className="rounded-xl bg-white px-4 py-4 shadow-sm dark:bg-zinc-800"
+                className="rounded-xl bg-white px-4 py-4 shadow-sm dark:bg-slate-800"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">
+                    <p className="truncate font-medium text-slate-900 dark:text-slate-100">
                       {atendimento.clientes.nome}
                     </p>
-                    <p className="mt-0.5 truncate text-sm text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-0.5 truncate text-sm text-slate-500 dark:text-slate-400">
                       {atendimento.servico}
                     </p>
                     {atendimento.horario && (
-                      <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+                      <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                         {atendimento.horario}
                       </p>
                     )}
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
                       {formatarData(atendimento.data_atendimento)}
                     </p>
                     {atendimento.preco !== null && (
-                      <p className="mt-0.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                      <p className="mt-0.5 text-sm font-semibold text-slate-700 dark:text-slate-300">
                         {formatarPreco(atendimento.preco)}
                       </p>
                     )}
                     {atendimento.forma_pagamento && (
-                      <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+                      <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                         {FORMA_PAGAMENTO_LABEL[atendimento.forma_pagamento] ?? atendimento.forma_pagamento}
                       </p>
                     )}

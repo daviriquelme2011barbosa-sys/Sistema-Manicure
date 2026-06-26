@@ -264,17 +264,17 @@ export default function MovimentacaoPage() {
   }, [carregar])
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-100 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           Movimentação
         </h1>
-        <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
           Atividades recentes do seu salão
         </p>
       </header>
 
-      <div className="border-b border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
         <div className="flex gap-2">
           {OPCOES_FILTRO.map((opcao) => (
             <button
@@ -282,8 +282,8 @@ export default function MovimentacaoPage() {
               onClick={() => setFiltro(opcao.valor)}
               className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${
                 filtro === opcao.valor
-                  ? 'bg-pink-500 text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-600'
               }`}
             >
               {opcao.rotulo}
@@ -302,10 +302,10 @@ export default function MovimentacaoPage() {
         ) : itens.length === 0 && !cardResumoMes ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
             <span className="text-4xl" aria-hidden="true">🔍</span>
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            <p className="font-medium text-slate-700 dark:text-slate-300">
               Nenhuma movimentação ainda
             </p>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+            <p className="text-sm text-slate-400 dark:text-slate-500">
               As ações do sistema aparecerão aqui automaticamente.
             </p>
           </div>
@@ -324,20 +324,20 @@ export default function MovimentacaoPage() {
 
 function CardMovimentacao({ item }: { item: ItemMovimentacao }) {
   const conteudo = (
-    <div className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm transition dark:bg-zinc-800">
+    <div className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm transition dark:bg-slate-800">
       <span className="flex-shrink-0 text-xl" aria-hidden="true">
         {iconeParaTipo(item.tipo)}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
+        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
           {item.descricao}
         </p>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
           {formatarDataHora(item.criado_em)}
         </p>
       </div>
       {item.href && (
-        <span className="flex-shrink-0 text-xs font-medium text-pink-500 dark:text-pink-400">
+        <span className="flex-shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400">
           Ver →
         </span>
       )}

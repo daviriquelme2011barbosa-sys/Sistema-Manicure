@@ -196,7 +196,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
             className="carrossel-progresso h-full"
             style={{
               width: `${progresso}%`,
-              background: 'linear-gradient(90deg, #ec4899, #9333ea)',
+              background: 'linear-gradient(90deg, #2563EB, #14B8A6)',
             }}
           />
         </div>
@@ -277,7 +277,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
                   width: i === indice ? '18px' : '6px',
                   height: '6px',
                   background: i === indice
-                    ? 'linear-gradient(90deg, #ec4899, #9333ea)'
+                    ? 'linear-gradient(90deg, #2563EB, #14B8A6)'
                     : 'rgba(255,255,255,0.22)',
                 }}
               />
@@ -290,7 +290,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
               onClick={onFechar}
               className="flex h-11 flex-shrink-0 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
               style={{
-                background: 'linear-gradient(135deg, #ec4899, #9333ea)',
+                background: 'linear-gradient(135deg, #2563EB, #14B8A6)',
                 boxShadow: '0 4px 16px rgba(236,72,153,0.35)',
               }}
             >
@@ -302,7 +302,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
               aria-label="Próximo slide"
               className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-white transition hover:opacity-90 active:scale-95"
               style={{
-                background: 'linear-gradient(135deg, #ec4899, #9333ea)',
+                background: 'linear-gradient(135deg, #2563EB, #14B8A6)',
                 boxShadow: '0 4px 16px rgba(236,72,153,0.35)',
               }}
             >

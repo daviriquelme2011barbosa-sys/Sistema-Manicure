@@ -217,24 +217,24 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       className="fixed inset-0 z-40 flex flex-col justify-end overflow-hidden sm:items-center sm:justify-center"
     >
       <div className="animar-overlay absolute inset-0 bg-black/40" onClick={fecharEdicao} />
-      <div className="animar-sheet relative flex flex-col w-full max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-zinc-900 shadow-xl sm:max-w-md sm:rounded-2xl">
+      <div className="animar-sheet relative flex flex-col w-full max-h-[85vh] sm:max-h-[80vh] rounded-t-2xl bg-white dark:bg-slate-800 shadow-xl sm:max-w-md sm:rounded-2xl">
         <button
           onClick={fecharEdicao}
           disabled={salvandoEdicao || excluindo}
-          className="absolute right-3 top-3 hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+          className="absolute right-3 top-3 hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40"
           aria-label="Fechar"
         >
           <IconeFechar />
         </button>
         <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-8 pt-5">
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700 sm:hidden" />
+        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200 dark:bg-slate-700 sm:hidden" />
 
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Editar cliente</h2>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Editar cliente</h2>
           <button
             onClick={fecharEdicao}
             disabled={salvandoEdicao || excluindo}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40"
             aria-label="Fechar"
           >
             <IconeFechar />
@@ -244,7 +244,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
         <div className="flex flex-col gap-4">
           {/* Nome */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="edit-nome" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="edit-nome" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Nome <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -254,8 +254,8 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               value={edicao.nome}
               onChange={(e) => setEdicao((prev) => ({ ...prev, nome: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
-                errosEdicao.nome ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+              className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
+                errosEdicao.nome ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
               }`}
             />
             {errosEdicao.nome && (
@@ -265,7 +265,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
 
           {/* WhatsApp */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="edit-whatsapp" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="edit-whatsapp" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -274,8 +274,8 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               value={edicao.whatsapp}
               onChange={(e) => setEdicao((prev) => ({ ...prev, whatsapp: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
-                errosEdicao.whatsapp ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+              className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
+                errosEdicao.whatsapp ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
               }`}
             />
             {errosEdicao.whatsapp && (
@@ -285,9 +285,9 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
 
           {/* E-mail */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="edit-email" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="edit-email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               E-mail
-              <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
+              <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
             <input
               id="edit-email"
@@ -296,8 +296,8 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               onChange={(e) => setEdicao((prev) => ({ ...prev, email: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
               placeholder="seu@email.com"
-              className={`h-12 rounded-lg border px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50 ${
-                errosEdicao.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'
+              className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
+                errosEdicao.email ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
               }`}
             />
             {errosEdicao.email && (
@@ -307,9 +307,9 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
 
           {/* Serviço */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="edit-servico" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="edit-servico" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Último serviço
-              <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
+              <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
             <input
               id="edit-servico"
@@ -319,7 +319,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               onChange={(e) => setEdicao((prev) => ({ ...prev, servico: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
               placeholder="Ex: Manicure, Pedicure…"
-              className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+              className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
             />
             <datalist id="lista-servicos-edit">
               {SERVICOS_SUGERIDOS.map((s) => (
@@ -331,7 +331,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
           {/* Data do último atendimento */}
           {cliente.ultima_visita && (
             <div className="flex flex-col gap-1">
-              <label htmlFor="edit-ultima-visita" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label htmlFor="edit-ultima-visita" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Data do último atendimento
               </label>
               <input
@@ -340,22 +340,22 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                 value={edicao.ultimaVisita}
                 onChange={(e) => setEdicao((prev) => ({ ...prev, ultimaVisita: e.target.value }))}
                 disabled={salvandoEdicao || excluindo}
-                className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+                className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
               />
             </div>
           )}
 
           {/* Preço do último atendimento */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="edit-preco" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="edit-preco" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Preço do último atendimento
-              <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
+              <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
             {carregandoPreco ? (
-              <div className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-zinc-100 dark:bg-zinc-700/50 animate-pulse" />
+              <div className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700/50 animate-pulse" />
             ) : cliente.ultima_visita ? (
-              <div className={`flex h-12 items-center overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-pink-500 border-zinc-300 dark:border-zinc-600 ${salvandoEdicao || excluindo ? 'bg-zinc-100 dark:bg-zinc-700/50' : 'bg-white dark:bg-zinc-800'}`}>
-                <span className="flex-shrink-0 pl-4 pr-2 text-sm select-none text-zinc-500 dark:text-zinc-400">
+              <div className={`flex h-12 items-center overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-blue-500 border-slate-300 dark:border-slate-600 ${salvandoEdicao || excluindo ? 'bg-slate-100 dark:bg-slate-700/50' : 'bg-white dark:bg-slate-800'}`}>
+                <span className="flex-shrink-0 pl-4 pr-2 text-sm select-none text-slate-500 dark:text-slate-400">
                   R$
                 </span>
                 <input
@@ -366,7 +366,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                   onChange={(e) => setEdicao((prev) => ({ ...prev, preco: e.target.value }))}
                   disabled={salvandoEdicao || excluindo}
                   placeholder="0,00"
-                  className="h-full flex-1 bg-transparent pr-4 text-base text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none disabled:cursor-not-allowed"
+                  className="h-full flex-1 bg-transparent pr-4 text-base text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none disabled:cursor-not-allowed"
                 />
               </div>
             ) : (
@@ -375,16 +375,16 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                 type="text"
                 disabled
                 placeholder="Sem atendimento registrado"
-                className="h-12 rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 text-base bg-zinc-100 dark:bg-zinc-700/50 text-zinc-400 dark:text-zinc-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 cursor-not-allowed"
+                className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-4 text-base bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 cursor-not-allowed"
               />
             )}
           </div>
 
           {/* Observações */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="edit-observacoes" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="edit-observacoes" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Observações
-              <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">(opcional)</span>
+              <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
             <textarea
               id="edit-observacoes"
@@ -393,7 +393,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               disabled={salvandoEdicao || excluindo}
               placeholder="Preferências, alergias…"
               rows={2}
-              className="resize-none rounded-lg border border-zinc-300 dark:border-zinc-600 px-4 py-3 text-base text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-700/50"
+              className="resize-none rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
             />
           </div>
 
@@ -404,9 +404,9 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               checked={edicao.autorizaContato}
               onChange={(e) => setEdicao((prev) => ({ ...prev, autorizaContato: e.target.checked }))}
               disabled={salvandoEdicao || excluindo}
-              className="mt-0.5 h-5 w-5 flex-shrink-0 accent-pink-500"
+              className="mt-0.5 h-5 w-5 flex-shrink-0 accent-blue-600"
             />
-            <span className="text-sm text-zinc-600 dark:text-zinc-400">
+            <span className="text-sm text-slate-600 dark:text-slate-400">
               Cliente autoriza contato via WhatsApp
             </span>
           </label>
@@ -420,7 +420,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                 <button
                   onClick={() => setConfirmarExclusao(false)}
                   disabled={excluindo}
-                  className="h-11 flex-1 rounded-lg border border-zinc-300 dark:border-zinc-600 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-40"
+                  className="h-11 flex-1 rounded-lg border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40"
                 >
                   Cancelar
                 </button>
@@ -438,7 +438,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               <button
                 onClick={salvarEdicao}
                 disabled={salvandoEdicao || !edicao.autorizaContato}
-                className="h-12 rounded-lg bg-pink-500 font-semibold text-white transition hover:bg-pink-600 active:bg-pink-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 rounded-lg bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {salvandoEdicao ? 'Salvando…' : 'Salvar alterações'}
               </button>

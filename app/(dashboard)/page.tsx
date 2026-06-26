@@ -1,36 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 
-type DadosMes = {
-  mes: string
-  clientesNovos: number
-  clientesAtivas: number
-  reativacoesBemsucedidas: number
-  agendamentos: number
-  faturamento: number
+type SeriesKPI = {
+  ativas: number[]
+  sumidas: number[]
+  aniversariantes: number[]
+  atendimentos: number[]
+  faturamento: number[]
+  total: number[]
 }
 
 type DadosDashboard = {
   clientesAtivas: number
+  clientesAtencao: number
   clientesSumidas: number
   aniversariantesDoMes: number
   atendimentosDoMes: number
   faturamentoDoMes: number
   totalClientes: number
   movimentacoesHoje: number
-  dadosMeses: DadosMes[]
+  series: SeriesKPI
   plano: string
   clientesPendentes: number
 }
@@ -45,10 +38,10 @@ function saudacao(): string {
 function gradienteGreeting(): string {
   const hora = new Date().getHours()
   if (hora < 12)
-    return 'from-amber-50 via-rose-50 to-pink-50 dark:from-amber-950/20 dark:via-rose-950/20 dark:to-pink-950/20'
+    return 'from-sky-50 via-blue-50 to-indigo-50 dark:from-sky-950/20 dark:via-blue-950/20 dark:to-indigo-950/20'
   if (hora < 18)
-    return 'from-sky-50 via-rose-50 to-pink-50 dark:from-sky-950/20 dark:via-rose-950/20 dark:to-pink-950/20'
-  return 'from-violet-50 via-rose-50 to-pink-50 dark:from-violet-950/20 dark:via-rose-950/20 dark:to-pink-950/20'
+    return 'from-blue-50 via-sky-50 to-cyan-50 dark:from-blue-950/20 dark:via-sky-950/20 dark:to-cyan-950/20'
+  return 'from-indigo-50 via-blue-50 to-slate-100 dark:from-indigo-950/20 dark:via-blue-950/20 dark:to-slate-900/40'
 }
 
 function formatarMoedaCompacta(valor: number): string {
@@ -88,11 +81,6 @@ function contarPorMes(
   return contagem
 }
 
-function calcularVariacao(atual: number, anterior: number): number | null {
-  if (anterior === 0) return null
-  return Math.round(((atual - anterior) / anterior) * 100)
-}
-
 function contarAtivosDistintosPorMes(
   atendimentos: { cliente_id: string; data_atendimento: string }[],
   estrutura: { chave: string; label: string }[],
@@ -108,31 +96,55 @@ function contarAtivosDistintosPorMes(
   return resultado
 }
 
-function contarReativacoesBemsucedidas(
-  reativacoes: { cliente_id: string; criado_em: string }[],
-  atendimentos: { cliente_id: string; data_atendimento: string }[],
-  estrutura: { chave: string; label: string }[],
-): Record<string, number> {
-  const atendPorCliente: Record<string, string[]> = {}
-  for (const a of atendimentos) {
-    if (!atendPorCliente[a.cliente_id]) atendPorCliente[a.cliente_id] = []
-    atendPorCliente[a.cliente_id].push(a.data_atendimento)
-  }
-  const contagem: Record<string, number> = {}
-  for (const m of estrutura) contagem[m.chave] = 0
-  for (const r of reativacoes) {
-    const chave = r.criado_em.slice(0, 7)
-    if (!(chave in contagem)) continue
-    const dataReativacao = r.criado_em.slice(0, 10)
-    const voltou = (atendPorCliente[r.cliente_id] ?? []).some((d) => d >= dataReativacao)
-    if (voltou) contagem[chave]++
-  }
-  return contagem
-}
-
 function SkeletonCard() {
   return (
-    <div className="shimmer h-[116px] rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
+    <div className="shimmer h-[116px] rounded-2xl bg-slate-100 dark:bg-slate-800" />
+  )
+}
+
+function Sparkline({ data, cor }: { data: number[]; cor: string }) {
+  const gid = useId()
+  if (!data || data.length < 2) return <div className="mt-4 h-7" aria-hidden="true" />
+
+  const w = 100
+  const h = 28
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pontos = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = h - ((v - min) / range) * h
+    return [x, y] as const
+  })
+  const linha = pontos
+    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`)
+    .join(' ')
+  const area = `${linha} L ${w} ${h} L 0 ${h} Z`
+
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      className="mt-4 h-7 w-full"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={cor} stopOpacity={0.28} />
+          <stop offset="100%" stopColor={cor} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gid})`} />
+      <path
+        d={linha}
+        fill="none"
+        stroke={cor}
+        strokeWidth={2}
+        vectorEffect="non-scaling-stroke"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }
 
@@ -141,29 +153,34 @@ function CartaoDado({
   numero,
   rotulo,
   href,
-  classeBadge,
-  classeFundo,
+  cor,
+  serie,
   animClass,
 }: {
   icone: React.ReactNode
   numero: string | number
   rotulo: string
   href: string
-  classeBadge: string
-  classeFundo: string
+  cor: string
+  serie: number[]
   animClass: string
 }) {
   return (
-    <Link href={href} className={`dash-card ${classeFundo} ${animClass}`}>
-      <div className={`dash-icon-badge ${classeBadge}`} aria-hidden="true">
+    <Link href={href} className={`dash-card ${animClass}`}>
+      <div
+        className="dash-icon-badge"
+        style={{ backgroundColor: `${cor}1A`, color: cor }}
+        aria-hidden="true"
+      >
         {icone}
       </div>
-      <span className="text-2xl font-bold leading-none text-zinc-900 dark:text-zinc-50">
+      <span className="text-3xl font-bold leading-none tracking-tight text-slate-900 dark:text-slate-50">
         {numero}
       </span>
-      <span className="mt-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+      <span className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
         {rotulo}
       </span>
+      <Sparkline data={serie} cor={cor} />
     </Link>
   )
 }
@@ -301,221 +318,132 @@ function IcTotal() {
   )
 }
 
-/* ── Gráfico ─────────────────────────────────────── */
+/* ── Gráfico de status (donut) ───────────────────── */
 
-type TooltipEntrada = { name?: string; value?: number; color?: string }
+type FatiaStatus = { nome: string; valor: number; cor: string }
 
-function TooltipDoGrafico({
+function TooltipDonut({
   active,
   payload,
-  label,
+  total,
 }: {
   active?: boolean
-  payload?: TooltipEntrada[]
-  label?: string
+  payload?: { payload: FatiaStatus }[]
+  total: number
 }) {
   if (!active || !payload?.length) return null
+  const f = payload[0].payload
+  const pct = total > 0 ? Math.round((f.valor / total) * 100) : 0
   return (
-    <div className="rounded-xl border border-zinc-200/80 bg-white/95 px-3 py-2.5 shadow-lg backdrop-blur-sm dark:border-zinc-700/50 dark:bg-zinc-900/95">
-      <p className="mb-1.5 text-xs font-semibold text-zinc-400 dark:text-zinc-500">{label}</p>
-      {payload.map((p, i) => (
-        <p key={i} className="text-sm font-medium" style={{ color: p.color }}>
-          {p.name}:{' '}
-          <span className="font-bold">{p.value ?? 0}</span>
-        </p>
-      ))}
+    <div className="rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-lg backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/95">
+      <p className="text-sm font-medium" style={{ color: f.cor }}>
+        {f.nome}: <span className="font-bold">{f.valor}</span>{' '}
+        <span className="text-slate-400 dark:text-slate-500">({pct}%)</span>
+      </p>
     </div>
   )
 }
 
-function BadgeVariacao({ valor, rotulo }: { valor: number | null; rotulo: string }) {
-  if (valor === null) return null
-  const positivo = valor >= 0
-  return (
-    <span
-      className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
-        positivo
-          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400'
-          : 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400'
-      }`}
-    >
-      {positivo ? '↑' : '↓'} {Math.abs(valor)}% {rotulo}
-    </span>
-  )
-}
-
-function GraficoDashboard({ dados, plano }: { dados: DadosMes[]; plano: string }) {
-  const n = dados.length
-  const varNovos =
-    n >= 2 ? calcularVariacao(dados[n - 1].clientesNovos, dados[n - 2].clientesNovos) : null
-  const varAtivas =
-    n >= 2 ? calcularVariacao(dados[n - 1].clientesAtivas, dados[n - 2].clientesAtivas) : null
-  const varBemsucedidas =
-    n >= 2
-      ? calcularVariacao(dados[n - 1].reativacoesBemsucedidas, dados[n - 2].reativacoesBemsucedidas)
-      : null
-
-  const mostrarAgendamentos = plano === 'profissional' || plano === 'master'
-  const mostrarFaturamento = plano === 'master'
+function DonutStatus({
+  ativas,
+  atencao,
+  sumidas,
+}: {
+  ativas: number
+  atencao: number
+  sumidas: number
+}) {
+  const total = ativas + atencao + sumidas
+  const fatias: FatiaStatus[] = [
+    { nome: 'Ativas', valor: ativas, cor: '#22C55E' },
+    { nome: 'Atenção', valor: atencao, cor: '#F59E0B' },
+    { nome: 'Sumidas', valor: sumidas, cor: '#EF4444' },
+  ]
+  const fatiasComValor = fatias.filter((f) => f.valor > 0)
 
   return (
-    <div className="dash-card dash-anim-8 col-span-2 bg-white ring-2 ring-zinc-100 dark:ring-0 lg:col-span-3">
-      {/* Cabeçalho */}
-      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-            Evolução nos últimos 6 meses
-          </p>
-          <p className="mt-0.5 text-xs text-zinc-400">Novas, ativas e reativações efetivas</p>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          <BadgeVariacao valor={varNovos} rotulo="novas" />
-          <BadgeVariacao valor={varAtivas} rotulo="ativas" />
-          <BadgeVariacao valor={varBemsucedidas} rotulo="reativações" />
-        </div>
+    <div className="dash-card dash-anim-8 col-span-2 lg:col-span-3">
+      <div className="mb-1">
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+          Clientes por status
+        </p>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+          Distribuição atual da sua base
+        </p>
       </div>
 
-      {/* Legenda */}
-      <div className="mb-4 flex flex-wrap items-center gap-4">
-        <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ec4899]" />
-          Novas clientes
-        </span>
-        <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
-          Clientes ativas
-        </span>
-        <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#9333ea]" />
-          Reativações efetivas
-        </span>
-        {mostrarAgendamentos && (
-          <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#3b82f6]" />
-            Agendamentos
-          </span>
-        )}
-        {mostrarFaturamento && (
-          <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
-            Faturamento
-          </span>
-        )}
-      </div>
+      {total === 0 ? (
+        <p className="py-12 text-center text-sm text-slate-400 dark:text-slate-500">
+          Nenhuma cliente para exibir ainda.
+        </p>
+      ) : (
+        <div className="mt-3 flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
+          {/* Donut */}
+          <div className="relative h-44 w-44 flex-shrink-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={fatiasComValor}
+                  dataKey="valor"
+                  nameKey="nome"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={62}
+                  outerRadius={86}
+                  paddingAngle={fatiasComValor.length > 1 ? 3 : 0}
+                  startAngle={90}
+                  endAngle={-270}
+                  stroke="none"
+                >
+                  {fatiasComValor.map((f) => (
+                    <Cell key={f.nome} fill={f.cor} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={(props) => (
+                    <TooltipDonut
+                      active={props.active}
+                      payload={props.payload as unknown as { payload: FatiaStatus }[]}
+                      total={total}
+                    />
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-3xl font-bold leading-none text-slate-900 dark:text-slate-50">
+                {total}
+              </span>
+              <span className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                clientes
+              </span>
+            </div>
+          </div>
 
-      {/* Área do gráfico */}
-      <ResponsiveContainer width="100%" height={160}>
-        <AreaChart data={dados} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-          <defs>
-            <linearGradient id="gcClientes" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="gcAtivas" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="gcReativacoes" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#9333ea" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#9333ea" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="gcAgendamentos" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="gcFaturamento" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="var(--chart-grid)"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="mes"
-            tick={{ fontSize: 10, fill: 'var(--chart-tick)' }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 10, fill: 'var(--chart-tick)' }}
-            axisLine={false}
-            tickLine={false}
-            allowDecimals={false}
-          />
-          <Tooltip
-            content={(props) => (
-              <TooltipDoGrafico
-                active={props.active}
-                label={props.label !== undefined ? String(props.label) : undefined}
-                payload={
-                  props.payload?.map((p) => ({
-                    name: p.name !== undefined ? String(p.name) : undefined,
-                    value: typeof p.value === 'number' ? p.value : undefined,
-                    color: p.color,
-                  })) ?? []
-                }
-              />
-            )}
-          />
-          <Area
-            type="monotone"
-            dataKey="clientesNovos"
-            name="Novas clientes"
-            stroke="#ec4899"
-            strokeWidth={2}
-            fill="url(#gcClientes)"
-            dot={false}
-            activeDot={{ r: 4, strokeWidth: 0, fill: '#ec4899' }}
-          />
-          <Area
-            type="monotone"
-            dataKey="clientesAtivas"
-            name="Clientes ativas"
-            stroke="#10b981"
-            strokeWidth={2}
-            fill="url(#gcAtivas)"
-            dot={false}
-            activeDot={{ r: 4, strokeWidth: 0, fill: '#10b981' }}
-          />
-          <Area
-            type="monotone"
-            dataKey="reativacoesBemsucedidas"
-            name="Reativações efetivas"
-            stroke="#9333ea"
-            strokeWidth={2}
-            fill="url(#gcReativacoes)"
-            dot={false}
-            activeDot={{ r: 4, strokeWidth: 0, fill: '#9333ea' }}
-          />
-          {mostrarAgendamentos && (
-            <Area
-              type="monotone"
-              dataKey="agendamentos"
-              name="Agendamentos"
-              stroke="#3b82f6"
-              strokeWidth={2}
-              fill="url(#gcAgendamentos)"
-              dot={false}
-              activeDot={{ r: 4, strokeWidth: 0, fill: '#3b82f6' }}
-            />
-          )}
-          {mostrarFaturamento && (
-            <Area
-              type="monotone"
-              dataKey="faturamento"
-              name="Faturamento"
-              stroke="#f59e0b"
-              strokeWidth={2}
-              fill="url(#gcFaturamento)"
-              dot={false}
-              activeDot={{ r: 4, strokeWidth: 0, fill: '#f59e0b' }}
-            />
-          )}
-        </AreaChart>
-      </ResponsiveContainer>
+          {/* Legenda */}
+          <div className="flex w-full flex-1 flex-col gap-3">
+            {fatias.map((f) => {
+              const pct = total > 0 ? Math.round((f.valor / total) * 100) : 0
+              return (
+                <div key={f.nome} className="flex items-center gap-3">
+                  <span
+                    className="h-3 w-3 flex-shrink-0 rounded-full"
+                    style={{ backgroundColor: f.cor }}
+                    aria-hidden="true"
+                  />
+                  <span className="flex-1 text-sm text-slate-600 dark:text-slate-300">{f.nome}</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {f.valor}
+                  </span>
+                  <span className="w-10 text-right text-xs text-slate-400 dark:text-slate-500">
+                    {pct}%
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -549,7 +477,6 @@ export default function DashboardPage() {
         { data: reativacoes24h },
         { data: clientesGrafico },
         { data: atendimentosGrafico },
-        { data: reavivacoesGrafico },
         { count: pendentesCount },
       ] = await Promise.all([
         supabase.from('salao_config').select('nome_salao, nome_manicure, plano').single(),
@@ -566,12 +493,8 @@ export default function DashboardPage() {
         supabase.from('clientes').select('criado_em').gte('criado_em', inicioGrafico),
         supabase
           .from('atendimentos')
-          .select('cliente_id, data_atendimento')
+          .select('cliente_id, data_atendimento, preco')
           .gte('data_atendimento', inicioGrafico),
-        supabase
-          .from('reativacoes')
-          .select('cliente_id, criado_em')
-          .gte('criado_em', inicioGrafico),
         supabase
           .from('clientes')
           .select('*', { count: 'exact', head: true })
@@ -592,6 +515,7 @@ export default function DashboardPage() {
 
       const clientes = (statusList ?? []) as { status: string }[]
       const ativas = clientes.filter((c) => c.status === 'verde').length
+      const atencao = clientes.filter((c) => c.status === 'amarelo').length
       const sumidas = clientes.filter((c) => c.status === 'vermelho').length
       const total = clientes.length
 
@@ -615,31 +539,87 @@ export default function DashboardPage() {
       // Dados do gráfico
       const estruturaMeses = gerarEstruturaMeses(6)
       const cliItems = (clientesGrafico ?? []) as { criado_em: string }[]
-      const atendItems = (atendimentosGrafico ?? []) as { cliente_id: string; data_atendimento: string }[]
-      const reavItems = (reavivacoesGrafico ?? []) as { cliente_id: string; criado_em: string }[]
+      const atendItems = (atendimentosGrafico ?? []) as {
+        cliente_id: string
+        data_atendimento: string
+        preco: number | null
+      }[]
+      const aniversItems = (todosClientes ?? []) as { data_nascimento: string | null }[]
 
       const cliPorMes = contarPorMes(cliItems, estruturaMeses)
       const ativosPorMes = contarAtivosDistintosPorMes(atendItems, estruturaMeses)
-      const bemsucedidasPorMes = contarReativacoesBemsucedidas(reavItems, atendItems, estruturaMeses)
 
-      const dadosMeses: DadosMes[] = estruturaMeses.map(({ chave, label }) => ({
-        mes: label,
-        clientesNovos: cliPorMes[chave],
-        clientesAtivas: ativosPorMes[chave],
-        reativacoesBemsucedidas: bemsucedidasPorMes[chave],
-        agendamentos: 0,
-        faturamento: 0,
-      }))
+      // Séries de 6 meses para os sparklines dos cards (dados reais)
+      const serieAtivas = estruturaMeses.map(({ chave }) => ativosPorMes[chave])
+      const serieAtendimentos = estruturaMeses.map(
+        ({ chave }) => atendItems.filter((a) => a.data_atendimento.slice(0, 7) === chave).length,
+      )
+      const serieFaturamento = estruturaMeses.map(({ chave }) =>
+        atendItems
+          .filter((a) => a.data_atendimento.slice(0, 7) === chave)
+          .reduce((s, a) => s + (a.preco ?? 0), 0),
+      )
+      const serieAniversariantes = estruturaMeses.map(({ chave }) => {
+        const mes = parseInt(chave.split('-')[1], 10)
+        return aniversItems.filter(
+          (c) => c.data_nascimento && parseInt(c.data_nascimento.split('-')[1], 10) === mes,
+        ).length
+      })
+
+      // Total de clientes ao fim de cada mês (retroativo a partir do total atual)
+      const serieTotal: number[] = new Array(estruturaMeses.length)
+      let acumulado = total
+      for (let i = estruturaMeses.length - 1; i >= 0; i--) {
+        serieTotal[i] = acumulado
+        acumulado -= cliPorMes[estruturaMeses[i].chave]
+      }
+
+      // Sumidas (60+ dias sem visita) ao fim de cada mês, pelo histórico disponível
+      const visitasPorCliente: Record<string, string[]> = {}
+      for (const a of atendItems) {
+        ;(visitasPorCliente[a.cliente_id] ??= []).push(a.data_atendimento)
+      }
+      for (const k in visitasPorCliente) visitasPorCliente[k].sort()
+      const serieSumidas = estruturaMeses.map(({ chave }) => {
+        const [ano, mes] = chave.split('-').map(Number)
+        let fim = new Date(ano, mes, 0)
+        if (fim > agora) fim = agora
+        const fimStr = fim.toISOString().slice(0, 10)
+        let count = 0
+        for (const k in visitasPorCliente) {
+          const datas = visitasPorCliente[k]
+          let ultima: string | undefined
+          for (let i = datas.length - 1; i >= 0; i--) {
+            if (datas[i] <= fimStr) {
+              ultima = datas[i]
+              break
+            }
+          }
+          if (ultima) {
+            const gap = Math.floor((fim.getTime() - new Date(ultima).getTime()) / 86400000)
+            if (gap > 60) count++
+          }
+        }
+        return count
+      })
 
       setDados({
         clientesAtivas: ativas,
+        clientesAtencao: atencao,
         clientesSumidas: sumidas,
         aniversariantesDoMes: aniversariantes,
         atendimentosDoMes: atendCount,
         faturamentoDoMes: faturamento,
         totalClientes: total,
         movimentacoesHoje,
-        dadosMeses,
+        series: {
+          ativas: serieAtivas,
+          sumidas: serieSumidas,
+          aniversariantes: serieAniversariantes,
+          atendimentos: serieAtendimentos,
+          faturamento: serieFaturamento,
+          total: serieTotal,
+        },
         plano: planoDoSalao,
         clientesPendentes: pendentesCount ?? 0,
       })
@@ -654,17 +634,13 @@ export default function DashboardPage() {
 
   return (
     <div className="dash-page">
-      {/* Orbs — visíveis apenas no modo escuro via CSS */}
-      <div className="dash-orb-1" aria-hidden="true" />
-      <div className="dash-orb-2" aria-hidden="true" />
-
       <div className="dash-content">
         {/* Saudação com gradiente horário — transparente no dark */}
         <div className={`dash-greeting bg-gradient-to-br ${gradiente} px-5 py-7`}>
-          <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <p className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             {cumprimento}{nome ? `, ${nome}` : ''}!
           </p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Aqui está o resumo do seu salão hoje
           </p>
         </div>
@@ -698,7 +674,7 @@ export default function DashboardPage() {
               {Array.from({ length: 7 }).map((_, i) => (
                 <SkeletonCard key={i} />
               ))}
-              <div className="shimmer col-span-2 h-52 rounded-2xl bg-zinc-100 dark:bg-zinc-800 lg:col-span-3" />
+              <div className="shimmer col-span-2 h-52 rounded-2xl bg-slate-100 dark:bg-slate-800 lg:col-span-3" />
             </>
           ) : dados ? (
             <>
@@ -707,8 +683,8 @@ export default function DashboardPage() {
                 numero={dados.clientesAtivas}
                 rotulo="Clientes ativas"
                 href="/clientes"
-                classeBadge="bg-emerald-500 text-white dark:bg-emerald-500/20 dark:text-emerald-400"
-                classeFundo="bg-white ring-2 ring-emerald-300 dark:ring-0"
+                cor="#8B5CF6"
+                serie={dados.series.ativas}
                 animClass="dash-anim-1"
               />
               <CartaoDado
@@ -716,8 +692,8 @@ export default function DashboardPage() {
                 numero={dados.clientesSumidas}
                 rotulo="Sumidas"
                 href="/reativar"
-                classeBadge="bg-rose-500 text-white dark:bg-rose-500/20 dark:text-rose-400"
-                classeFundo="bg-white ring-2 ring-rose-300 dark:ring-0"
+                cor="#EF4444"
+                serie={dados.series.sumidas}
                 animClass="dash-anim-2"
               />
               <CartaoDado
@@ -725,8 +701,8 @@ export default function DashboardPage() {
                 numero={dados.aniversariantesDoMes}
                 rotulo="Aniversariantes do mês"
                 href="/aniversariantes"
-                classeBadge="bg-amber-500 text-white dark:bg-amber-500/20 dark:text-amber-400"
-                classeFundo="bg-white ring-2 ring-amber-300 dark:ring-0"
+                cor="#F59E0B"
+                serie={dados.series.aniversariantes}
                 animClass="dash-anim-3"
               />
               <CartaoDado
@@ -734,8 +710,8 @@ export default function DashboardPage() {
                 numero={dados.atendimentosDoMes}
                 rotulo="Atendimentos este mês"
                 href="/historico"
-                classeBadge="bg-sky-500 text-white dark:bg-sky-500/20 dark:text-sky-400"
-                classeFundo="bg-white ring-2 ring-sky-300 dark:ring-0"
+                cor="#14B8A6"
+                serie={dados.series.atendimentos}
                 animClass="dash-anim-4"
               />
               <CartaoDado
@@ -743,8 +719,8 @@ export default function DashboardPage() {
                 numero={formatarMoedaCompacta(dados.faturamentoDoMes)}
                 rotulo="Faturamento do mês"
                 href="/historico"
-                classeBadge="bg-violet-500 text-white dark:bg-violet-500/20 dark:text-violet-400"
-                classeFundo="bg-white ring-2 ring-violet-300 dark:ring-0"
+                cor="#22C55E"
+                serie={dados.series.faturamento}
                 animClass="dash-anim-5"
               />
               <CartaoDado
@@ -752,8 +728,8 @@ export default function DashboardPage() {
                 numero={dados.totalClientes}
                 rotulo="Total de clientes"
                 href="/cadastrados"
-                classeBadge="bg-pink-500 text-white dark:bg-pink-500/20 dark:text-pink-400"
-                classeFundo="bg-white ring-2 ring-pink-300 dark:ring-0"
+                cor="#2563EB"
+                serie={dados.series.total}
                 animClass="dash-anim-6"
               />
               <CartaoDado
@@ -761,11 +737,15 @@ export default function DashboardPage() {
                 numero={dados.movimentacoesHoje}
                 rotulo="Movimentações hoje"
                 href="/movimentacao"
-                classeBadge="bg-teal-500 text-white dark:bg-teal-500/20 dark:text-teal-400"
-                classeFundo="bg-white ring-2 ring-teal-300 dark:ring-0"
+                cor="#3B82F6"
+                serie={[]}
                 animClass="dash-anim-7"
               />
-              <GraficoDashboard dados={dados.dadosMeses} plano={dados.plano} />
+              <DonutStatus
+                ativas={dados.clientesAtivas}
+                atencao={dados.clientesAtencao}
+                sumidas={dados.clientesSumidas}
+              />
             </>
           ) : null}
         </div>
