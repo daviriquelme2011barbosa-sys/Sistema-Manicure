@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { normalizarWhatsApp } from '@/lib/formatters'
+import { montarNumeroInternacional } from '@/lib/whatsapp'
 
 type EstadoAuth = 'carregando' | 'login' | 'verificando' | 'pendente' | 'nao_encontrado' | 'autenticado'
 type Secao = 'inicio' | 'agendar' | 'agendamentos' | 'historico' | 'perfil'
@@ -412,9 +412,8 @@ export default function FormularioAgendamento({
 
   function linkWhatsApp(): string {
     if (!whatsappManicure) return '#'
-    const numero = normalizarWhatsApp(whatsappManicure)
     const mensagem = `Olá! 😊 Passando aqui para confirmar meu agendamento para ${formatarDataBR(dataSelecionada)} às ${horarioSelecionado} - ${servico}. Até lá!`
-    return `https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`
+    return `https://wa.me/${montarNumeroInternacional(whatsappManicure)}?text=${encodeURIComponent(mensagem)}`
   }
 
   // ── Derived data (computed during render) ────────────────────────────────────

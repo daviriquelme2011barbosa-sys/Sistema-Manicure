@@ -34,7 +34,14 @@ import {
   IconeLupa,
   IconeCoroa,
 } from '@/components/icons'
-import { normalizarWhatsApp } from '@/lib/formatters'
+import {
+  DDI_BRASIL,
+  montarNumeroInternacional,
+  normalizarWhatsAppCompleto,
+  separarDdiNumero,
+  validarNumeroWhatsApp,
+} from '@/lib/whatsapp'
+import { CampoWhatsApp } from '@/components/CampoWhatsApp'
 import { HeaderProvider, useHeader } from '@/lib/header-context'
 import { TutorialCarrossel } from '@/components/TutorialCarrossel'
 import QRCode from 'qrcode'
@@ -107,7 +114,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [idSalao, setIdSalao] = useState<string | null>(null)
   const [salvandoNome, setSalvandoNome] = useState(false)
   const [whatsapp, setWhatsapp] = useState('')
-  const [novoWhatsapp, setNovoWhatsapp] = useState('')
+  const [ddiWhatsapp, setDdiWhatsapp] = useState(DDI_BRASIL)
+  const [numeroWhatsapp, setNumeroWhatsapp] = useState('')
   const [salvandoWhatsapp, setSalvandoWhatsapp] = useState(false)
   const [plano, setPlano] = useState<string>('basic')
   const [badgeAgenda, setBadgeAgenda] = useState(0)
@@ -208,6 +216,15 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setSidebarRecolhida(localStorage.getItem('sidebar_recolhida') === 'true')
+  }, [])
+
+  // Permite que as Ações rápidas do dashboard abram o painel de configurações
+  useEffect(() => {
+    function abrir() {
+      setPainelAberto(true)
+    }
+    window.addEventListener('abrir-configuracoes', abrir)
+    return () => window.removeEventListener('abrir-configuracoes', abrir)
   }, [])
 
   // Fecha dropdowns ao clicar fora
@@ -339,7 +356,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setGenero(generoInicial)
         const whatsappInicial = (config.whatsapp as string | null) ?? ''
         setWhatsapp(whatsappInicial)
-        setNovoWhatsapp(whatsappInicial)
+        const whatsappSeparado = separarDdiNumero(whatsappInicial)
+        setDdiWhatsapp(whatsappSeparado.ddi)
+        setNumeroWhatsapp(whatsappSeparado.numero)
 
         const planoConfig = (config.plano as string | null) ?? 'basic'
         setPlano(planoConfig)
@@ -463,8 +482,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   async function salvarWhatsapp() {
-    const normalizado = normalizarWhatsApp(novoWhatsapp)
-    if (normalizado.length < 10 || normalizado === whatsapp || !idSalao) return
+    if (!idSalao) return
+    const validacao = validarNumeroWhatsApp(ddiWhatsapp, numeroWhatsapp)
+    if (!validacao.valido) {
+      mostrarToast(validacao.erro ?? 'WhatsApp inválido.', 'erro')
+      return
+    }
+    const normalizado = normalizarWhatsAppCompleto(ddiWhatsapp, numeroWhatsapp)
+    if (normalizado === montarNumeroInternacional(whatsapp)) return
     setSalvandoWhatsapp(true)
     const { error } = await supabase
       .from('salao_config')
@@ -1098,23 +1123,28 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   WhatsApp do profissional
                 </label>
                 <div className="flex gap-2">
-                  <input
-                    id="config-whatsapp"
-                    type="tel"
-                    value={novoWhatsapp}
-                    onChange={(e) => setNovoWhatsapp(e.target.value)}
-                    disabled={salvandoWhatsapp}
-                    placeholder="(11) 99999-9999"
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:disabled:bg-slate-900/50"
-                  />
+                  <div className="min-w-0 flex-1">
+                    <CampoWhatsApp
+                      id="config-whatsapp"
+                      variante="painel"
+                      ddi={ddiWhatsapp}
+                      numero={numeroWhatsapp}
+                      onChange={(novoDdi, novoNumero) => {
+                        setDdiWhatsapp(novoDdi)
+                        setNumeroWhatsapp(novoNumero)
+                      }}
+                      disabled={salvandoWhatsapp}
+                    />
+                  </div>
                   <button
                     onClick={salvarWhatsapp}
                     disabled={
                       salvandoWhatsapp ||
-                      normalizarWhatsApp(novoWhatsapp).length < 10 ||
-                      normalizarWhatsApp(novoWhatsapp) === whatsapp
+                      !validarNumeroWhatsApp(ddiWhatsapp, numeroWhatsapp).valido ||
+                      normalizarWhatsAppCompleto(ddiWhatsapp, numeroWhatsapp) ===
+                        montarNumeroInternacional(whatsapp)
                     }
-                    className="h-11 flex-shrink-0 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-12 flex-shrink-0 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {salvandoWhatsapp ? '…' : 'Salvar'}
                   </button>

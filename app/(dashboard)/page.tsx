@@ -4,6 +4,31 @@ import { useState, useEffect, useId } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { formatarData, dataHoje } from '@/lib/formatters'
+import {
+  IconePessoa,
+  IconeCoracao,
+  IconeRelogio,
+  IconeEngrenagem,
+  IconeAgenda,
+  IconeAusente,
+} from '@/components/icons'
+import type { StatusCliente } from '@/types'
+
+type ClienteRecente = {
+  id: string
+  nome: string
+  ultima_visita: string | null
+  status: StatusCliente
+}
+
+type AgendamentoHoje = {
+  id: string
+  horario: string | null
+  servico: string | null
+  status: string
+  clientes: { nome: string } | null
+}
 
 type SeriesKPI = {
   ativas: number[]
@@ -26,6 +51,8 @@ type DadosDashboard = {
   series: SeriesKPI
   plano: string
   clientesPendentes: number
+  clientesRecentes: ClienteRecente[]
+  agendamentosHoje: AgendamentoHoje[]
 }
 
 function saudacao(): string {
@@ -448,6 +475,223 @@ function DonutStatus({
   )
 }
 
+/* ── Colunas inferiores (recentes · agenda · ações) ─ */
+
+const INFO_STATUS_CLIENTE: Record<StatusCliente, { label: string; cor: string }> = {
+  verde: { label: 'Ativa', cor: '#22C55E' },
+  amarelo: { label: 'Atenção', cor: '#F59E0B' },
+  vermelho: { label: 'Sumida', cor: '#EF4444' },
+  sem_atendimento: { label: 'Nova', cor: '#94A3B8' },
+}
+
+const INFO_STATUS_AGENDAMENTO: Record<string, { label: string; cor: string }> = {
+  pendente: { label: 'Pendente', cor: '#F59E0B' },
+  confirmado: { label: 'Confirmado', cor: '#2563EB' },
+  compareceu: { label: 'Compareceu', cor: '#22C55E' },
+  faltou: { label: 'Faltou', cor: '#EF4444' },
+  cancelado: { label: 'Cancelado', cor: '#94A3B8' },
+}
+
+function inicialNome(nome: string): string {
+  return nome.trim().charAt(0).toUpperCase() || '?'
+}
+
+function PilulaStatus({ label, cor }: { label: string; cor: string }) {
+  return (
+    <span
+      className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium"
+      style={{ backgroundColor: `${cor}1A`, color: cor }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: cor }} aria-hidden="true" />
+      {label}
+    </span>
+  )
+}
+
+function CabecalhoColuna({
+  titulo,
+  rotuloLink,
+  href,
+}: {
+  titulo: string
+  rotuloLink?: string
+  href?: string
+}) {
+  return (
+    <div className="mb-3 flex items-center justify-between gap-2">
+      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{titulo}</p>
+      {href && rotuloLink && (
+        <Link
+          href={href}
+          className="flex-shrink-0 text-xs font-medium text-blue-600 transition hover:text-blue-700 hover:underline dark:text-blue-400"
+        >
+          {rotuloLink}
+        </Link>
+      )}
+    </div>
+  )
+}
+
+function ColunaClientesRecentes({
+  clientes,
+  className = '',
+}: {
+  clientes: ClienteRecente[]
+  className?: string
+}) {
+  return (
+    <div className={`dash-card dash-anim-1 ${className}`}>
+      <CabecalhoColuna titulo="Clientes recentes" rotuloLink="Ver todos" href="/clientes" />
+      {clientes.length === 0 ? (
+        <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+          <span className="text-3xl" aria-hidden="true">👥</span>
+          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500">
+            Nenhum atendimento registrado ainda
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-1">
+          {clientes.map((c) => {
+            const info = INFO_STATUS_CLIENTE[c.status]
+            return (
+              <Link
+                key={c.id}
+                href="/clientes"
+                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+              >
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-teal-500 text-sm font-semibold text-white">
+                  {inicialNome(c.nome)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+                    {c.nome}
+                  </p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                    {c.ultima_visita ? formatarData(c.ultima_visita) : '—'}
+                  </p>
+                </div>
+                <PilulaStatus label={info.label} cor={info.cor} />
+              </Link>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] }) {
+  return (
+    <div className="dash-card dash-anim-2">
+      <CabecalhoColuna titulo="Agenda de hoje" rotuloLink="Ver agenda" href="/agenda" />
+      {agendamentos.length === 0 ? (
+        <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+          <span className="text-3xl" aria-hidden="true">📅</span>
+          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500">
+            Nenhum agendamento para hoje
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-1">
+          {agendamentos.map((a) => {
+            const info =
+              INFO_STATUS_AGENDAMENTO[a.status] ?? { label: a.status, cor: '#94A3B8' }
+            return (
+              <li
+                key={a.id}
+                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+              >
+                <span className="flex h-9 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                  {a.horario ? a.horario.slice(0, 5) : '—'}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+                    {a.clientes?.nome ?? '—'}
+                  </p>
+                  {a.servico && (
+                    <p className="truncate text-xs text-slate-400 dark:text-slate-500">
+                      {a.servico}
+                    </p>
+                  )}
+                </div>
+                <PilulaStatus label={info.label} cor={info.cor} />
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function AcaoRapida({
+  icone,
+  label,
+  cor,
+  href,
+  onClick,
+}: {
+  icone: React.ReactNode
+  label: string
+  cor: string
+  href?: string
+  onClick?: () => void
+}) {
+  const classes =
+    'flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-center transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-sm dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600 dark:hover:bg-slate-800'
+  const conteudo = (
+    <>
+      <span
+        className="flex h-10 w-10 items-center justify-center rounded-xl"
+        style={{ backgroundColor: `${cor}1A`, color: cor }}
+        aria-hidden="true"
+      >
+        {icone}
+      </span>
+      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{label}</span>
+    </>
+  )
+  if (href) {
+    return (
+      <Link href={href} className={classes}>
+        {conteudo}
+      </Link>
+    )
+  }
+  return (
+    <button type="button" onClick={onClick} className={classes}>
+      {conteudo}
+    </button>
+  )
+}
+
+function ColunaAcoesRapidas({ temAgenda }: { temAgenda: boolean }) {
+  return (
+    <div className="dash-card dash-anim-3">
+      <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
+        Ações rápidas
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <AcaoRapida icone={<IconePessoa />} label="Novo cliente" cor="#22C55E" href="/cadastro" />
+        <AcaoRapida icone={<IconeCoracao />} label="Reativar clientes" cor="#EF4444" href="/reativar" />
+        <AcaoRapida icone={<IconeRelogio />} label="Ver histórico" cor="#64748B" href="/historico" />
+        <AcaoRapida
+          icone={<IconeEngrenagem />}
+          label="Configurações"
+          cor="#3B82F6"
+          onClick={() => window.dispatchEvent(new CustomEvent('abrir-configuracoes'))}
+        />
+        {temAgenda && (
+          <AcaoRapida icone={<IconeAgenda />} label="Novo agendamento" cor="#14B8A6" href="/agenda" />
+        )}
+        {temAgenda && (
+          <AcaoRapida icone={<IconeAusente />} label="Ver faltaram" cor="#F59E0B" href="/faltaram" />
+        )}
+      </div>
+    </div>
+  )
+}
+
 /* ── Página principal ────────────────────────────── */
 
 export default function DashboardPage() {
@@ -478,8 +722,9 @@ export default function DashboardPage() {
         { data: clientesGrafico },
         { data: atendimentosGrafico },
         { count: pendentesCount },
+        { data: recentesData },
       ] = await Promise.all([
-        supabase.from('salao_config').select('nome_salao, nome_manicure, plano').single(),
+        supabase.from('salao_config').select('id, nome_salao, nome_manicure, plano').single(),
         supabase.from('clientes_status').select('status'),
         supabase.from('clientes').select('data_nascimento').not('data_nascimento', 'is', null),
         supabase.from('atendimentos').select('preco').gte('data_atendimento', inicioMes),
@@ -499,11 +744,19 @@ export default function DashboardPage() {
           .from('clientes')
           .select('*', { count: 'exact', head: true })
           .eq('status_cadastro', 'pendente'),
+        supabase
+          .from('clientes_status')
+          .select('id, nome, ultima_visita, status')
+          .not('ultima_visita', 'is', null)
+          .order('ultima_visita', { ascending: false })
+          .limit(5),
       ])
 
       let planoDoSalao = 'basic'
+      let idSalao: string | null = null
       if (config) {
         const cfg = config as {
+          id: string
           nome_salao: string
           nome_manicure?: string | null
           plano?: string | null
@@ -511,6 +764,21 @@ export default function DashboardPage() {
         const nomeBase = cfg.nome_manicure || cfg.nome_salao
         setNome(nomeBase.split(' ')[0])
         planoDoSalao = cfg.plano ?? 'basic'
+        idSalao = cfg.id
+      }
+
+      const clientesRecentes = (recentesData ?? []) as ClienteRecente[]
+
+      // Agenda de hoje — exclusivo dos planos Profissional e Master
+      let agendamentosHoje: AgendamentoHoje[] = []
+      if ((planoDoSalao === 'profissional' || planoDoSalao === 'master') && idSalao) {
+        const { data: agData } = await supabase
+          .from('agendamentos')
+          .select('id, horario, servico, status, clientes(nome)')
+          .eq('salao_id', idSalao)
+          .eq('data', dataHoje())
+          .order('horario', { ascending: true, nullsFirst: false })
+        agendamentosHoje = (agData ?? []) as unknown as AgendamentoHoje[]
       }
 
       const clientes = (statusList ?? []) as { status: string }[]
@@ -622,6 +890,8 @@ export default function DashboardPage() {
         },
         plano: planoDoSalao,
         clientesPendentes: pendentesCount ?? 0,
+        clientesRecentes,
+        agendamentosHoje,
       })
       setCarregando(false)
     }
@@ -631,6 +901,7 @@ export default function DashboardPage() {
 
   const gradiente = gradienteGreeting()
   const cumprimento = saudacao()
+  const temAgenda = dados?.plano === 'profissional' || dados?.plano === 'master'
 
   return (
     <div className="dash-page">
@@ -749,6 +1020,27 @@ export default function DashboardPage() {
             </>
           ) : null}
         </div>
+
+        {/* Colunas: clientes recentes · agenda de hoje · ações rápidas */}
+        {carregando ? (
+          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="shimmer h-64 rounded-2xl bg-slate-100 dark:bg-slate-800"
+              />
+            ))}
+          </div>
+        ) : dados ? (
+          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-3">
+            <ColunaClientesRecentes
+              clientes={dados.clientesRecentes}
+              className={temAgenda ? '' : 'lg:col-span-2'}
+            />
+            {temAgenda && <ColunaAgendaHoje agendamentos={dados.agendamentosHoje} />}
+            <ColunaAcoesRapidas temAgenda={temAgenda} />
+          </div>
+        ) : null}
       </div>
     </div>
   )

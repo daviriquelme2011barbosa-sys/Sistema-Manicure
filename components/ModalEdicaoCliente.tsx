@@ -2,9 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { normalizarWhatsApp, parsearPreco } from '@/lib/formatters'
+import { parsearPreco } from '@/lib/formatters'
+import {
+  montarNumeroInternacional,
+  normalizarWhatsAppCompleto,
+  separarDdiNumero,
+  validarNumeroWhatsApp,
+} from '@/lib/whatsapp'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
 import { IconeFechar, IconeLixeira } from '@/components/icons'
+import { CampoWhatsApp } from '@/components/CampoWhatsApp'
 import type { ClienteStatus } from '@/types'
 
 type Props = {
@@ -16,9 +23,11 @@ type Props = {
 }
 
 export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mostrarToast }: Props) {
+  const whatsappInicial = separarDdiNumero(cliente.whatsapp)
   const [edicao, setEdicao] = useState({
     nome: cliente.nome,
-    whatsapp: cliente.whatsapp,
+    ddi: whatsappInicial.ddi,
+    numero: whatsappInicial.numero,
     email: cliente.email ?? '',
     servico: cliente.ultimo_servico ?? '',
     ultimaVisita: cliente.ultima_visita ?? '',
@@ -81,11 +90,9 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
       novosErros.nome = 'Informe o nome'
     }
 
-    const whatsappNormalizado = normalizarWhatsApp(edicao.whatsapp)
-    if (!edicao.whatsapp.trim()) {
-      novosErros.whatsapp = 'Informe o WhatsApp'
-    } else if (whatsappNormalizado.length < 10) {
-      novosErros.whatsapp = 'Número inválido — confira o WhatsApp'
+    const validacaoWhatsApp = validarNumeroWhatsApp(edicao.ddi, edicao.numero)
+    if (!validacaoWhatsApp.valido) {
+      novosErros.whatsapp = validacaoWhatsApp.erro ?? 'Informe o WhatsApp'
     }
 
     if (edicao.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(edicao.email.trim())) {
@@ -97,16 +104,24 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
 
     setSalvandoEdicao(true)
 
-    if (whatsappNormalizado !== cliente.whatsapp) {
-      const { data: duplicado } = await supabase
+    const whatsappNormalizado = normalizarWhatsAppCompleto(edicao.ddi, edicao.numero)
+
+    if (whatsappNormalizado !== montarNumeroInternacional(cliente.whatsapp)) {
+      // Deduplicação pelo número completo, incluindo a forma legada (sem DDI).
+      const candidatos = [whatsappNormalizado]
+      if (whatsappNormalizado.startsWith('55')) {
+        candidatos.push(whatsappNormalizado.slice(2))
+      }
+
+      const { data: duplicados } = await supabase
         .from('clientes')
         .select('id')
-        .eq('whatsapp', whatsappNormalizado)
         .neq('id', cliente.id)
-        .maybeSingle()
+        .in('whatsapp', candidatos)
+        .limit(1)
 
-      if (duplicado) {
-        setErrosEdicao({ whatsapp: 'Já existe uma cliente com esse WhatsApp' })
+      if (duplicados && duplicados.length > 0) {
+        setErrosEdicao({ whatsapp: 'Este número já está cadastrado' })
         setSalvandoEdicao(false)
         return
       }
@@ -268,15 +283,16 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
             <label htmlFor="edit-whatsapp" className="text-sm font-medium text-slate-700 dark:text-slate-300">
               WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
             </label>
-            <input
+            <CampoWhatsApp
               id="edit-whatsapp"
-              type="tel"
-              value={edicao.whatsapp}
-              onChange={(e) => setEdicao((prev) => ({ ...prev, whatsapp: e.target.value }))}
+              variante="painel"
+              ddi={edicao.ddi}
+              numero={edicao.numero}
+              onChange={(novoDdi, novoNumero) =>
+                setEdicao((prev) => ({ ...prev, ddi: novoDdi, numero: novoNumero }))
+              }
               disabled={salvandoEdicao || excluindo}
-              className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
-                errosEdicao.whatsapp ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
-              }`}
+              erro={!!errosEdicao.whatsapp}
             />
             {errosEdicao.whatsapp && (
               <span role="alert" className="text-sm text-red-600">{errosEdicao.whatsapp}</span>

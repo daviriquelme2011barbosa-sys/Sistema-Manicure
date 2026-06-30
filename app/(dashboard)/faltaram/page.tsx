@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { formatarData } from '@/lib/formatters'
+import { montarNumeroInternacional } from '@/lib/whatsapp'
 import { IconeWhatsApp } from '@/components/icons'
 
 type Faltou = {
@@ -17,7 +18,7 @@ type Faltou = {
 function construirLinkWhatsApp(whatsapp: string, nome: string): string {
   const primeiroNome = nome.split(' ')[0]
   const mensagem = `Oi ${primeiroNome}! Vi que você tinha horário marcado aqui no salão mas não conseguiu aparecer. Que tal a gente remarcar? Estou te esperando! 😊`
-  return `https://wa.me/55${whatsapp}?text=${encodeURIComponent(mensagem)}`
+  return `https://wa.me/${montarNumeroInternacional(whatsapp)}?text=${encodeURIComponent(mensagem)}`
 }
 
 export default function FaltaramPage() {

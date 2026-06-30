@@ -2,8 +2,9 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { normalizarWhatsApp } from '@/lib/formatters'
 import { CampoSenha } from '@/components/CampoSenha'
+import { CampoWhatsApp } from '@/components/CampoWhatsApp'
+import { DDI_BRASIL, validarNumeroWhatsApp } from '@/lib/whatsapp'
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -36,7 +37,8 @@ export default function FormularioCadastroPublico({
   const ehPro = plano === 'profissional' || plano === 'master'
 
   const [nome, setNome] = useState('')
-  const [whatsapp, setWhatsapp] = useState('')
+  const [ddi, setDdi] = useState(DDI_BRASIL)
+  const [numero, setNumero] = useState('')
   const [email, setEmail] = useState('')
   const [dataNascimento, setDataNascimento] = useState('')
   const [observacoes, setObservacoes] = useState('')
@@ -69,11 +71,9 @@ export default function FormularioCadastroPublico({
       novosErros.nome = 'Por favor, informe seu nome completo (nome e sobrenome)'
     }
 
-    const whatsappNormalizado = normalizarWhatsApp(whatsapp)
-    if (!whatsapp.trim()) {
-      novosErros.whatsapp = 'Informe seu WhatsApp'
-    } else if (whatsappNormalizado.length < 10) {
-      novosErros.whatsapp = 'Número inválido — mínimo 10 dígitos'
+    const validacaoWhatsApp = validarNumeroWhatsApp(ddi, numero)
+    if (!validacaoWhatsApp.valido) {
+      novosErros.whatsapp = validacaoWhatsApp.erro ?? 'Informe seu WhatsApp'
     }
 
     if (!email.trim()) {
@@ -116,7 +116,8 @@ export default function FormularioCadastroPublico({
         body: JSON.stringify({
           salaoId,
           nome: nome.trim(),
-          whatsapp,
+          ddi,
+          numero,
           email: email.trim() || null,
           dataNascimento: dataNascimento || null,
           observacoes: observacoes.trim() || null,
@@ -145,7 +146,8 @@ export default function FormularioCadastroPublico({
       localStorage.setItem(`cadastrado_${salaoId}`, '1')
       setSucesso(true)
       setNome('')
-      setWhatsapp('')
+      setDdi(DDI_BRASIL)
+      setNumero('')
       setEmail('')
       setDataNascimento('')
       setObservacoes('')
@@ -304,24 +306,18 @@ export default function FormularioCadastroPublico({
               <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
                 WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
               </label>
-              <input
+              <CampoWhatsApp
                 id="whatsapp"
-                type="tel"
-                autoComplete="tel"
-                value={whatsapp}
-                onChange={(e) => {
-                  setWhatsapp(e.target.value)
+                variante="publico"
+                ddi={ddi}
+                numero={numero}
+                onChange={(novoDdi, novoNumero) => {
+                  setDdi(novoDdi)
+                  setNumero(novoNumero)
                   setAvisoWhatsApp('')
                 }}
                 disabled={enviando}
-                placeholder="(38) 99999-0000"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.whatsapp
-                    ? 'border-red-500'
-                    : avisoWhatsApp
-                      ? 'border-amber-400'
-                      : 'border-zinc-300'
-                }`}
+                erro={!!erros.whatsapp}
               />
               {erros.whatsapp && (
                 <span role="alert" className="text-sm text-red-600">

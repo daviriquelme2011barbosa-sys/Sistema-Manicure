@@ -5,8 +5,17 @@ export function normalizarWhatsApp(valor: string): string {
 }
 
 // Formata um número de WhatsApp (só dígitos) para exibição: (11) 91234-5678.
+// Aceita números com DDI: números do Brasil (55 + 10/11 dígitos) têm o DDI removido
+// para exibir no formato local; outros DDIs são exibidos como +DDI número.
 export function formatarWhatsApp(numero: string): string {
-  const n = normalizarWhatsApp(numero)
+  let n = normalizarWhatsApp(numero)
+
+  if (n.startsWith('55') && (n.length === 12 || n.length === 13)) {
+    n = n.slice(2)
+  } else if (n.length >= 12) {
+    return `+${n}`
+  }
+
   if (n.length === 11) return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`
   if (n.length === 10) return `(${n.slice(0, 2)}) ${n.slice(2, 6)}-${n.slice(6)}`
   return numero

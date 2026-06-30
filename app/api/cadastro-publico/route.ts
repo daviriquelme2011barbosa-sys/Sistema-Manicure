@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { criarRateLimiter, obterIp } from '@/lib/rate-limit'
-import { normalizarWhatsApp } from '@/lib/formatters'
+import {
+  DDI_BRASIL,
+  normalizarWhatsAppCompleto,
+  validarNumeroWhatsApp,
+} from '@/lib/whatsapp'
 import { UUID_REGEX } from '@/lib/validators'
 
 const permitir = criarRateLimiter(5)
@@ -30,7 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
   }
 
-  const { salaoId, nome, whatsapp, email, dataNascimento, observacoes, autorizaContato, senha } = body
+  const { salaoId, nome, ddi, numero, email, dataNascimento, observacoes, autorizaContato, senha } = body
 
   if (typeof salaoId !== 'string' || !UUID_REGEX.test(salaoId)) {
     return NextResponse.json({ erro: 'Requisição inválida.' }, { status: 400 })
@@ -43,14 +47,19 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const whatsappNormalizado =
-    typeof whatsapp === 'string' ? normalizarWhatsApp(whatsapp) : ''
-  if (whatsappNormalizado.length < 10) {
+  const ddiNormalizado = typeof ddi === 'string' && ddi.trim() ? ddi : DDI_BRASIL
+  const numeroLocal = typeof numero === 'string' ? numero : ''
+
+  const validacaoWhatsApp = validarNumeroWhatsApp(ddiNormalizado, numeroLocal)
+  if (!validacaoWhatsApp.valido) {
     return NextResponse.json(
-      { erro: 'WhatsApp inválido — mínimo 10 dígitos.', campo: 'whatsapp' },
+      { erro: validacaoWhatsApp.erro ?? 'WhatsApp inválido.', campo: 'whatsapp' },
       { status: 400 },
     )
   }
+
+  // Número completo já normalizado (DDI + DDD + número, só dígitos).
+  const whatsappNormalizado = normalizarWhatsAppCompleto(ddiNormalizado, numeroLocal)
 
   if (autorizaContato !== true) {
     return NextResponse.json(
@@ -82,12 +91,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { data: clienteExistente, error: erroConsulta } = await supabase
+  // Deduplicação pelo número completo normalizado. Inclui também a forma legada
+  // (sem DDI) para reconhecer cadastros antigos salvos antes da adoção do código do país.
+  const candidatosWhatsApp = [whatsappNormalizado]
+  if (whatsappNormalizado.startsWith(DDI_BRASIL)) {
+    candidatosWhatsApp.push(whatsappNormalizado.slice(DDI_BRASIL.length))
+  }
+
+  const { data: clientesExistentes, error: erroConsulta } = await supabase
     .from('clientes')
     .select('id')
-    .eq('whatsapp', whatsappNormalizado)
     .eq('salao_id', salaoId)
-    .maybeSingle()
+    .in('whatsapp', candidatosWhatsApp)
+    .limit(1)
 
   if (erroConsulta) {
     return NextResponse.json(
@@ -96,7 +112,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (clienteExistente) {
+  if (clientesExistentes && clientesExistentes.length > 0) {
     return NextResponse.json({ duplicado: true }, { status: 409 })
   }
 

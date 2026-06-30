@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { CampoSenha } from '@/components/CampoSenha'
-import { normalizarWhatsApp } from '@/lib/formatters'
+import { CampoWhatsApp } from '@/components/CampoWhatsApp'
+import { DDI_BRASIL, normalizarWhatsAppCompleto, validarNumeroWhatsApp } from '@/lib/whatsapp'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
@@ -25,7 +26,8 @@ export default function FormularioOnboarding({ token }: Props) {
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null)
 
   const [nomeSalao, setNomeSalao] = useState('')
-  const [whatsapp, setWhatsapp] = useState('')
+  const [ddi, setDdi] = useState(DDI_BRASIL)
+  const [numero, setNumero] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [confirmarSenha, setConfirmarSenha] = useState('')
@@ -57,7 +59,8 @@ export default function FormularioOnboarding({ token }: Props) {
   function validar(): Record<string, string> {
     const e: Record<string, string> = {}
     if (!nomeSalao.trim()) e.nomeSalao = 'Informe seu nome'
-    if (normalizarWhatsApp(whatsapp).length < 10) e.whatsapp = 'WhatsApp inválido — mínimo 10 dígitos'
+    const validacaoWhatsApp = validarNumeroWhatsApp(ddi, numero)
+    if (!validacaoWhatsApp.valido) e.whatsapp = validacaoWhatsApp.erro ?? 'Informe seu WhatsApp'
     if (!email.trim()) e.email = 'Informe o e-mail'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = 'E-mail inválido'
     if (!senha) e.senha = 'Crie uma senha'
@@ -81,7 +84,7 @@ export default function FormularioOnboarding({ token }: Props) {
       const resposta = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, nomeSalao, whatsapp: normalizarWhatsApp(whatsapp), email, senha }),
+        body: JSON.stringify({ token, nomeSalao, whatsapp: normalizarWhatsAppCompleto(ddi, numero), email, senha }),
       })
 
       const dados = await resposta.json()
@@ -356,17 +359,17 @@ export default function FormularioOnboarding({ token }: Props) {
                 <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
                   WhatsApp
                 </label>
-                <input
+                <CampoWhatsApp
                   id="whatsapp"
-                  type="tel"
-                  autoComplete="tel"
-                  value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
+                  variante="publico"
+                  ddi={ddi}
+                  numero={numero}
+                  onChange={(novoDdi, novoNumero) => {
+                    setDdi(novoDdi)
+                    setNumero(novoNumero)
+                  }}
                   disabled={salvando}
-                  placeholder="(11) 99999-9999"
-                  className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-zinc-100 ${
-                    erros.whatsapp ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-                  }`}
+                  erro={!!erros.whatsapp}
                 />
                 {erros.whatsapp && (
                   <span role="alert" className="text-sm text-red-600">{erros.whatsapp}</span>
