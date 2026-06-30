@@ -324,6 +324,7 @@ html.dark .shimmer::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   width: 100%;
   height: 48px;
   border-radius: 12px;
@@ -410,6 +411,23 @@ html.dark .shimmer::after {
 }
 .login-campo-senha-toggle:hover { color: rgba(255, 255, 255, 0.75); }
 .login-campo-senha-toggle:disabled { pointer-events: none; }
+
+@keyframes login-erro-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.login-campo-erro {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #f87171;
+  animation: login-erro-in 0.18s ease both;
+}
+.login-campo-erro svg { flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .login-campo-erro { animation: none !important; }
+}
 
 .login-divider {
   height: 1px;
@@ -633,4 +651,164 @@ html.dark {
   .chrome-shell,
   .chrome-header,
   .chrome-label { transition: none !important; }
+}
+
+/* ===== Formulários — sistema visual unificado ===== */
+/* Em @layer components para que utilitários Tailwind (h-12, pr-12, w-auto...)
+   aplicados junto a estas classes continuem podendo sobrescrever o padrão. */
+@layer components {
+  .form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0F172A;
+  }
+  html.dark .form-label { color: #E2E8F0; }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    background-color: #FFFFFF;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    color: #0F172A;
+    outline: none;
+    transition-property: border-color, box-shadow, background-color;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+  .form-input::placeholder,
+  .form-textarea::placeholder { color: #94A3B8; }
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+  }
+  .form-input:disabled,
+  .form-select:disabled,
+  .form-textarea:disabled {
+    background-color: #F1F5F9;
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+  html.dark .form-input,
+  html.dark .form-select,
+  html.dark .form-textarea {
+    background-color: #1E293B;
+    border-color: #334155;
+    color: #F8FAFC;
+  }
+  html.dark .form-input::placeholder,
+  html.dark .form-textarea::placeholder { color: #64748B; }
+  html.dark .form-input:disabled,
+  html.dark .form-select:disabled,
+  html.dark .form-textarea:disabled { background-color: rgba(51, 65, 85, 0.5); }
+
+  .form-input.form-input-erro,
+  .form-select.form-input-erro,
+  .form-textarea.form-input-erro { border-color: #EF4444; }
+  .form-input.form-input-erro:focus,
+  .form-select.form-input-erro:focus,
+  .form-textarea.form-input-erro:focus { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18); }
+
+  .form-select {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  }
+  html.dark .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  }
+
+  .form-textarea { resize: none; }
+
+  @keyframes form-error-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .form-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 0.875rem;
+    color: #EF4444;
+    animation: form-error-in 0.18s ease both;
+  }
+  .form-error svg { flex-shrink: 0; }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #2563EB;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+  .btn-primary:hover:not(:disabled) { background-color: #1D4ED8; }
+  .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #334155;
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    transition: background-color 0.2s ease;
+  }
+  .btn-secondary:hover:not(:disabled) { background-color: #F8FAFC; }
+  .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+  html.dark .btn-secondary { background-color: #1E293B; border-color: #334155; color: #CBD5E1; }
+  html.dark .btn-secondary:hover:not(:disabled) { background-color: #334155; }
+
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #EF4444;
+    transition: background-color 0.2s ease;
+  }
+  .btn-danger:hover:not(:disabled) { background-color: #DC2626; }
+  .btn-danger:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .form-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #FFFFFF;
+    animation: form-spin 0.6s linear infinite;
+  }
+  @keyframes form-spin { to { transform: rotate(360deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .form-error { animation: none !important; }
+    .form-spinner { animation: none !important; }
+  }
 }

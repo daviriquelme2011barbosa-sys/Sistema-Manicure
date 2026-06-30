@@ -9,7 +9,8 @@
       "Bash(ls ~/.claude/plugins/ 2>/dev/null || echo \"vazio\")",
       "Read(//c/Users/tfdav/.claude/plugins/**)",
       "PowerShell(node --version)",
-      "PowerShell(npm --version)"
+      "PowerShell(npm --version)",
+      "mcp__plugin_playwright_playwright__browser_evaluate"
     ]
   }
 }

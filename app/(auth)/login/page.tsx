@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { CampoSenha } from '@/components/CampoSenha'
+import { IconeAlerta } from '@/components/icons'
 
 type Tela = 'login' | 'esqueci' | 'link_enviado' | 'nova_senha'
 
@@ -167,7 +168,8 @@ export default function LoginPage() {
                     glass
                   />
                   {erroNovaSenha && (
-                    <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                    <span role="alert" className="login-campo-erro">
+                      <IconeAlerta />
                       {erroNovaSenha}
                     </span>
                   )}
@@ -186,7 +188,8 @@ export default function LoginPage() {
                     glass
                   />
                   {erroConfirmarSenha && (
-                    <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                    <span role="alert" className="login-campo-erro">
+                      <IconeAlerta />
                       {erroConfirmarSenha}
                     </span>
                   )}
@@ -197,7 +200,8 @@ export default function LoginPage() {
                   disabled={salvandoSenha}
                   className="login-btn login-anim-5"
                 >
-                  {salvandoSenha ? 'Salvando…' : 'Salvar nova senha'}
+                  {salvandoSenha && <span className="form-spinner" aria-hidden="true" />}
+                  {salvandoSenha ? 'Salvando...' : 'Salvar nova senha'}
                 </button>
               </form>
             </div>
@@ -268,7 +272,8 @@ export default function LoginPage() {
                     className={`login-input${erroEmailRecuperacao ? ' login-input-erro' : ''}`}
                   />
                   {erroEmailRecuperacao && (
-                    <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                    <span role="alert" className="login-campo-erro">
+                      <IconeAlerta />
                       {erroEmailRecuperacao}
                     </span>
                   )}
@@ -279,7 +284,8 @@ export default function LoginPage() {
                   disabled={enviandoRecuperacao}
                   className="login-btn login-anim-4"
                 >
-                  {enviandoRecuperacao ? 'Enviando…' : 'Enviar link de recuperação'}
+                  {enviandoRecuperacao && <span className="form-spinner" aria-hidden="true" />}
+                  {enviandoRecuperacao ? 'Enviando...' : 'Enviar link de recuperação'}
                 </button>
 
                 <button
@@ -333,7 +339,8 @@ export default function LoginPage() {
                   className={`login-input${erroEmail ? ' login-input-erro' : ''}`}
                 />
                 {erroEmail && (
-                  <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                  <span role="alert" className="login-campo-erro">
+                    <IconeAlerta />
                     {erroEmail}
                   </span>
                 )}
@@ -352,7 +359,8 @@ export default function LoginPage() {
                   glass
                 />
                 {erroSenha && (
-                  <span role="alert" className="text-xs" style={{ color: '#fca5a5' }}>
+                  <span role="alert" className="login-campo-erro">
+                    <IconeAlerta />
                     {erroSenha}
                   </span>
                 )}
@@ -369,7 +377,8 @@ export default function LoginPage() {
                 disabled={enviando}
                 className="login-btn login-anim-7"
               >
-                {enviando ? 'Entrando…' : 'Entrar'}
+                {enviando && <span className="form-spinner" aria-hidden="true" />}
+                {enviando ? 'Entrando...' : 'Entrar'}
               </button>
 
               <button

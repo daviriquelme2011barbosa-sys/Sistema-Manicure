@@ -10,7 +10,7 @@ import {
   validarNumeroWhatsApp,
 } from '@/lib/whatsapp'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
-import { IconeFechar, IconeLixeira } from '@/components/icons'
+import { IconeFechar, IconeLixeira, IconeAlerta } from '@/components/icons'
 import { CampoWhatsApp } from '@/components/CampoWhatsApp'
 import type { ClienteStatus } from '@/types'
 
@@ -258,8 +258,8 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
 
         <div className="flex flex-col gap-4">
           {/* Nome */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="edit-nome" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex flex-col">
+            <label htmlFor="edit-nome" className="form-label">
               Nome <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -269,18 +269,16 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               value={edicao.nome}
               onChange={(e) => setEdicao((prev) => ({ ...prev, nome: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
-              className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
-                errosEdicao.nome ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
-              }`}
+              className={`form-input${errosEdicao.nome ? ' form-input-erro' : ''}`}
             />
             {errosEdicao.nome && (
-              <span role="alert" className="text-sm text-red-600">{errosEdicao.nome}</span>
+              <span role="alert" className="form-error"><IconeAlerta />{errosEdicao.nome}</span>
             )}
           </div>
 
           {/* WhatsApp */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="edit-whatsapp" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex flex-col">
+            <label htmlFor="edit-whatsapp" className="form-label">
               WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <CampoWhatsApp
@@ -295,13 +293,13 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               erro={!!errosEdicao.whatsapp}
             />
             {errosEdicao.whatsapp && (
-              <span role="alert" className="text-sm text-red-600">{errosEdicao.whatsapp}</span>
+              <span role="alert" className="form-error"><IconeAlerta />{errosEdicao.whatsapp}</span>
             )}
           </div>
 
           {/* E-mail */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="edit-email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex flex-col">
+            <label htmlFor="edit-email" className="form-label">
               E-mail
               <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
@@ -312,18 +310,16 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               onChange={(e) => setEdicao((prev) => ({ ...prev, email: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
               placeholder="seu@email.com"
-              className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
-                errosEdicao.email ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
-              }`}
+              className={`form-input${errosEdicao.email ? ' form-input-erro' : ''}`}
             />
             {errosEdicao.email && (
-              <span role="alert" className="text-sm text-red-600">{errosEdicao.email}</span>
+              <span role="alert" className="form-error"><IconeAlerta />{errosEdicao.email}</span>
             )}
           </div>
 
           {/* Serviço */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="edit-servico" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex flex-col">
+            <label htmlFor="edit-servico" className="form-label">
               Último serviço
               <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
@@ -335,7 +331,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               onChange={(e) => setEdicao((prev) => ({ ...prev, servico: e.target.value }))}
               disabled={salvandoEdicao || excluindo}
               placeholder="Ex: Manicure, Pedicure…"
-              className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
+              className="form-input"
             />
             <datalist id="lista-servicos-edit">
               {SERVICOS_SUGERIDOS.map((s) => (
@@ -346,8 +342,8 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
 
           {/* Data do último atendimento */}
           {cliente.ultima_visita && (
-            <div className="flex flex-col gap-1">
-              <label htmlFor="edit-ultima-visita" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <div className="flex flex-col">
+              <label htmlFor="edit-ultima-visita" className="form-label">
                 Data do último atendimento
               </label>
               <input
@@ -356,21 +352,21 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                 value={edicao.ultimaVisita}
                 onChange={(e) => setEdicao((prev) => ({ ...prev, ultimaVisita: e.target.value }))}
                 disabled={salvandoEdicao || excluindo}
-                className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
+                className="form-input"
               />
             </div>
           )}
 
           {/* Preço do último atendimento */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="edit-preco" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex flex-col">
+            <label htmlFor="edit-preco" className="form-label">
               Preço do último atendimento
               <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
             {carregandoPreco ? (
-              <div className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700/50 animate-pulse" />
+              <div className="h-12 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-700/50 animate-pulse" />
             ) : cliente.ultima_visita ? (
-              <div className={`flex h-12 items-center overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-blue-500 border-slate-300 dark:border-slate-600 ${salvandoEdicao || excluindo ? 'bg-slate-100 dark:bg-slate-700/50' : 'bg-white dark:bg-slate-800'}`}>
+              <div className={`flex h-12 items-center overflow-hidden rounded-lg border border-slate-200 transition-colors duration-200 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-700 ${salvandoEdicao || excluindo ? 'bg-slate-100 dark:bg-slate-700/50' : 'bg-white dark:bg-slate-800'}`}>
                 <span className="flex-shrink-0 pl-4 pr-2 text-sm select-none text-slate-500 dark:text-slate-400">
                   R$
                 </span>
@@ -391,14 +387,14 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                 type="text"
                 disabled
                 placeholder="Sem atendimento registrado"
-                className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-4 text-base bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 cursor-not-allowed"
+                className="h-12 rounded-lg border border-slate-200 dark:border-slate-700 px-4 text-base bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 cursor-not-allowed"
               />
             )}
           </div>
 
           {/* Observações */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="edit-observacoes" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex flex-col">
+            <label htmlFor="edit-observacoes" className="form-label">
               Observações
               <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
             </label>
@@ -409,7 +405,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               disabled={salvandoEdicao || excluindo}
               placeholder="Preferências, alergias…"
               rows={2}
-              className="resize-none rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
+              className="form-textarea"
             />
           </div>
 
@@ -436,16 +432,17 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
                 <button
                   onClick={() => setConfirmarExclusao(false)}
                   disabled={excluindo}
-                  className="h-11 flex-1 rounded-lg border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40"
+                  className="btn-secondary flex-1 text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={excluirCliente}
                   disabled={excluindo}
-                  className="h-11 flex-1 rounded-lg bg-red-600 text-sm font-semibold text-white transition hover:bg-red-700 active:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="btn-danger flex-1 text-sm"
                 >
-                  {excluindo ? 'Excluindo…' : 'Confirmar exclusão'}
+                  {excluindo && <span className="form-spinner" aria-hidden="true" />}
+                  {excluindo ? 'Excluindo...' : 'Confirmar exclusão'}
                 </button>
               </div>
             </div>
@@ -454,9 +451,10 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               <button
                 onClick={salvarEdicao}
                 disabled={salvandoEdicao || !edicao.autorizaContato}
-                className="h-12 rounded-lg bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-primary w-full active:scale-[0.98]"
               >
-                {salvandoEdicao ? 'Salvando…' : 'Salvar alterações'}
+                {salvandoEdicao && <span className="form-spinner" aria-hidden="true" />}
+                {salvandoEdicao ? 'Salvando...' : 'Salvar alterações'}
               </button>
               <button
                 onClick={() => setConfirmarExclusao(true)}

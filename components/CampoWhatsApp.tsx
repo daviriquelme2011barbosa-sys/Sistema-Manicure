@@ -22,22 +22,23 @@ const ESTILOS: Record<
 > = {
   publico: {
     container:
-      'border-zinc-300 bg-white focus-within:ring-2 focus-within:ring-pink-400',
-    containerErro: 'border-red-500 bg-white focus-within:ring-2 focus-within:ring-red-400',
-    texto: 'text-zinc-900',
-    placeholder: 'placeholder:text-zinc-400',
-    dropdown: 'border-zinc-200 bg-white',
-    opcao: 'text-zinc-700 hover:bg-zinc-50',
-    opcaoAtiva: 'bg-pink-50 text-pink-700',
+      'border-slate-200 bg-white focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20',
+    containerErro:
+      'border-red-500 bg-white focus-within:ring-2 focus-within:ring-red-500/20',
+    texto: 'text-slate-900',
+    placeholder: 'placeholder:text-slate-400',
+    dropdown: 'border-slate-200 bg-white',
+    opcao: 'text-slate-700 hover:bg-slate-50',
+    opcaoAtiva: 'bg-blue-50 text-blue-700',
   },
   painel: {
     container:
-      'border-slate-300 bg-white focus-within:ring-2 focus-within:ring-blue-500 dark:border-slate-600 dark:bg-slate-800',
+      'border-slate-200 bg-white focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800',
     containerErro:
-      'border-red-500 bg-white focus-within:ring-2 focus-within:ring-red-400 dark:bg-slate-800',
+      'border-red-500 bg-white focus-within:ring-2 focus-within:ring-red-500/20 dark:bg-slate-800',
     texto: 'text-slate-900 dark:text-slate-100',
     placeholder: 'placeholder:text-slate-400 dark:placeholder:text-slate-500',
-    dropdown: 'border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800',
+    dropdown: 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800',
     opcao: 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700',
     opcaoAtiva: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
   },
@@ -76,7 +77,7 @@ export function CampoWhatsApp({
   return (
     <div ref={containerRef} className="relative">
       <div
-        className={`flex h-12 items-stretch overflow-hidden rounded-lg border shadow-sm transition ${
+        className={`flex h-12 items-stretch overflow-hidden rounded-lg border shadow-sm transition-colors duration-200 ${
           erro ? estilo.containerErro : estilo.container
         } ${disabled ? 'opacity-60' : ''}`}
       >
@@ -87,18 +88,16 @@ export function CampoWhatsApp({
           aria-haspopup="listbox"
           aria-expanded={aberto}
           aria-label="Selecionar código do país"
-          className={`flex flex-shrink-0 items-center gap-1.5 border-r px-3 text-sm font-medium outline-none ${estilo.texto} ${
-            variante === 'publico' ? 'border-zinc-300' : 'border-slate-300 dark:border-slate-600'
-          } ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          className={`flex flex-shrink-0 items-center gap-1.5 border-r border-slate-200 px-3 text-sm font-medium outline-none dark:border-slate-700 ${estilo.texto} ${
+            disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+          }`}
         >
           <span className="text-base leading-none" aria-hidden="true">
             {paisAtual.bandeira}
           </span>
           <span>+{paisAtual.ddi}</span>
           <span
-            className={`transition-transform ${aberto ? 'rotate-180' : ''} ${
-              variante === 'publico' ? 'text-zinc-400' : 'text-slate-400 dark:text-slate-500'
-            }`}
+            className={`text-slate-400 transition-transform dark:text-slate-500 ${aberto ? 'rotate-180' : ''}`}
             aria-hidden="true"
           >
             <IconeChevronBaixo />

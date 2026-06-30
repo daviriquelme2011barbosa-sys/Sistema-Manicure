@@ -1084,11 +1084,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
             <div className="flex flex-col gap-5">
 
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="config-nome-salao"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
+              <div className="flex flex-col">
+                <label htmlFor="config-nome-salao" className="form-label">
                   Nome do profissional
                 </label>
                 <div className="flex gap-2">
@@ -1099,7 +1096,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     value={novoNomeSalao}
                     onChange={(e) => setNovoNomeSalao(e.target.value)}
                     disabled={salvandoNome}
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:disabled:bg-slate-900/50"
+                    className="form-input min-w-0 flex-1"
                   />
                   <button
                     onClick={salvarNomeSalao}
@@ -1108,18 +1105,16 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       !novoNomeSalao.trim() ||
                       novoNomeSalao.trim() === nomeSalao
                     }
-                    className="h-11 flex-shrink-0 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="btn-primary flex-shrink-0 px-4 text-sm"
                   >
-                    {salvandoNome ? '…' : 'Salvar'}
+                    {salvandoNome && <span className="form-spinner" aria-hidden="true" />}
+                    {salvandoNome ? 'Salvando...' : 'Salvar'}
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="config-whatsapp"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
+              <div className="flex flex-col">
+                <label htmlFor="config-whatsapp" className="form-label">
                   WhatsApp do profissional
                 </label>
                 <div className="flex gap-2">
@@ -1144,18 +1139,16 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       normalizarWhatsAppCompleto(ddiWhatsapp, numeroWhatsapp) ===
                         montarNumeroInternacional(whatsapp)
                     }
-                    className="h-12 flex-shrink-0 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="btn-primary flex-shrink-0 px-4 text-sm"
                   >
-                    {salvandoWhatsapp ? '…' : 'Salvar'}
+                    {salvandoWhatsapp && <span className="form-spinner" aria-hidden="true" />}
+                    {salvandoWhatsapp ? 'Salvando...' : 'Salvar'}
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="config-genero"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
+              <div className="flex flex-col">
+                <label htmlFor="config-genero" className="form-label">
                   Gênero do profissional
                 </label>
                 <select
@@ -1163,14 +1156,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   value={genero}
                   onChange={(e) => salvarGenero(e.target.value as 'feminino' | 'masculino' | 'nao_informar')}
                   disabled={salvandoGenero}
-                  className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:disabled:bg-slate-900/50"
+                  className="form-select"
                 >
                   <option value="feminino">Feminino</option>
                   <option value="masculino">Masculino</option>
                   <option value="nao_informar">Prefiro não informar</option>
                 </select>
                 {salvandoGenero && (
-                  <p className="text-xs text-slate-400 dark:text-slate-500">Salvando…</p>
+                  <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">Salvando...</p>
                 )}
               </div>
 
@@ -1250,11 +1243,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <button
                     onClick={() => setOpcoesFotoAbertas((v) => !v)}
                     disabled={salvandoFoto}
-                    className={`flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 ${
-                      salvandoFoto ? 'cursor-not-allowed opacity-60' : ''
-                    }`}
+                    className="btn-secondary text-sm"
                   >
-                    {salvandoFoto ? 'Enviando…' : fotoUrl ? 'Alterar foto' : 'Escolher foto'}
+                    {salvandoFoto && <span className="form-spinner border-slate-400 border-t-slate-700 dark:border-slate-500 dark:border-t-slate-200" aria-hidden="true" />}
+                    {salvandoFoto ? 'Enviando...' : fotoUrl ? 'Alterar foto' : 'Escolher foto'}
                   </button>
 
                   {opcoesFotoAbertas && !salvandoFoto && (
@@ -1319,9 +1311,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <button
                     onClick={salvarCor}
                     disabled={salvandoCor || corSelecionada === corPrimaria}
-                    className="flex h-11 items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="btn-primary text-sm"
                   >
-                    {salvandoCor ? 'Salvando…' : 'Salvar cor'}
+                    {salvandoCor && <span className="form-spinner" aria-hidden="true" />}
+                    {salvandoCor ? 'Salvando...' : 'Salvar cor'}
                   </button>
                 </div>
               </div>

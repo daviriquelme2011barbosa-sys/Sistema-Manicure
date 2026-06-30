@@ -700,8 +700,8 @@ export default function AgendaPage() {
               {modalCompareceu.clientes?.nome ?? '—'}
             </p>
             <div className="mt-4 flex flex-col gap-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+              <div className="flex flex-col">
+                <label className="form-label">
                   Valor do serviço (opcional)
                 </label>
                 <input
@@ -711,17 +711,17 @@ export default function AgendaPage() {
                   value={precoInput ? formatarPreco(precoInput) : ''}
                   placeholder="R$ 0,00"
                   onChange={(e) => setPrecoInput(e.target.value.replace(/\D/g, ''))}
-                  className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="form-input"
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+              <div className="flex flex-col">
+                <label className="form-label">
                   Forma de pagamento (opcional)
                 </label>
                 <select
                   value={formaPagamentoModal}
                   onChange={(e) => setFormaPagamentoModal(e.target.value)}
-                  className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="form-select"
                 >
                   <option value="">Selecionar…</option>
                   <option value="pix">Pix</option>

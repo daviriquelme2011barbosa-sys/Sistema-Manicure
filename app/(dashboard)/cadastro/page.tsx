@@ -7,7 +7,7 @@ import { dataHoje, parsearPreco } from '@/lib/formatters'
 import { SERVICOS_SUGERIDOS } from '@/lib/constantes'
 import { useToast } from '@/hooks/useToast'
 import { ToastView } from '@/components/Toast'
-import { IconeFechar } from '@/components/icons'
+import { IconeFechar, IconeAlerta } from '@/components/icons'
 import { useHeader } from '@/lib/header-context'
 
 type ClienteBusca = {
@@ -36,10 +36,7 @@ function BuscaCliente({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <label
-          htmlFor="busca-cliente"
-          className="text-sm font-medium text-slate-700 dark:text-slate-300"
-        >
+        <label htmlFor="busca-cliente" className="form-label">
           Buscar cliente pelo nome
         </label>
         <input
@@ -49,7 +46,7 @@ function BuscaCliente({
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Nome da cliente…"
           autoComplete="off"
-          className="mt-1 h-12 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500"
+          className="form-input"
         />
       </div>
 
@@ -222,11 +219,8 @@ export default function CadastroPage() {
 
             <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
               {/* Serviço */}
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="servico"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
-                >
+              <div className="flex flex-col">
+                <label htmlFor="servico" className="form-label">
                   Serviço <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
                 <input
@@ -237,9 +231,7 @@ export default function CadastroPage() {
                   onChange={(e) => setServico(e.target.value)}
                   disabled={salvando}
                   placeholder="Ex: Manicure, Pedicure…"
-                  className={`h-12 rounded-lg border px-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
-                    erros.servico ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
-                  }`}
+                  className={`form-input${erros.servico ? ' form-input-erro' : ''}`}
                 />
                 <datalist id="lista-servicos">
                   {SERVICOS_SUGERIDOS.map((s) => (
@@ -247,7 +239,8 @@ export default function CadastroPage() {
                   ))}
                 </datalist>
                 {erros.servico && (
-                  <span role="alert" className="text-sm text-red-600">
+                  <span role="alert" className="form-error">
+                    <IconeAlerta />
                     {erros.servico}
                   </span>
                 )}
@@ -255,11 +248,8 @@ export default function CadastroPage() {
 
               {/* Data e Horário */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1">
-                  <label
-                    htmlFor="dataAtendimento"
-                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
-                  >
+                <div className="flex flex-col">
+                  <label htmlFor="dataAtendimento" className="form-label">
                     Data <span aria-hidden="true" className="text-red-500">*</span>
                   </label>
                   <input
@@ -268,16 +258,13 @@ export default function CadastroPage() {
                     value={dataAtendimento}
                     onChange={(e) => setDataAtendimento(e.target.value)}
                     disabled={salvando}
-                    className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
+                    className="form-input px-3"
                   />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <label
-                    htmlFor="horario"
-                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
-                  >
+                <div className="flex flex-col">
+                  <label htmlFor="horario" className="form-label">
                     Horário
-                    <span className="ml-1 text-xs font-normal text-slate-400">(opcional)</span>
+                    <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
                   </label>
                   <input
                     id="horario"
@@ -285,19 +272,16 @@ export default function CadastroPage() {
                     value={horario}
                     onChange={(e) => setHorario(e.target.value)}
                     disabled={salvando}
-                    className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
+                    className="form-input px-3"
                   />
                 </div>
               </div>
 
               {/* Preço */}
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="preco"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
-                >
+              <div className="flex flex-col">
+                <label htmlFor="preco" className="form-label">
                   Preço
-                  <span className="ml-1 text-xs font-normal text-slate-400">(opcional)</span>
+                  <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 select-none text-base text-slate-400 dark:text-slate-500">
@@ -313,33 +297,29 @@ export default function CadastroPage() {
                     onChange={(e) => setPreco(e.target.value)}
                     disabled={salvando}
                     placeholder="0,00"
-                    className={`h-12 w-full rounded-lg border pl-10 pr-4 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50 ${
-                      erros.preco ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
-                    }`}
+                    className={`form-input pl-10${erros.preco ? ' form-input-erro' : ''}`}
                   />
                 </div>
                 {erros.preco && (
-                  <span role="alert" className="text-sm text-red-600">
+                  <span role="alert" className="form-error">
+                    <IconeAlerta />
                     {erros.preco}
                   </span>
                 )}
               </div>
 
               {/* Forma de pagamento */}
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="formaPagamento"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
-                >
+              <div className="flex flex-col">
+                <label htmlFor="formaPagamento" className="form-label">
                   Forma de pagamento
-                  <span className="ml-1 text-xs font-normal text-slate-400">(opcional)</span>
+                  <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
                 </label>
                 <select
                   id="formaPagamento"
                   value={formaPagamento}
                   onChange={(e) => setFormaPagamento(e.target.value)}
                   disabled={salvando}
-                  className="h-12 rounded-lg border border-slate-300 dark:border-slate-600 px-3 text-base text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-700/50"
+                  className="form-select"
                 >
                   <option value="">Selecionar…</option>
                   <option value="pix">Pix</option>
@@ -352,16 +332,17 @@ export default function CadastroPage() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="h-12 rounded-lg bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-primary active:scale-[0.98]"
               >
-                {salvando ? 'Salvando…' : 'Registrar atendimento'}
+                {salvando && <span className="form-spinner" aria-hidden="true" />}
+                {salvando ? 'Salvando...' : 'Registrar atendimento'}
               </button>
 
               <button
                 type="button"
                 onClick={limpar}
                 disabled={salvando}
-                className="h-12 rounded-lg border border-slate-300 bg-white font-semibold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="btn-secondary"
               >
                 Cancelar registro
               </button>

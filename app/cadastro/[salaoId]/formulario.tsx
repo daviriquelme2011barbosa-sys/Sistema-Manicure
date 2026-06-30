@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { CampoSenha } from '@/components/CampoSenha'
 import { CampoWhatsApp } from '@/components/CampoWhatsApp'
 import { DDI_BRASIL, validarNumeroWhatsApp } from '@/lib/whatsapp'
+import { IconeAlerta } from '@/components/icons'
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -274,8 +275,8 @@ export default function FormularioCadastroPublico({
             className="flex flex-col gap-6"
           >
             {/* Nome */}
-            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '60ms' }}>
-              <label htmlFor="nome" className="text-sm font-medium text-zinc-700">
+            <div className="campo-formulario flex flex-col" style={{ animationDelay: '60ms' }}>
+              <label htmlFor="nome" className="form-label">
                 Nome <span aria-hidden="true" className="text-red-500">*</span>
               </label>
               <input
@@ -287,23 +288,22 @@ export default function FormularioCadastroPublico({
                 onChange={(e) => setNome(e.target.value)}
                 disabled={enviando}
                 placeholder="Nome completo"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.nome ? 'border-red-500' : 'border-zinc-300'
-                }`}
+                className={`form-input${erros.nome ? ' form-input-erro' : ''}`}
               />
-              <p className="text-sm text-zinc-400">
+              <p className="mt-1.5 text-sm text-slate-400 dark:text-slate-500">
                 Por favor, informe seu nome completo para evitar confusões
               </p>
               {erros.nome && (
-                <span role="alert" className="text-sm text-red-600">
+                <span role="alert" className="form-error">
+                  <IconeAlerta />
                   {erros.nome}
                 </span>
               )}
             </div>
 
             {/* WhatsApp */}
-            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '140ms' }}>
-              <label htmlFor="whatsapp" className="text-sm font-medium text-zinc-700">
+            <div className="campo-formulario flex flex-col" style={{ animationDelay: '140ms' }}>
+              <label htmlFor="whatsapp" className="form-label">
                 WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
               </label>
               <CampoWhatsApp
@@ -320,20 +320,21 @@ export default function FormularioCadastroPublico({
                 erro={!!erros.whatsapp}
               />
               {erros.whatsapp && (
-                <span role="alert" className="text-sm text-red-600">
+                <span role="alert" className="form-error">
+                  <IconeAlerta />
                   {erros.whatsapp}
                 </span>
               )}
               {avisoWhatsApp && !erros.whatsapp && (
-                <span role="status" className="text-sm text-amber-600">
+                <span role="status" className="mt-1.5 block text-sm text-amber-600">
                   {avisoWhatsApp}
                 </span>
               )}
             </div>
 
             {/* E-mail */}
-            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '220ms' }}>
-              <label htmlFor="email" className="text-sm font-medium text-zinc-700">
+            <div className="campo-formulario flex flex-col" style={{ animationDelay: '220ms' }}>
+              <label htmlFor="email" className="form-label">
                 E-mail <span aria-hidden="true" className="text-red-500">*</span>
               </label>
               <input
@@ -344,22 +345,21 @@ export default function FormularioCadastroPublico({
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={enviando}
                 placeholder="seu@email.com"
-                className={`h-12 rounded-lg border px-4 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100 ${
-                  erros.email ? 'border-red-500' : 'border-zinc-300'
-                }`}
+                className={`form-input${erros.email ? ' form-input-erro' : ''}`}
               />
               {erros.email && (
-                <span role="alert" className="text-sm text-red-600">
+                <span role="alert" className="form-error">
+                  <IconeAlerta />
                   {erros.email}
                 </span>
               )}
             </div>
 
             {/* Data de nascimento */}
-            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '300ms' }}>
-              <label htmlFor="data_nascimento" className="text-sm font-medium text-zinc-700">
+            <div className="campo-formulario flex flex-col" style={{ animationDelay: '300ms' }}>
+              <label htmlFor="data_nascimento" className="form-label">
                 Data de nascimento
-                <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+                <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
               </label>
               <input
                 id="data_nascimento"
@@ -367,15 +367,15 @@ export default function FormularioCadastroPublico({
                 value={dataNascimento}
                 onChange={(e) => setDataNascimento(e.target.value)}
                 disabled={enviando}
-                className="h-12 rounded-lg border border-zinc-300 px-4 text-base text-zinc-900 bg-white shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
+                className="form-input"
               />
             </div>
 
             {/* Observações */}
-            <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '380ms' }}>
-              <label htmlFor="observacoes" className="text-sm font-medium text-zinc-700">
+            <div className="campo-formulario flex flex-col" style={{ animationDelay: '380ms' }}>
+              <label htmlFor="observacoes" className="form-label">
                 Observações
-                <span className="ml-1 text-xs font-normal text-zinc-400">(opcional)</span>
+                <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
               </label>
               <textarea
                 id="observacoes"
@@ -384,14 +384,14 @@ export default function FormularioCadastroPublico({
                 disabled={enviando}
                 placeholder="Alergias, preferências…"
                 rows={3}
-                className="resize-none rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 bg-white placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-pink-400 disabled:bg-zinc-100"
+                className="form-textarea"
               />
             </div>
 
             {/* Senha (apenas planos Profissional e Master) */}
             {ehPro && (
-              <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '460ms' }}>
-                <label htmlFor="senha" className="text-sm font-medium text-zinc-700">
+              <div className="campo-formulario flex flex-col" style={{ animationDelay: '460ms' }}>
+                <label htmlFor="senha" className="form-label">
                   Senha <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
                 <CampoSenha
@@ -403,11 +403,12 @@ export default function FormularioCadastroPublico({
                   autoComplete="new-password"
                   erro={!!erros.senha}
                 />
-                <p className="text-sm text-zinc-400">
+                <p className="mt-1.5 text-sm text-slate-400 dark:text-slate-500">
                   Você usará essa senha para acessar o agendamento online
                 </p>
                 {erros.senha && (
-                  <span role="alert" className="text-sm text-red-600">
+                  <span role="alert" className="form-error">
+                    <IconeAlerta />
                     {erros.senha}
                   </span>
                 )}
@@ -416,8 +417,8 @@ export default function FormularioCadastroPublico({
 
             {/* Confirmar senha (apenas planos Profissional e Master) */}
             {ehPro && (
-              <div className="campo-formulario flex flex-col gap-1" style={{ animationDelay: '540ms' }}>
-                <label htmlFor="confirmar-senha" className="text-sm font-medium text-zinc-700">
+              <div className="campo-formulario flex flex-col" style={{ animationDelay: '540ms' }}>
+                <label htmlFor="confirmar-senha" className="form-label">
                   Confirmar senha <span aria-hidden="true" className="text-red-500">*</span>
                 </label>
                 <CampoSenha
@@ -430,7 +431,8 @@ export default function FormularioCadastroPublico({
                   erro={!!erros.confirmarSenha}
                 />
                 {erros.confirmarSenha && (
-                  <span role="alert" className="text-sm text-red-600">
+                  <span role="alert" className="form-error">
+                    <IconeAlerta />
                     {erros.confirmarSenha}
                   </span>
                 )}
@@ -444,9 +446,9 @@ export default function FormularioCadastroPublico({
                 checked={autorizaContato}
                 onChange={(e) => setAutorizaContato(e.target.checked)}
                 disabled={enviando}
-                className="mt-0.5 h-5 w-5 flex-shrink-0 accent-pink-500"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 accent-blue-600"
               />
-              <span className="text-sm text-zinc-600">
+              <span className="text-sm text-slate-600">
                 Autorizo o salão a entrar em contato comigo via WhatsApp para
                 agendamentos e reativação
                 <span aria-hidden="true" className="text-red-500"> *</span>
@@ -462,13 +464,13 @@ export default function FormularioCadastroPublico({
             <button
               type="submit"
               disabled={enviando || !autorizaContato}
-              className="campo-formulario h-12 rounded-lg font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="campo-formulario h-12 rounded-lg font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
               style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}`, animationDelay: ehPro ? '700ms' : '540ms' }}
             >
-              {enviando ? 'Enviando…' : 'Enviar'}
+              {enviando ? 'Enviando...' : 'Enviar'}
             </button>
 
-            <p className="text-center text-xs leading-relaxed text-zinc-400">
+            <p className="text-center text-xs leading-relaxed text-slate-400">
               Seus dados são usados exclusivamente para gestão interna do salão,
               conforme a{' '}
               <abbr title="Lei Geral de Proteção de Dados">LGPD</abbr>.

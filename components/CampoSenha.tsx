@@ -62,16 +62,14 @@ export function CampoSenha({
         onChange={onChange}
         disabled={disabled}
         placeholder={placeholder}
-        className={`h-12 w-full rounded-xl border px-4 pr-12 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-zinc-100 ${
-          erro ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
-        }`}
+        className={`form-input pr-12${erro ? ' form-input-erro' : ''}`}
       />
       <button
         type="button"
         onClick={() => setMostrar((v) => !v)}
         disabled={disabled}
         aria-label={mostrar ? 'Ocultar senha' : 'Mostrar senha'}
-        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:text-zinc-600 disabled:pointer-events-none"
+        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors duration-200 hover:text-slate-600 disabled:pointer-events-none dark:text-slate-500 dark:hover:text-slate-300"
       >
         {mostrar ? <IconeOlhoFechado /> : <IconeOlho />}
       </button>
