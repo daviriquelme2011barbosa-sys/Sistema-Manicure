@@ -674,7 +674,7 @@ function ColunaAcoesRapidas({ temAgenda }: { temAgenda: boolean }) {
         Ações rápidas
       </p>
       <div className="grid grid-cols-2 gap-2">
-        <AcaoRapida icone={<IconePessoa />} label="Novo cliente" cor="#22C55E" href="/cadastro" />
+        <AcaoRapida icone={<IconePessoa />} label="Novo cliente" cor="#22C55E" href="/cadastrados" />
         <AcaoRapida icone={<IconeCoracao />} label="Reativar clientes" cor="#EF4444" href="/reativar" />
         <AcaoRapida icone={<IconeRelogio />} label="Ver histórico" cor="#64748B" href="/historico" />
         <AcaoRapida
