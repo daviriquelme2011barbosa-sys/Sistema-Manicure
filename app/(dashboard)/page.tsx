@@ -193,7 +193,7 @@ function CartaoDado({
   animClass: string
 }) {
   return (
-    <Link href={href} className={`dash-card ${animClass}`}>
+    <Link href={href} className={`dash-card dash-card-kpi ${animClass}`}>
       <div
         className="dash-icon-badge"
         style={{ backgroundColor: `${cor}1A`, color: cor }}
@@ -201,7 +201,7 @@ function CartaoDado({
       >
         {icone}
       </div>
-      <span className="text-3xl font-bold leading-none tracking-tight text-slate-900 dark:text-slate-50">
+      <span className="text-2xl font-bold leading-none tracking-tight text-slate-900 dark:text-slate-50 lg:text-3xl">
         {numero}
       </span>
       <span className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -389,7 +389,7 @@ function DonutStatus({
   const fatiasComValor = fatias.filter((f) => f.valor > 0)
 
   return (
-    <div className="dash-card dash-anim-8 col-span-2 lg:col-span-3">
+    <div className="dash-card dash-card-compact dash-anim-1">
       <div className="mb-1">
         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
           Clientes por status
@@ -404,7 +404,7 @@ function DonutStatus({
           Nenhuma cliente para exibir ainda.
         </p>
       ) : (
-        <div className="mt-3 flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
+        <div className="mt-3 flex flex-col items-center gap-6 sm:flex-row sm:gap-8 lg:flex-col lg:gap-5">
           {/* Donut */}
           <div className="relative h-44 w-44 flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
@@ -540,7 +540,7 @@ function ColunaClientesRecentes({
   className?: string
 }) {
   return (
-    <div className={`dash-card dash-anim-1 ${className}`}>
+    <div className={`dash-card dash-card-compact dash-anim-2 ${className}`}>
       <CabecalhoColuna titulo="Clientes recentes" rotuloLink="Ver todos" href="/clientes" />
       {clientes.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
@@ -582,7 +582,7 @@ function ColunaClientesRecentes({
 
 function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] }) {
   return (
-    <div className="dash-card dash-anim-2">
+    <div className="dash-card dash-card-compact dash-anim-3">
       <CabecalhoColuna titulo="Agenda de hoje" rotuloLink="Ver agenda" href="/agenda" />
       {agendamentos.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
@@ -599,12 +599,15 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
             return (
               <li
                 key={a.id}
-                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                className="flex flex-col gap-1.5 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
               >
-                <span className="flex h-9 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                  {a.horario ? a.horario.slice(0, 5) : '—'}
-                </span>
-                <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex h-6 flex-shrink-0 items-center rounded-lg bg-slate-100 px-2 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                    {a.horario ? a.horario.slice(0, 5) : '—'}
+                  </span>
+                  <PilulaStatus label={info.label} cor={info.cor} />
+                </div>
+                <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
                     {a.clientes?.nome ?? '—'}
                   </p>
@@ -614,7 +617,6 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
                     </p>
                   )}
                 </div>
-                <PilulaStatus label={info.label} cor={info.cor} />
               </li>
             )
           })}
@@ -638,17 +640,17 @@ function AcaoRapida({
   onClick?: () => void
 }) {
   const classes =
-    'flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-center transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-sm dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600 dark:hover:bg-slate-800'
+    'flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-sm dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600 dark:hover:bg-slate-800'
   const conteudo = (
     <>
       <span
-        className="flex h-10 w-10 items-center justify-center rounded-xl"
+        className="flex h-9 w-9 items-center justify-center rounded-xl"
         style={{ backgroundColor: `${cor}1A`, color: cor }}
         aria-hidden="true"
       >
         {icone}
       </span>
-      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{label}</span>
+      <span className="text-xs font-medium leading-tight text-slate-600 dark:text-slate-300">{label}</span>
     </>
   )
   if (href) {
@@ -667,7 +669,7 @@ function AcaoRapida({
 
 function ColunaAcoesRapidas({ temAgenda }: { temAgenda: boolean }) {
   return (
-    <div className="dash-card dash-anim-3">
+    <div className="dash-card dash-card-compact dash-anim-4">
       <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
         Ações rápidas
       </p>
@@ -938,14 +940,13 @@ export default function DashboardPage() {
           </Link>
         )}
 
-        {/* Grid de resumo + gráfico */}
+        {/* Grid de resumo (cards de KPI) */}
         <div className="grid grid-cols-2 gap-3 p-4 lg:grid-cols-3">
           {carregando ? (
             <>
               {Array.from({ length: 7 }).map((_, i) => (
                 <SkeletonCard key={i} />
               ))}
-              <div className="shimmer col-span-2 h-52 rounded-2xl bg-slate-100 dark:bg-slate-800 lg:col-span-3" />
             </>
           ) : dados ? (
             <>
@@ -1012,19 +1013,14 @@ export default function DashboardPage() {
                 serie={[]}
                 animClass="dash-anim-7"
               />
-              <DonutStatus
-                ativas={dados.clientesAtivas}
-                atencao={dados.clientesAtencao}
-                sumidas={dados.clientesSumidas}
-              />
             </>
           ) : null}
         </div>
 
-        {/* Colunas: clientes recentes · agenda de hoje · ações rápidas */}
+        {/* Donut de status + colunas: clientes recentes · agenda de hoje · ações rápidas */}
         {carregando ? (
-          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
                 className="shimmer h-64 rounded-2xl bg-slate-100 dark:bg-slate-800"
@@ -1032,7 +1028,12 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : dados ? (
-          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-4">
+            <DonutStatus
+              ativas={dados.clientesAtivas}
+              atencao={dados.clientesAtencao}
+              sumidas={dados.clientesSumidas}
+            />
             <ColunaClientesRecentes
               clientes={dados.clientesRecentes}
               className={temAgenda ? '' : 'lg:col-span-2'}
