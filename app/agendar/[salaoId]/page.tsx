@@ -39,9 +39,9 @@ export default async function AgendarPage({
 
   if (!salao) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
-        <h1 className="text-xl font-semibold text-zinc-800">Salão não encontrado</h1>
-        <p className="mt-2 text-sm text-zinc-500">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 text-center">
+        <h1 className="text-xl font-semibold text-slate-800">Salão não encontrado</h1>
+        <p className="mt-2 text-sm text-slate-500">
           Verifique o link com a sua manicure e tente novamente.
         </p>
       </div>
@@ -51,12 +51,12 @@ export default async function AgendarPage({
   const plano = salao.plano ?? 'basic'
   if (plano !== 'profissional' && plano !== 'master') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 text-center">
         <p className="text-4xl">🔒</p>
-        <h1 className="mt-4 text-xl font-semibold text-zinc-800">
+        <h1 className="mt-4 text-xl font-semibold text-slate-800">
           Agendamento online não disponível para este salão
         </h1>
-        <p className="mt-2 text-sm text-zinc-500">
+        <p className="mt-2 text-sm text-slate-500">
           Entre em contato diretamente com a profissional para agendar.
         </p>
       </div>

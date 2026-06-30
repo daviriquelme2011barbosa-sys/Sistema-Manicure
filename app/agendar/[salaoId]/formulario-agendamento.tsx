@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { montarNumeroInternacional } from '@/lib/whatsapp'
+import { CampoSenha } from '@/components/CampoSenha'
+import { IconeCasa, IconeAgenda, IconeLista, IconeRelogio, IconePessoa, IconeAlerta } from '@/components/icons'
 
 type EstadoAuth = 'carregando' | 'login' | 'verificando' | 'pendente' | 'nao_encontrado' | 'autenticado'
 type Secao = 'inicio' | 'agendar' | 'agendamentos' | 'historico' | 'perfil'
@@ -40,20 +42,13 @@ const NOMES_MESES = [
 const NOMES_MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 const LABELS_DIAS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
 
-const SECOES_MENU: { id: Secao; label: string; icone: string }[] = [
-  { id: 'inicio', label: 'Início', icone: '🏠' },
-  { id: 'agendar', label: 'Agendar', icone: '📅' },
-  { id: 'agendamentos', label: 'Meus Agendamentos', icone: '📋' },
-  { id: 'historico', label: 'Histórico', icone: '🕐' },
-  { id: 'perfil', label: 'Meu Perfil', icone: '👤' },
+const SECOES_MENU: { id: Secao; label: string; Icone: () => React.ReactElement; cor: string }[] = [
+  { id: 'inicio', label: 'Início', Icone: IconeCasa, cor: '#2563EB' },
+  { id: 'agendar', label: 'Agendar', Icone: IconeAgenda, cor: '#14B8A6' },
+  { id: 'agendamentos', label: 'Meus Agendamentos', Icone: IconeLista, cor: '#F59E0B' },
+  { id: 'historico', label: 'Histórico', Icone: IconeRelogio, cor: '#64748B' },
+  { id: 'perfil', label: 'Meu Perfil', Icone: IconePessoa, cor: '#8B5CF6' },
 ]
-
-function hexToRgba(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
-}
 
 function formatarDataBR(dataISO: string): string {
   const [ano, mes, dia] = dataISO.split('-')
@@ -72,18 +67,17 @@ function dataHojeISO(): string {
 function badgeStatus(status: string): { label: string; classes: string } {
   switch (status) {
     case 'pendente':   return { label: 'Pendente',   classes: 'bg-amber-100 text-amber-700' }
-    case 'confirmado': return { label: 'Confirmado', classes: 'bg-blue-100 text-blue-700' }
+    case 'confirmado': return { label: 'Confirmado', classes: 'bg-green-100 text-green-700' }
     case 'compareceu': return { label: 'Compareceu', classes: 'bg-green-100 text-green-700' }
     case 'faltou':     return { label: 'Faltou',     classes: 'bg-red-100 text-red-600' }
-    case 'cancelado':  return { label: 'Cancelado',  classes: 'bg-zinc-100 text-zinc-500' }
-    default:           return { label: status,       classes: 'bg-zinc-100 text-zinc-500' }
+    case 'cancelado':  return { label: 'Cancelado',  classes: 'bg-red-100 text-red-600' }
+    default:           return { label: status,       classes: 'bg-slate-100 text-slate-500' }
   }
 }
 
 export default function FormularioAgendamento({
   salaoId,
   nomeSalao,
-  corPrimaria,
   nomeManicure,
   whatsappManicure,
 }: Props) {
@@ -103,7 +97,6 @@ export default function FormularioAgendamento({
   // ── Login form ───────────────────────────────────────────────────────────────
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [mostrarSenha, setMostrarSenha] = useState(false)
   const [erroLogin, setErroLogin] = useState('')
 
   // ── Navigation ───────────────────────────────────────────────────────────────
@@ -452,28 +445,25 @@ export default function FormularioAgendamento({
   function renderInicio() {
     return (
       <div className="flex flex-col gap-5 px-4 py-5">
-        <h2 className="text-lg font-semibold text-zinc-900">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900">
           Olá, {cliente?.nome.split(' ')[0]}!
         </h2>
 
         {/* Próximo agendamento */}
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Próximo agendamento
           </p>
           {carregandoAgendamentos ? (
-            <div className="h-24 animate-pulse rounded-2xl bg-zinc-100" />
+            <div className="h-24 animate-pulse rounded-2xl bg-slate-100" />
           ) : proximoAgendamento ? (
-            <div
-              className="rounded-2xl p-4"
-              style={{ backgroundColor: hexToRgba(corPrimaria, 0.08) }}
-            >
-              <p className="text-sm font-semibold" style={{ color: corPrimaria }}>
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+              <p className="text-sm font-semibold text-blue-700">
                 📅 {formatarDataBR(proximoAgendamento.data)}
                 {proximoAgendamento.horario ? ` às ${proximoAgendamento.horario}` : ''}
               </p>
               {proximoAgendamento.servico && (
-                <p className="mt-1 text-sm text-zinc-700">✂️ {proximoAgendamento.servico}</p>
+                <p className="mt-1 text-sm text-slate-700">✂️ {proximoAgendamento.servico}</p>
               )}
               <span
                 className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${badgeStatus(proximoAgendamento.status).classes}`}
@@ -482,12 +472,11 @@ export default function FormularioAgendamento({
               </span>
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-zinc-200 py-8 text-center">
-              <p className="text-sm text-zinc-400">Nenhum agendamento futuro</p>
+            <div className="rounded-2xl border border-dashed border-slate-200 py-8 text-center">
+              <p className="text-sm text-slate-400">Nenhum agendamento futuro</p>
               <button
                 onClick={() => setSecao('agendar')}
-                className="mt-3 rounded-lg px-4 py-2 text-sm font-semibold text-white"
-                style={{ backgroundColor: corPrimaria }}
+                className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
               >
                 Agendar agora
               </button>
@@ -497,22 +486,30 @@ export default function FormularioAgendamento({
 
         {/* Métricas */}
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Seus números
           </p>
-          <div className="rounded-2xl border border-zinc-100 bg-white p-4">
-            <div className="mb-3 flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-zinc-900">{realizados.length}</span>
-              <span className="text-sm text-zinc-500">atendimentos realizados</span>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="mb-3 flex items-center gap-3">
+              <span
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-600"
+                aria-hidden="true"
+              >
+                ✓
+              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-slate-900">{realizados.length}</span>
+                <span className="text-sm text-slate-500">atendimentos realizados</span>
+              </div>
             </div>
-            <div className="flex gap-6 border-t border-zinc-50 pt-3">
+            <div className="flex gap-6 border-t border-slate-100 pt-3">
               <div>
-                <p className="text-xs text-zinc-400">{NOMES_MESES_CURTOS[mesAtualNum - 1]}</p>
-                <p className="text-lg font-semibold text-zinc-900">{realizadosMesAtual}</p>
+                <p className="text-xs text-slate-400">{NOMES_MESES_CURTOS[mesAtualNum - 1]}</p>
+                <p className="text-lg font-semibold text-slate-900">{realizadosMesAtual}</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-400">{NOMES_MESES_CURTOS[mesAntNum - 1]}</p>
-                <p className="text-lg font-semibold text-zinc-400">{realizadosMesAnterior}</p>
+                <p className="text-xs text-slate-400">{NOMES_MESES_CURTOS[mesAntNum - 1]}</p>
+                <p className="text-lg font-semibold text-slate-400">{realizadosMesAnterior}</p>
               </div>
             </div>
           </div>
@@ -521,8 +518,7 @@ export default function FormularioAgendamento({
         {/* Atalho rápido */}
         <button
           onClick={() => { setSecao('agendar'); resetarAgendar() }}
-          className="flex h-12 w-full items-center justify-center rounded-xl font-semibold text-white"
-          style={{ backgroundColor: corPrimaria }}
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
         >
           📅 Fazer novo agendamento
         </button>
@@ -537,11 +533,8 @@ export default function FormularioAgendamento({
         : 'Confirmando agendamento…'
       return (
         <div className="flex flex-col items-center gap-4 py-16 px-4">
-          <div
-            className="h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"
-            style={{ borderColor: `${corPrimaria} transparent ${corPrimaria} ${corPrimaria}` }}
-          />
-          <p className="text-sm text-zinc-500">{label}</p>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <p className="text-sm text-slate-500">{label}</p>
         </div>
       )
     }
@@ -556,27 +549,27 @@ export default function FormularioAgendamento({
 
       return (
         <div className="flex flex-col gap-4 px-4 py-5">
-          <h2 className="text-base font-semibold text-zinc-900">Escolha uma data</h2>
+          <h2 className="text-base font-semibold text-slate-900">Escolha uma data</h2>
           {erroHorarios && (
-            <p role="alert" className="text-sm text-red-600">{erroHorarios}</p>
+            <p role="alert" className="form-error"><IconeAlerta />{erroHorarios}</p>
           )}
 
-          <div className="rounded-2xl border border-zinc-100 bg-white p-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
             <div className="mb-4 flex items-center justify-between">
               <button
                 onClick={mesAnterior}
                 disabled={!podeMesAnterior}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-600 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="Mês anterior"
               >
                 ‹
               </button>
-              <span className="text-sm font-semibold text-zinc-800">
+              <span className="text-sm font-semibold text-slate-800">
                 {NOMES_MESES[calMes]} {calAno}
               </span>
               <button
                 onClick={proximoMes}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-600 transition hover:bg-zinc-100"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition-colors duration-200 hover:bg-slate-100"
                 aria-label="Próximo mês"
               >
                 ›
@@ -585,7 +578,7 @@ export default function FormularioAgendamento({
 
             <div className="grid grid-cols-7 gap-1">
               {LABELS_DIAS.map((d, i) => (
-                <div key={i} className="py-1 text-center text-xs font-medium text-zinc-400">
+                <div key={i} className="py-1 text-center text-xs font-medium text-slate-400">
                   {d}
                 </div>
               ))}
@@ -599,20 +592,13 @@ export default function FormularioAgendamento({
                     key={dia}
                     onClick={() => disponivel && selecionarData(dataISO)}
                     disabled={!disponivel}
-                    className={`h-10 w-full rounded-lg text-sm font-medium transition ${
+                    className={`h-10 w-full rounded-lg text-sm font-medium transition-colors duration-200 ${
                       selecionado
-                        ? 'text-white'
+                        ? 'bg-blue-600 text-white'
                         : disponivel
-                        ? 'hover:opacity-80'
-                        : 'cursor-default text-zinc-300'
+                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                        : 'cursor-default text-slate-300'
                     }`}
-                    style={
-                      selecionado
-                        ? { backgroundColor: corPrimaria }
-                        : disponivel
-                        ? { backgroundColor: hexToRgba(corPrimaria, 0.12), color: corPrimaria }
-                        : {}
-                    }
                   >
                     {dia}
                   </button>
@@ -630,26 +616,25 @@ export default function FormularioAgendamento({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setEtapaAgendar('calendario')}
-              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
               aria-label="Voltar"
             >
               ‹
             </button>
             <div>
-              <h2 className="text-base font-semibold text-zinc-900">Horários disponíveis</h2>
-              <p className="text-sm text-zinc-500">{formatarDataBR(dataSelecionada)}</p>
+              <h2 className="text-base font-semibold text-slate-900">Horários disponíveis</h2>
+              <p className="text-sm text-slate-500">{formatarDataBR(dataSelecionada)}</p>
             </div>
           </div>
 
           {horariosDisponiveis.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-zinc-100 bg-white py-12 text-center">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white py-12 text-center">
               <p className="text-3xl">😔</p>
-              <p className="text-sm font-medium text-zinc-700">Nenhum horário disponível</p>
-              <p className="text-xs text-zinc-400">Escolha outro dia</p>
+              <p className="text-sm font-medium text-slate-700">Nenhum horário disponível</p>
+              <p className="text-xs text-slate-400">Escolha outro dia</p>
               <button
                 onClick={() => setEtapaAgendar('calendario')}
-                className="mt-2 rounded-lg px-4 py-2 text-sm font-semibold text-white"
-                style={{ backgroundColor: corPrimaria }}
+                className="mt-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
               >
                 Voltar ao calendário
               </button>
@@ -662,12 +647,11 @@ export default function FormularioAgendamento({
                   <button
                     key={h}
                     onClick={() => setHorarioSelecionado(h)}
-                    className="flex h-12 items-center justify-center rounded-xl text-sm font-semibold transition"
-                    style={
+                    className={`flex h-12 items-center justify-center rounded-xl border text-sm font-semibold transition-colors duration-200 ${
                       selecionado
-                        ? { backgroundColor: corPrimaria, color: '#fff' }
-                        : { backgroundColor: hexToRgba(corPrimaria, 0.1), color: corPrimaria }
-                    }
+                        ? 'border-blue-600 bg-blue-600 text-white'
+                        : 'border-blue-200 bg-white text-blue-600 hover:bg-blue-50'
+                    }`}
                   >
                     {h}
                   </button>
@@ -679,8 +663,7 @@ export default function FormularioAgendamento({
           {horarioSelecionado && (
             <button
               onClick={() => setEtapaAgendar('servico')}
-              className="flex h-12 w-full items-center justify-center rounded-xl font-semibold text-white transition"
-              style={{ backgroundColor: corPrimaria }}
+              className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
             >
               Continuar → {horarioSelecionado}
             </button>
@@ -695,22 +678,22 @@ export default function FormularioAgendamento({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setEtapaAgendar('horarios')}
-              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
               aria-label="Voltar"
             >
               ‹
             </button>
-            <h2 className="text-base font-semibold text-zinc-900">Qual serviço você quer fazer?</h2>
+            <h2 className="text-base font-semibold text-slate-900">Qual serviço você quer fazer?</h2>
           </div>
 
-          <div className="rounded-2xl p-4" style={{ backgroundColor: hexToRgba(corPrimaria, 0.08) }}>
-            <p className="text-sm font-medium" style={{ color: corPrimaria }}>
+          <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+            <p className="text-sm font-medium text-blue-700">
               📅 {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
             </p>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="servico" className="text-sm font-medium text-zinc-700">
+          <div className="flex flex-col">
+            <label htmlFor="servico" className="form-label">
               Serviço desejado <span aria-hidden="true" className="text-red-500">*</span>
             </label>
             <input
@@ -719,12 +702,10 @@ export default function FormularioAgendamento({
               value={servico}
               onChange={(e) => { setServico(e.target.value); setErroServico('') }}
               placeholder="Ex: manicure, pedicure, unhas em gel…"
-              className={`h-12 rounded-xl border px-4 text-base text-zinc-900 bg-white shadow-sm outline-none placeholder:text-zinc-400 transition focus:ring-2 focus:ring-pink-400 ${
-                erroServico ? 'border-red-500' : 'border-zinc-300'
-              }`}
+              className={`form-input${erroServico ? ' form-input-erro' : ''}`}
             />
             {erroServico && (
-              <span role="alert" className="text-sm text-red-600">{erroServico}</span>
+              <span role="alert" className="form-error"><IconeAlerta />{erroServico}</span>
             )}
           </div>
 
@@ -736,8 +717,7 @@ export default function FormularioAgendamento({
 
           <button
             onClick={confirmarAgendamento}
-            className="flex h-12 w-full items-center justify-center rounded-xl font-semibold text-white transition"
-            style={{ backgroundColor: corPrimaria }}
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
           >
             Confirmar agendamento
           </button>
@@ -751,20 +731,17 @@ export default function FormularioAgendamento({
         <div className="flex flex-col items-center gap-5 px-4 py-8 text-center">
           <p className="text-5xl">✅</p>
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900">Agendamento solicitado!</h2>
-            <p className="mt-1 text-sm text-zinc-500">
+            <h2 className="text-lg font-semibold text-slate-900">Agendamento solicitado!</h2>
+            <p className="mt-1 text-sm text-slate-500">
               Sua solicitação foi enviada. A profissional irá confirmar em breve.
             </p>
           </div>
 
-          <div
-            className="w-full rounded-2xl p-4 text-left"
-            style={{ backgroundColor: hexToRgba(corPrimaria, 0.08) }}
-          >
-            <p className="text-sm font-medium text-zinc-700">
+          <div className="w-full rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left">
+            <p className="text-sm font-medium text-slate-700">
               📅 {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
             </p>
-            <p className="mt-1 text-sm text-zinc-600">✂️ {servico}</p>
+            <p className="mt-1 text-sm text-slate-600">✂️ {servico}</p>
           </div>
 
           {temWhatsApp && (
@@ -772,7 +749,7 @@ export default function FormularioAgendamento({
               href={linkWhatsApp()}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl font-semibold text-white shadow-sm transition"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl font-semibold text-white shadow-sm transition-colors duration-200"
               style={{ backgroundColor: '#25D366' }}
             >
               <span>📱</span> Confirmar pelo WhatsApp
@@ -781,8 +758,7 @@ export default function FormularioAgendamento({
 
           <button
             onClick={() => { setSecao('agendamentos'); resetarAgendar() }}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: corPrimaria }}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700"
           >
             Ver meus agendamentos
           </button>
@@ -796,23 +772,22 @@ export default function FormularioAgendamento({
   function renderMeusAgendamentos() {
     return (
       <div className="flex flex-col gap-4 px-4 py-5">
-        <h2 className="text-base font-semibold text-zinc-900">Meus Agendamentos</h2>
+        <h2 className="text-base font-semibold text-slate-900">Meus Agendamentos</h2>
 
         {carregandoAgendamentos ? (
           <div className="flex flex-col gap-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-24 animate-pulse rounded-2xl bg-zinc-100" />
+              <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
             ))}
           </div>
         ) : agendamentosAtivos.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
             <p className="text-4xl">📭</p>
-            <p className="text-sm font-medium text-zinc-700">Nenhum agendamento ativo</p>
-            <p className="text-xs text-zinc-400">Seus próximos agendamentos aparecerão aqui.</p>
+            <p className="text-sm font-medium text-slate-700">Nenhum agendamento ativo</p>
+            <p className="text-xs text-slate-400">Seus próximos agendamentos aparecerão aqui.</p>
             <button
               onClick={() => { setSecao('agendar'); resetarAgendar() }}
-              className="mt-2 rounded-lg px-4 py-2 text-sm font-semibold text-white"
-              style={{ backgroundColor: corPrimaria }}
+              className="mt-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
             >
               Agendar agora
             </button>
@@ -822,14 +797,14 @@ export default function FormularioAgendamento({
             {agendamentosAtivos.map((ag) => {
               const badge = badgeStatus(ag.status)
               return (
-                <li key={ag.id} className="rounded-2xl border border-zinc-100 bg-white p-4">
+                <li key={ag.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-zinc-900">
+                      <p className="text-sm font-semibold text-slate-900">
                         📅 {formatarDataBR(ag.data)}{ag.horario ? ` às ${ag.horario}` : ''}
                       </p>
                       {ag.servico && (
-                        <p className="mt-0.5 truncate text-sm text-zinc-500">✂️ {ag.servico}</p>
+                        <p className="mt-0.5 truncate text-sm text-slate-500">✂️ {ag.servico}</p>
                       )}
                     </div>
                     <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.classes}`}>
@@ -838,7 +813,7 @@ export default function FormularioAgendamento({
                   </div>
                   <button
                     onClick={() => setConfirmandoCancelar(ag)}
-                    className="mt-3 flex h-9 w-full items-center justify-center rounded-xl border border-red-200 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="mt-3 flex h-9 w-full items-center justify-center rounded-xl border border-red-200 text-sm font-medium text-red-600 transition-colors duration-200 hover:bg-red-50"
                   >
                     Cancelar agendamento
                   </button>
@@ -854,33 +829,33 @@ export default function FormularioAgendamento({
   function renderHistorico() {
     return (
       <div className="flex flex-col gap-4 px-4 py-5">
-        <h2 className="text-base font-semibold text-zinc-900">Histórico</h2>
+        <h2 className="text-base font-semibold text-slate-900">Histórico</h2>
 
         {carregandoAgendamentos ? (
           <div className="flex flex-col gap-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-20 animate-pulse rounded-2xl bg-zinc-100" />
+              <div key={i} className="h-20 animate-pulse rounded-2xl bg-slate-100" />
             ))}
           </div>
         ) : historicoAgendamentos.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-12 text-center">
             <p className="text-4xl">🕐</p>
-            <p className="text-sm font-medium text-zinc-700">Nenhum histórico ainda</p>
-            <p className="text-xs text-zinc-400">Seus agendamentos passados aparecerão aqui.</p>
+            <p className="text-sm font-medium text-slate-700">Nenhum histórico ainda</p>
+            <p className="text-xs text-slate-400">Seus agendamentos passados aparecerão aqui.</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-3">
             {historicoAgendamentos.map((ag) => {
               const badge = badgeStatus(ag.status)
               return (
-                <li key={ag.id} className="rounded-2xl border border-zinc-100 bg-white p-4">
+                <li key={ag.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-zinc-700">
+                      <p className="text-sm font-medium text-slate-700">
                         📅 {formatarDataBR(ag.data)}{ag.horario ? ` às ${ag.horario}` : ''}
                       </p>
                       {ag.servico && (
-                        <p className="mt-0.5 truncate text-sm text-zinc-400">✂️ {ag.servico}</p>
+                        <p className="mt-0.5 truncate text-sm text-slate-400">✂️ {ag.servico}</p>
                       )}
                     </div>
                     <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.classes}`}>
@@ -899,17 +874,17 @@ export default function FormularioAgendamento({
   function renderPerfil() {
     return (
       <div className="flex flex-col gap-5 px-4 py-5">
-        <h2 className="text-base font-semibold text-zinc-900">Meu Perfil</h2>
+        <h2 className="text-base font-semibold text-slate-900">Meu Perfil</h2>
 
-        <div className="rounded-2xl border border-zinc-100 bg-white p-4">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
           <div className="mb-4 flex flex-col gap-3">
             <div>
-              <p className="text-xs font-medium text-zinc-400">E-mail</p>
-              <p className="mt-0.5 text-sm text-zinc-700">{cliente?.email || '—'}</p>
+              <p className="text-xs font-medium text-slate-400">E-mail</p>
+              <p className="mt-0.5 text-sm text-slate-700">{cliente?.email || '—'}</p>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="nomeEditado" className="text-xs font-medium text-zinc-400">
+            <div className="flex flex-col">
+              <label htmlFor="nomeEditado" className="form-label">
                 Nome
               </label>
               <input
@@ -918,24 +893,24 @@ export default function FormularioAgendamento({
                 value={nomeEditado}
                 onChange={(e) => setNomeEditado(e.target.value)}
                 disabled={salvandoNome}
-                className="h-11 rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-pink-500 disabled:opacity-60"
+                className="form-input"
               />
             </div>
 
             <button
               onClick={salvarNome}
               disabled={salvandoNome || !nomeEditado.trim() || nomeEditado.trim() === cliente?.nome}
-              className="flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ backgroundColor: corPrimaria }}
+              className="flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {salvandoNome ? 'Salvando…' : 'Salvar nome'}
+              {salvandoNome && <span className="form-spinner" aria-hidden="true" />}
+              {salvandoNome ? 'Salvando...' : 'Salvar nome'}
             </button>
           </div>
         </div>
 
         <button
           onClick={sairDaConta}
-          className="flex h-12 w-full items-center justify-center rounded-xl border border-red-200 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-red-500 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-600"
         >
           Sair da conta
         </button>
@@ -947,7 +922,7 @@ export default function FormularioAgendamento({
 
   if (estadoAuth === 'autenticado') {
     return (
-      <div className="flex min-h-screen flex-col bg-zinc-50">
+      <div className="flex min-h-screen flex-col bg-slate-50">
         {/* Toast */}
         {toast && (
           <div
@@ -960,10 +935,11 @@ export default function FormularioAgendamento({
         )}
 
         {/* Fixed header */}
-        <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-zinc-100 bg-white px-4 shadow-sm">
+        <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm">
+          <span className="truncate text-sm font-semibold text-slate-900">{nomeSalao}</span>
           <button
             onClick={() => setMenuAberto(true)}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-zinc-600 transition hover:bg-zinc-100"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors duration-200 hover:bg-slate-100"
             aria-label="Abrir menu"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -972,7 +948,6 @@ export default function FormularioAgendamento({
               <rect y="15" width="20" height="2" rx="1" fill="currentColor" />
             </svg>
           </button>
-          <span className="ml-3 truncate text-sm font-semibold text-zinc-900">{nomeSalao}</span>
         </header>
 
         {/* Hamburger menu overlay */}
@@ -984,31 +959,35 @@ export default function FormularioAgendamento({
               aria-hidden="true"
             />
             <div className="fixed bottom-0 left-0 top-0 z-50 w-72 bg-white shadow-2xl">
-              <div className="flex h-14 items-center border-b border-zinc-100 px-4">
-                <span className="text-sm font-semibold text-zinc-900">{nomeSalao}</span>
+              <div className="flex h-14 items-center border-b border-slate-200 px-4">
+                <span className="text-sm font-semibold text-slate-900">{nomeSalao}</span>
               </div>
               <nav className="flex flex-col py-2">
-                {SECOES_MENU.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setSecao(item.id)
-                      setMenuAberto(false)
-                    }}
-                    className={`flex items-center gap-3 px-4 py-3.5 text-left text-sm font-medium transition ${
-                      secao === item.id
-                        ? 'text-zinc-900'
-                        : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800'
-                    }`}
-                    style={secao === item.id ? { color: corPrimaria } : {}}
-                  >
-                    <span className="text-base">{item.icone}</span>
-                    {item.label}
-                  </button>
-                ))}
+                {SECOES_MENU.map((item) => {
+                  const ativo = secao === item.id
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setSecao(item.id)
+                        setMenuAberto(false)
+                      }}
+                      className={`flex items-center gap-3 px-4 py-3.5 text-left text-sm font-medium transition-colors duration-200 ${
+                        ativo
+                          ? 'bg-blue-50 font-semibold text-blue-700'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                      }`}
+                    >
+                      <span className="flex-shrink-0" style={{ color: item.cor }}>
+                        <item.Icone />
+                      </span>
+                      {item.label}
+                    </button>
+                  )
+                })}
               </nav>
-              <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-100 p-4">
-                <p className="truncate text-xs text-zinc-400">{cliente?.nome}</p>
+              <div className="absolute bottom-0 left-0 right-0 border-t border-slate-200 p-4">
+                <p className="truncate text-xs text-slate-400">{cliente?.nome}</p>
               </div>
             </div>
           </>
@@ -1033,8 +1012,8 @@ export default function FormularioAgendamento({
               className="w-full max-w-sm rounded-t-2xl bg-white p-6 sm:rounded-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-base font-semibold text-zinc-900">Cancelar agendamento</h3>
-              <p className="mt-2 text-sm text-zinc-500">
+              <h3 className="text-base font-semibold text-slate-900">Cancelar agendamento</h3>
+              <p className="mt-2 text-sm text-slate-500">
                 Tem certeza que deseja cancelar o agendamento do dia{' '}
                 <strong>{formatarDataBR(confirmandoCancelar.data)}</strong>
                 {confirmandoCancelar.horario ? ` às ${confirmandoCancelar.horario}` : ''}?
@@ -1043,16 +1022,17 @@ export default function FormularioAgendamento({
                 <button
                   onClick={() => setConfirmandoCancelar(null)}
                   disabled={cancelando}
-                  className="flex h-11 flex-1 items-center justify-center rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
+                  className="flex h-11 flex-1 items-center justify-center rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-50 disabled:opacity-50"
                 >
                   Manter
                 </button>
                 <button
                   onClick={() => executarCancelar(confirmandoCancelar.id)}
                   disabled={cancelando}
-                  className="flex h-11 flex-1 items-center justify-center rounded-xl bg-red-500 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-50"
+                  className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-red-500 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-600 disabled:opacity-50"
                 >
-                  {cancelando ? '…' : 'Cancelar'}
+                  {cancelando && <span className="form-spinner" aria-hidden="true" />}
+                  {cancelando ? 'Cancelando...' : 'Cancelar'}
                 </button>
               </div>
             </div>
@@ -1064,29 +1044,14 @@ export default function FormularioAgendamento({
 
   // ── Unauthenticated screens ──────────────────────────────────────────────────
 
-  const estiloAurora: React.CSSProperties = {
-    position: 'fixed',
-    inset: 0,
-    zIndex: 0,
-    backgroundColor: '#fdfbff',
-    backgroundImage: `
-      radial-gradient(ellipse 100% 70% at 50% -10%, ${hexToRgba(corPrimaria, 0.42)}, transparent 70%),
-      radial-gradient(ellipse 75% 55% at 92% 100%, ${hexToRgba(corPrimaria, 0.28)}, transparent 60%),
-      radial-gradient(ellipse 65% 50% at 8% 65%, ${hexToRgba(corPrimaria, 0.18)}, transparent 55%)
-    `,
-  }
-
   const estiloScroll: React.CSSProperties = { position: 'fixed', inset: 0, overflowY: 'auto', zIndex: 1 }
 
   function renderTelaAuth() {
     if (estadoAuth === 'carregando' || estadoAuth === 'verificando') {
       return (
         <div className="flex flex-col items-center gap-4 py-16">
-          <div
-            className="h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"
-            style={{ borderColor: `${corPrimaria} transparent ${corPrimaria} ${corPrimaria}` }}
-          />
-          <p className="text-sm text-zinc-500">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <p className="text-sm text-slate-500">
             {estadoAuth === 'carregando' ? 'Carregando…' : 'Verificando seu cadastro…'}
           </p>
         </div>
@@ -1097,14 +1062,14 @@ export default function FormularioAgendamento({
       return (
         <form onSubmit={handleLogin} noValidate className="flex flex-col gap-5">
           <div>
-            <h2 className="text-base font-semibold text-zinc-800">Entrar na sua conta</h2>
-            <p className="mt-1 text-sm text-zinc-500">
-              Acesse para gerenciar seus agendamentos com {nomeExibido}
+            <h2 className="text-base font-semibold text-slate-900">Entrar na sua conta</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Acesse sua conta para gerenciar seus agendamentos com {nomeExibido}
             </p>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="email-login" className="text-sm font-medium text-zinc-700">E-mail</label>
+          <div className="flex flex-col">
+            <label htmlFor="email-login" className="form-label">E-mail</label>
             <input
               id="email-login"
               type="email"
@@ -1112,54 +1077,40 @@ export default function FormularioAgendamento({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="h-12 rounded-xl border border-zinc-300 bg-white px-4 text-base text-zinc-900 shadow-sm outline-none placeholder:text-zinc-400 transition focus:ring-2"
-              style={{ ['--tw-ring-color' as string]: hexToRgba(corPrimaria, 0.5) }}
+              className="form-input"
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="senha-login" className="text-sm font-medium text-zinc-700">Senha</label>
-            <div className="relative">
-              <input
-                id="senha-login"
-                type={mostrarSenha ? 'text' : 'password'}
-                autoComplete="current-password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="••••••••"
-                className="h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 pr-12 text-base text-zinc-900 shadow-sm outline-none placeholder:text-zinc-400 transition focus:ring-2"
-              />
-              <button
-                type="button"
-                onClick={() => setMostrarSenha((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
-                aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                {mostrarSenha ? '🙈' : '👁️'}
-              </button>
-            </div>
+          <div className="flex flex-col">
+            <label htmlFor="senha-login" className="form-label">Senha</label>
+            <CampoSenha
+              id="senha-login"
+              autoComplete="current-password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="••••••••"
+            />
           </div>
 
           {erroLogin && (
-            <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+            <p role="alert" className="form-error rounded-xl bg-red-50 px-4 py-3">
+              <IconeAlerta />
               {erroLogin}
             </p>
           )}
 
           <button
             type="submit"
-            className="flex h-12 w-full items-center justify-center rounded-xl font-semibold text-white shadow-sm transition"
-            style={{ backgroundColor: corPrimaria }}
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700"
           >
             Entrar
           </button>
 
-          <p className="text-center text-sm text-zinc-500">
+          <p className="text-center text-sm text-slate-500">
             Não tem cadastro?{' '}
             <Link
               href={`/cadastro/${salaoId}`}
-              className="font-semibold underline"
-              style={{ color: corPrimaria }}
+              className="font-semibold text-blue-600 underline hover:text-blue-700"
             >
               Fazer cadastro
             </Link>
@@ -1172,11 +1123,11 @@ export default function FormularioAgendamento({
       return (
         <div className="flex flex-col items-center gap-4 py-8 text-center">
           <p className="text-5xl">⏳</p>
-          <h2 className="text-base font-semibold text-zinc-800">Cadastro em análise</h2>
-          <p className="text-sm leading-relaxed text-zinc-500">
+          <h2 className="text-base font-semibold text-slate-900">Cadastro em análise</h2>
+          <p className="text-sm leading-relaxed text-slate-500">
             Seu cadastro está aguardando aprovação da profissional. Assim que for aprovado, você poderá agendar!
           </p>
-          <button onClick={sairDaConta} className="mt-2 text-sm font-medium text-zinc-400 underline">
+          <button onClick={sairDaConta} className="mt-2 text-sm font-medium text-slate-400 underline">
             Voltar ao início
           </button>
         </div>
@@ -1187,18 +1138,17 @@ export default function FormularioAgendamento({
       return (
         <div className="flex flex-col items-center gap-4 py-8 text-center">
           <p className="text-5xl">📋</p>
-          <h2 className="text-base font-semibold text-zinc-800">Cadastro não encontrado</h2>
-          <p className="text-sm leading-relaxed text-zinc-500">
+          <h2 className="text-base font-semibold text-slate-900">Cadastro não encontrado</h2>
+          <p className="text-sm leading-relaxed text-slate-500">
             Você ainda não tem cadastro com {nomeExibido}. Faça seu cadastro primeiro para poder agendar.
           </p>
           <Link
             href={`/cadastro/${salaoId}`}
-            className="flex h-12 w-full items-center justify-center rounded-xl font-semibold text-white shadow-sm"
-            style={{ backgroundColor: corPrimaria }}
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700"
           >
             Fazer cadastro
           </Link>
-          <button onClick={sairDaConta} className="text-sm font-medium text-zinc-400 underline">
+          <button onClick={sairDaConta} className="text-sm font-medium text-slate-400 underline">
             Voltar ao início
           </button>
         </div>
@@ -1209,18 +1159,15 @@ export default function FormularioAgendamento({
   }
 
   return (
-    <>
-      <div aria-hidden="true" style={estiloAurora} />
-      <div style={estiloScroll}>
-        <div className="relative flex min-h-full flex-col">
-          <header className="px-6 pt-10 pb-2 text-center">
-            <h1 className="text-lg font-bold" style={{ color: corPrimaria }}>
-              {nomeSalao}
-            </h1>
-          </header>
-          <main className="flex-1 px-4 pb-12 pt-6">{renderTelaAuth()}</main>
+    <div style={estiloScroll} className="bg-gradient-to-b from-blue-50/60 via-white to-slate-50">
+      <div className="relative flex min-h-full flex-col items-center justify-center px-4 py-10">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/60">
+          <div className="mb-6 text-center">
+            <h1 className="text-lg font-bold text-slate-900">{nomeSalao}</h1>
+          </div>
+          {renderTelaAuth()}
         </div>
       </div>
-    </>
+    </div>
   )
 }
