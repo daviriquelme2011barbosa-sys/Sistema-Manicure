@@ -43,6 +43,7 @@ type SeriesKPI = {
 
 type DadosDashboard = {
   clientesAtivas: number
+  clientesAtivasCard: number
   clientesAtencao: number
   clientesSumidas: number
   aniversariantesDoMes: number
@@ -85,16 +86,32 @@ function formatarMoedaCompacta(valor: number): string {
 }
 
 const MESES_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+const MESES_PT_COMPLETO = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+]
 
-function gerarEstruturaMeses(qtd: number): { chave: string; label: string }[] {
-  const agora = new Date()
+function gerarEstruturaMeses(qtd: number, referencia: Date = new Date()): { chave: string; label: string }[] {
   return Array.from({ length: qtd }, (_, i) => {
-    const d = new Date(agora.getFullYear(), agora.getMonth() - (qtd - 1 - i), 1)
+    const d = new Date(referencia.getFullYear(), referencia.getMonth() - (qtd - 1 - i), 1)
     return {
       chave: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
       label: MESES_PT[d.getMonth()],
     }
   })
+}
+
+// Opções do filtro de período: "Resumo geral" + cada mês do ano corrente até o mês atual.
+function gerarOpcoesPeriodo(): { valor: string; label: string }[] {
+  const agora = new Date()
+  const opcoes: { valor: string; label: string }[] = [{ valor: 'geral', label: 'Resumo geral' }]
+  for (let m = 0; m <= agora.getMonth(); m++) {
+    opcoes.push({
+      valor: `${agora.getFullYear()}-${String(m + 1).padStart(2, '0')}`,
+      label: MESES_PT_COMPLETO[m],
+    })
+  }
+  return opcoes
 }
 
 function contarPorMes(
@@ -698,13 +715,12 @@ export default function DashboardPage() {
   const [carregando, setCarregando] = useState(true)
   const [nome, setNome] = useState('')
   const [dados, setDados] = useState<DadosDashboard | null>(null)
+  const [periodo, setPeriodo] = useState('geral')
 
   useEffect(() => {
     async function carregar() {
+      setCarregando(true)
       const agora = new Date()
-      const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1)
-        .toISOString()
-        .slice(0, 10)
       const mesAtual = agora.getMonth() + 1
       const cutoff24hISO = new Date(agora.getTime() - 24 * 60 * 60 * 1000).toISOString()
       const inicioGrafico = new Date(agora.getFullYear(), agora.getMonth() - 5, 1)
@@ -727,7 +743,8 @@ export default function DashboardPage() {
         supabase.from('salao_config').select('id, nome_salao, nome_manicure, plano').single(),
         supabase.from('clientes_status').select('status'),
         supabase.from('clientes').select('data_nascimento').not('data_nascimento', 'is', null),
-        supabase.from('atendimentos').select('preco').gte('data_atendimento', inicioMes),
+        // Faturamento/atendimentos totais (histórico completo) — usados no "Resumo geral".
+        supabase.from('atendimentos').select('preco'),
         supabase
           .from('clientes')
           .select('id')
@@ -824,6 +841,7 @@ export default function DashboardPage() {
         return mes === mesAtual
       }).length
 
+      // Totais históricos (todos os atendimentos, sem filtro de data) — usados no "Resumo geral".
       const atendimentos = (atendimentosList ?? []) as { preco: number | null }[]
       const atendCount = atendimentos.length
       const faturamento = atendimentos.reduce((acc, a) => acc + (a.preco ?? 0), 0)
@@ -900,37 +918,148 @@ export default function DashboardPage() {
         return count
       })
 
+      // Filtro de período: quando um mês específico está selecionado, sobrescreve
+      // faturamento, atendimentos, clientes ativas (e suas sparklines) e a lista de
+      // clientes recentes para refletirem apenas aquele mês. O donut de status e a
+      // agenda de hoje nunca são afetados pelo filtro.
+      let faturamentoPeriodo: number | null = null
+      let atendCountPeriodo: number | null = null
+      let ativasPeriodo: number | null = null
+      let seriePeriodo: { ativas: number[]; atendimentos: number[]; faturamento: number[] } | null = null
+      let clientesRecentesPeriodo: ClienteRecente[] | null = null
+
+      if (periodo !== 'geral') {
+        const [anoRef, mesRef] = periodo.split('-').map(Number)
+        const mesReferenciaData = new Date(anoRef, mesRef - 1, 1)
+        const chaveReferencia = `${anoRef}-${String(mesRef).padStart(2, '0')}`
+        const fimPeriodo = new Date(anoRef, mesRef, 1).toISOString().slice(0, 10)
+        const inicioGraficoPeriodo = new Date(anoRef, mesRef - 1 - 5, 1).toISOString().slice(0, 10)
+
+        const { data: atendGraficoPeriodo } = await supabase
+          .from('atendimentos')
+          .select('cliente_id, data_atendimento, preco')
+          .gte('data_atendimento', inicioGraficoPeriodo)
+          .lt('data_atendimento', fimPeriodo)
+
+        const atendItemsPeriodo = (atendGraficoPeriodo ?? []) as {
+          cliente_id: string
+          data_atendimento: string
+          preco: number | null
+        }[]
+
+        const estruturaMesesPeriodo = gerarEstruturaMeses(6, mesReferenciaData)
+        const ativosPorMesPeriodo = contarAtivosDistintosPorMes(atendItemsPeriodo, estruturaMesesPeriodo)
+        const atendDoMesPeriodo = atendItemsPeriodo.filter(
+          (a) => a.data_atendimento.slice(0, 7) === chaveReferencia,
+        )
+
+        faturamentoPeriodo = atendDoMesPeriodo.reduce((s, a) => s + (a.preco ?? 0), 0)
+        atendCountPeriodo = atendDoMesPeriodo.length
+        ativasPeriodo = ativosPorMesPeriodo[chaveReferencia] ?? 0
+
+        seriePeriodo = {
+          ativas: estruturaMesesPeriodo.map(({ chave }) => ativosPorMesPeriodo[chave]),
+          atendimentos: estruturaMesesPeriodo.map(
+            ({ chave }) => atendItemsPeriodo.filter((a) => a.data_atendimento.slice(0, 7) === chave).length,
+          ),
+          faturamento: estruturaMesesPeriodo.map(({ chave }) =>
+            atendItemsPeriodo
+              .filter((a) => a.data_atendimento.slice(0, 7) === chave)
+              .reduce((s, a) => s + (a.preco ?? 0), 0),
+          ),
+        }
+
+        // Clientes recentes do período: distintas, ordenadas pelo atendimento mais
+        // recente dentro do mês selecionado.
+        const maisRecentePorCliente = new Map<string, string>()
+        for (const a of atendDoMesPeriodo) {
+          const atual = maisRecentePorCliente.get(a.cliente_id)
+          if (!atual || a.data_atendimento > atual) {
+            maisRecentePorCliente.set(a.cliente_id, a.data_atendimento)
+          }
+        }
+        const idsRecentesPeriodo = [...maisRecentePorCliente.entries()]
+          .sort((a, b) => b[1].localeCompare(a[1]))
+          .slice(0, 5)
+          .map(([id]) => id)
+
+        if (idsRecentesPeriodo.length > 0) {
+          const { data: statusPeriodoData, error: erroStatusPeriodo } = await supabase
+            .from('clientes_status')
+            .select('id, nome, status')
+            .in('id', idsRecentesPeriodo)
+          if (erroStatusPeriodo) {
+            console.error('Erro ao buscar clientes recentes do período:', erroStatusPeriodo)
+          }
+          const statusPorId = Object.fromEntries(
+            ((statusPeriodoData ?? []) as { id: string; nome: string; status: StatusCliente }[]).map(
+              (c) => [c.id, c],
+            ),
+          )
+          const { data: fotosPeriodoData, error: erroFotosPeriodo } = await supabase
+            .from('clientes')
+            .select('id, foto_url')
+            .in('id', idsRecentesPeriodo)
+          if (erroFotosPeriodo) {
+            console.error('Erro ao buscar fotos das clientes recentes do período:', erroFotosPeriodo)
+          }
+          const fotosPeriodoPorId = Object.fromEntries(
+            ((fotosPeriodoData ?? []) as { id: string; foto_url: string | null }[]).map((f) => [
+              f.id,
+              f.foto_url,
+            ]),
+          )
+          clientesRecentesPeriodo = idsRecentesPeriodo
+            .filter((id) => statusPorId[id])
+            .map((id) => ({
+              id,
+              nome: statusPorId[id].nome,
+              status: statusPorId[id].status,
+              ultima_visita: maisRecentePorCliente.get(id) ?? null,
+              foto_url: fotosPeriodoPorId[id] ?? null,
+            }))
+        } else {
+          clientesRecentesPeriodo = []
+        }
+      }
+
       setDados({
         clientesAtivas: ativas,
+        clientesAtivasCard: ativasPeriodo ?? ativas,
         clientesAtencao: atencao,
         clientesSumidas: sumidas,
         aniversariantesDoMes: aniversariantes,
-        atendimentosDoMes: atendCount,
-        faturamentoDoMes: faturamento,
+        atendimentosDoMes: atendCountPeriodo ?? atendCount,
+        faturamentoDoMes: faturamentoPeriodo ?? faturamento,
         totalClientes: total,
         movimentacoesHoje,
         series: {
-          ativas: serieAtivas,
+          ativas: seriePeriodo?.ativas ?? serieAtivas,
           sumidas: serieSumidas,
           aniversariantes: serieAniversariantes,
-          atendimentos: serieAtendimentos,
-          faturamento: serieFaturamento,
+          atendimentos: seriePeriodo?.atendimentos ?? serieAtendimentos,
+          faturamento: seriePeriodo?.faturamento ?? serieFaturamento,
           total: serieTotal,
         },
         plano: planoDoSalao,
         clientesPendentes: pendentesCount ?? 0,
-        clientesRecentes,
+        clientesRecentes: clientesRecentesPeriodo ?? clientesRecentes,
         agendamentosHoje,
       })
       setCarregando(false)
     }
 
     carregar()
-  }, [])
+  }, [periodo])
 
   const gradiente = gradienteGreeting()
   const cumprimento = saudacao()
   const temAgenda = dados?.plano === 'profissional' || dados?.plano === 'master'
+  const opcoesPeriodo = gerarOpcoesPeriodo()
+  const labelPeriodo = periodo === 'geral' ? null : MESES_PT_COMPLETO[Number(periodo.split('-')[1]) - 1]
+  const rotuloFaturamento = labelPeriodo ? `Faturamento em ${labelPeriodo}` : 'Faturamento total'
+  const rotuloAtendimentos = labelPeriodo ? `Atendimentos em ${labelPeriodo}` : 'Atendimentos totais'
+  const rotuloAtivas = labelPeriodo ? `Clientes ativas em ${labelPeriodo}` : 'Clientes ativas'
 
   return (
     <div className="dash-page">
@@ -967,6 +1096,24 @@ export default function DashboardPage() {
           </Link>
         )}
 
+        {/* Cabeçalho do resumo + filtro de período */}
+        <div className="flex items-center justify-between gap-3 px-4 pt-4">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Resumo geral</h2>
+          <select
+            value={periodo}
+            onChange={(e) => setPeriodo(e.target.value)}
+            disabled={carregando}
+            aria-label="Filtrar período do resumo"
+            className="form-select h-11 w-auto min-w-[9.5rem] text-sm font-medium"
+          >
+            {opcoesPeriodo.map((o) => (
+              <option key={o.valor} value={o.valor}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Grid de resumo (cards de KPI) */}
         <div className="grid grid-cols-2 gap-3 p-4 lg:grid-cols-3">
           {carregando ? (
@@ -979,8 +1126,8 @@ export default function DashboardPage() {
             <>
               <CartaoDado
                 icone={<IcAtivas />}
-                numero={dados.clientesAtivas}
-                rotulo="Clientes ativas"
+                numero={dados.clientesAtivasCard}
+                rotulo={rotuloAtivas}
                 href="/clientes"
                 cor="#8B5CF6"
                 serie={dados.series.ativas}
@@ -1007,7 +1154,7 @@ export default function DashboardPage() {
               <CartaoDado
                 icone={<IcAtendimentos />}
                 numero={dados.atendimentosDoMes}
-                rotulo="Atendimentos este mês"
+                rotulo={rotuloAtendimentos}
                 href="/historico"
                 cor="#14B8A6"
                 serie={dados.series.atendimentos}
@@ -1016,7 +1163,7 @@ export default function DashboardPage() {
               <CartaoDado
                 icone={<IcFaturamento />}
                 numero={formatarMoedaCompacta(dados.faturamentoDoMes)}
-                rotulo="Faturamento do mês"
+                rotulo={rotuloFaturamento}
                 href="/historico"
                 cor="#22C55E"
                 serie={dados.series.faturamento}
