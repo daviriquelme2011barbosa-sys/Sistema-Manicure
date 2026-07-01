@@ -539,7 +539,7 @@ function ColunaClientesRecentes({
 }) {
   return (
     <div className={`dash-card dash-card-compact dash-anim-2 ${className}`}>
-      <CabecalhoColuna titulo="Clientes status" rotuloLink="Ver todos" href="/clientes" />
+      <CabecalhoColuna titulo="Clientes recentes" rotuloLink="Ver todos" href="/clientes" />
       {clientes.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
           <span className="text-3xl" aria-hidden="true">👥</span>
@@ -563,7 +563,9 @@ function ColunaClientesRecentes({
                     {c.nome}
                   </p>
                   <p className="text-xs text-slate-400 dark:text-slate-500">
-                    {c.ultima_visita ? formatarData(c.ultima_visita) : '—'}
+                    {c.ultima_visita
+                      ? `Último atendimento: ${formatarData(c.ultima_visita)}`
+                      : '—'}
                   </p>
                 </div>
                 <PilulaStatus label={info.label} cor={info.cor} />
@@ -720,7 +722,7 @@ export default function DashboardPage() {
         { data: clientesGrafico },
         { data: atendimentosGrafico },
         { count: pendentesCount },
-        { data: recentesData },
+        { data: recentesData, error: recentesError },
       ] = await Promise.all([
         supabase.from('salao_config').select('id, nome_salao, nome_manicure, plano').single(),
         supabase.from('clientes_status').select('status'),
@@ -744,11 +746,15 @@ export default function DashboardPage() {
           .eq('status_cadastro', 'pendente'),
         supabase
           .from('clientes_status')
-          .select('id, nome, ultima_visita, status, foto_url')
+          .select('id, nome, ultima_visita, status')
           .not('ultima_visita', 'is', null)
           .order('ultima_visita', { ascending: false })
           .limit(5),
       ])
+
+      if (recentesError) {
+        console.error('Erro ao buscar clientes recentes:', recentesError)
+      }
 
       let planoDoSalao = 'basic'
       let idSalao: string | null = null
@@ -765,7 +771,32 @@ export default function DashboardPage() {
         idSalao = cfg.id
       }
 
-      const clientesRecentes = (recentesData ?? []) as ClienteRecente[]
+      const clientesRecentesBase = (recentesData ?? []) as Omit<ClienteRecente, 'foto_url'>[]
+
+      // foto_url é buscada em consulta separada e tolera a coluna ainda não existir
+      // (pendente da migration sql/add-foto-url-clientes.sql) sem quebrar o card.
+      let fotosPorId: Record<string, string | null> = {}
+      if (clientesRecentesBase.length > 0) {
+        const { data: fotosData, error: fotosError } = await supabase
+          .from('clientes')
+          .select('id, foto_url')
+          .in('id', clientesRecentesBase.map((c) => c.id))
+        if (fotosError) {
+          console.error('Erro ao buscar fotos das clientes recentes:', fotosError)
+        } else {
+          fotosPorId = Object.fromEntries(
+            ((fotosData ?? []) as { id: string; foto_url: string | null }[]).map((f) => [
+              f.id,
+              f.foto_url,
+            ]),
+          )
+        }
+      }
+
+      const clientesRecentes: ClienteRecente[] = clientesRecentesBase.map((c) => ({
+        ...c,
+        foto_url: fotosPorId[c.id] ?? null,
+      }))
 
       // Agenda de hoje — exclusivo dos planos Profissional e Master
       let agendamentosHoje: AgendamentoHoje[] = []
