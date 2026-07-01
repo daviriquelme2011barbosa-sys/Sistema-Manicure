@@ -200,6 +200,8 @@ function CartaoDado({
   rotulo,
   href,
   cor,
+  corIcone,
+  fundoIcone,
   serie,
   animClass,
 }: {
@@ -208,6 +210,8 @@ function CartaoDado({
   rotulo: string
   href: string
   cor: string
+  corIcone: string
+  fundoIcone: string
   serie: number[]
   animClass: string
 }) {
@@ -215,7 +219,7 @@ function CartaoDado({
     <Link href={href} className={`dash-card dash-card-kpi ${animClass}`}>
       <div
         className="dash-icon-badge"
-        style={{ backgroundColor: `${cor}1A`, color: cor }}
+        style={{ backgroundColor: fundoIcone, color: corIcone }}
         aria-hidden="true"
       >
         {icone}
@@ -240,6 +244,8 @@ type KpiItem = {
   rotulo: string
   href: string
   cor: string
+  corIcone: string
+  fundoIcone: string
   serie: number[]
 }
 
@@ -302,6 +308,8 @@ function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
                   rotulo={kpi.rotulo}
                   href={kpi.href}
                   cor={kpi.cor}
+                  corIcone={kpi.corIcone}
+                  fundoIcone={kpi.fundoIcone}
                   serie={kpi.serie}
                   animClass={`dash-anim-${(idx % 3) + 1}`}
                 />
@@ -1177,15 +1185,20 @@ export default function DashboardPage() {
   const rotuloAtendimentos = labelPeriodo ? `Atendimentos em ${labelPeriodo}` : 'Atendimentos totais'
   const rotuloAtivas = labelPeriodo ? `Clientes ativas em ${labelPeriodo}` : 'Clientes ativas'
 
+  // Ícones dos KPIs usam violeta (acento único da marca); apenas "Sumidas" mantém
+  // vermelho por ser um status real. As sparklines conservam a cor do próprio dado.
+  const iconeMarca = { corIcone: 'var(--color-primary)', fundoIcone: 'var(--color-primary-soft)' }
+  const iconeSumidas = { corIcone: 'var(--color-danger)', fundoIcone: 'var(--color-danger-soft)' }
+
   const kpis: KpiItem[] = dados
     ? [
-        { key: 'ativas', icone: <IcAtivas />, numero: dados.clientesAtivasCard, rotulo: rotuloAtivas, href: '/clientes', cor: '#8B5CF6', serie: dados.series.ativas },
-        { key: 'sumidas', icone: <IcSumidas />, numero: dados.clientesSumidas, rotulo: 'Sumidas', href: '/reativar', cor: '#EF4444', serie: dados.series.sumidas },
-        { key: 'aniversariantes', icone: <IcAniversariantes />, numero: dados.aniversariantesDoMes, rotulo: 'Aniversariantes do mês', href: '/aniversariantes', cor: '#F59E0B', serie: dados.series.aniversariantes },
-        { key: 'atendimentos', icone: <IcAtendimentos />, numero: dados.atendimentosDoMes, rotulo: rotuloAtendimentos, href: '/historico', cor: '#14B8A6', serie: dados.series.atendimentos },
-        { key: 'faturamento', icone: <IcFaturamento />, numero: formatarMoedaCompacta(dados.faturamentoDoMes), rotulo: rotuloFaturamento, href: '/historico', cor: '#22C55E', serie: dados.series.faturamento },
-        { key: 'total', icone: <IcTotal />, numero: dados.totalClientes, rotulo: 'Total de clientes', href: '/cadastrados', cor: '#2563EB', serie: dados.series.total },
-        { key: 'movimentacoes', icone: <IcMovimentacao />, numero: dados.movimentacoesHoje, rotulo: 'Movimentações hoje', href: '/movimentacao', cor: '#3B82F6', serie: [] },
+        { key: 'ativas', icone: <IcAtivas />, numero: dados.clientesAtivasCard, rotulo: rotuloAtivas, href: '/clientes', cor: '#8B5CF6', ...iconeMarca, serie: dados.series.ativas },
+        { key: 'sumidas', icone: <IcSumidas />, numero: dados.clientesSumidas, rotulo: 'Sumidas', href: '/reativar', cor: '#EF4444', ...iconeSumidas, serie: dados.series.sumidas },
+        { key: 'aniversariantes', icone: <IcAniversariantes />, numero: dados.aniversariantesDoMes, rotulo: 'Aniversariantes do mês', href: '/aniversariantes', cor: '#F59E0B', ...iconeMarca, serie: dados.series.aniversariantes },
+        { key: 'atendimentos', icone: <IcAtendimentos />, numero: dados.atendimentosDoMes, rotulo: rotuloAtendimentos, href: '/historico', cor: '#14B8A6', ...iconeMarca, serie: dados.series.atendimentos },
+        { key: 'faturamento', icone: <IcFaturamento />, numero: formatarMoedaCompacta(dados.faturamentoDoMes), rotulo: rotuloFaturamento, href: '/historico', cor: '#22C55E', ...iconeMarca, serie: dados.series.faturamento },
+        { key: 'total', icone: <IcTotal />, numero: dados.totalClientes, rotulo: 'Total de clientes', href: '/cadastrados', cor: '#2563EB', ...iconeMarca, serie: dados.series.total },
+        { key: 'movimentacoes', icone: <IcMovimentacao />, numero: dados.movimentacoesHoje, rotulo: 'Movimentações hoje', href: '/movimentacao', cor: '#3B82F6', ...iconeMarca, serie: [] },
       ]
     : []
 
