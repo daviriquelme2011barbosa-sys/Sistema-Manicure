@@ -67,7 +67,7 @@ export default async function AgendarPage({
     <FormularioAgendamento
       salaoId={salao.id}
       nomeSalao={salao.nome_salao}
-      corPrimaria={salao.cor_primaria ?? '#ec4899'}
+      corPrimaria={salao.cor_primaria ?? '#7C5CFF'}
       nomeManicure={salao.nome_manicure}
       whatsappManicure={salao.whatsapp}
     />

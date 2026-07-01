@@ -57,7 +57,7 @@ export default async function CadastroPublicoPage({
     <FormularioCadastroPublico
       salaoId={salao.id}
       nomeSalao={salao.nome_salao}
-      corPrimaria={salao.cor_primaria ?? '#ec4899'}
+      corPrimaria={salao.cor_primaria ?? '#7C5CFF'}
       fotoUrl={fotoUrl}
       nomeManicure={salao.nome_manicure}
       genero={salao.genero ?? 'nao_informar'}

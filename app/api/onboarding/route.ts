@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     user_id: authData.user.id,
     nome_salao: nomeSalao.trim(),
     whatsapp: whatsappNormalizado,
-    cor_primaria: '#ec4899',
+    cor_primaria: '#7C5CFF',
     plano: 'basic',
   })
 

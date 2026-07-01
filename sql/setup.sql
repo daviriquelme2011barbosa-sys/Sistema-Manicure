@@ -32,7 +32,7 @@ create table if not exists public.salao_config (
   user_id       uuid        not null unique references auth.users(id) on delete cascade,
   nome_salao    text        not null,
   nome_manicure text,
-  cor_primaria  text        not null default '#ec4899',
+  cor_primaria  text        not null default '#7C5CFF',
   foto_url      text,
   plano         text        not null default 'basic' check (plano in ('basic', 'profissional', 'master')),
   criado_em     timestamptz not null default now()
@@ -352,7 +352,7 @@ create policy "autenticados podem ler changelog"
 -- values (
 --   '<uuid-do-usuario-criado-no-auth>',
 --   '<Nome do Salão>',
---   '#ec4899'
+--   '#7C5CFF'
 -- );
 --
 -- Para criar um convite de onboarding:

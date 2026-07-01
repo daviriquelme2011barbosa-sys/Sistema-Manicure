@@ -128,7 +128,7 @@ export default function FormularioOnboarding({ token }: Props) {
   // ── verificando ───────────────────────────────────────────────────
   if (estado === 'verificando') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#F3F0FF] px-4">
         <div className="w-full max-w-sm text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="mt-4 text-sm text-zinc-500">Verificando seu convite…</p>
@@ -140,7 +140,7 @@ export default function FormularioOnboarding({ token }: Props) {
   // ── inválido ──────────────────────────────────────────────────────
   if (estado === 'invalido') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4 py-12">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#F3F0FF] px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
             <p className="text-5xl">❌</p>
@@ -162,7 +162,7 @@ export default function FormularioOnboarding({ token }: Props) {
   // ── confirmado ────────────────────────────────────────────────────
   if (estado === 'confirmado') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4 py-12">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#F3F0FF] px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
             <p className="text-5xl">✅</p>
@@ -338,7 +338,7 @@ export default function FormularioOnboarding({ token }: Props) {
         </div>
       )}
 
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4 py-12">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#F3F0FF] px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
             <p className="text-5xl">😊</p>

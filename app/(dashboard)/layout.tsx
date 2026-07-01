@@ -125,8 +125,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [badgeMovimentacao, setBadgeMovimentacao] = useState(0)
   const [badgeCadastrados, setBadgeCadastrados] = useState(0)
   const [fotoUrl, setFotoUrl] = useState('')
-  const [corPrimaria, setCorPrimaria] = useState('#ec4899')
-  const [corSelecionada, setCorSelecionada] = useState('#ec4899')
+  const [corPrimaria, setCorPrimaria] = useState('#7C5CFF')
+  const [corSelecionada, setCorSelecionada] = useState('#7C5CFF')
   const [salvandoFoto, setSalvandoFoto] = useState(false)
   const [removendoFoto, setRemovendoFoto] = useState(false)
   const [confirmandoRemoverFoto, setConfirmandoRemoverFoto] = useState(false)
@@ -349,7 +349,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         setLinkAgendamento(`${window.location.origin}/agendar/${config.id}`)
         const fotoRaw = (config.foto_url as string | null) ?? ''
         setFotoUrl(fotoRaw ? `${fotoRaw}?t=${Date.now()}` : '')
-        const corInicial = (config.cor_primaria as string | null) ?? '#ec4899'
+        const corInicial = (config.cor_primaria as string | null) ?? '#7C5CFF'
         setCorPrimaria(corInicial)
         setCorSelecionada(corInicial)
         const generoInicial = (config.genero as 'feminino' | 'masculino' | 'nao_informar' | null) ?? 'nao_informar'

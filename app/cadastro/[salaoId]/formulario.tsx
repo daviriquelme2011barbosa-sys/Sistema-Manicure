@@ -465,7 +465,7 @@ export default function FormularioCadastroPublico({
               type="submit"
               disabled={enviando || !autorizaContato}
               className="campo-formulario h-12 rounded-lg font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ backgroundColor: '#fdf2f8', color: corPrimaria, border: `1.5px solid ${corPrimaria}`, animationDelay: ehPro ? '700ms' : '540ms' }}
+              style={{ backgroundColor: '#F3F0FF', color: corPrimaria, border: `1.5px solid ${corPrimaria}`, animationDelay: ehPro ? '700ms' : '540ms' }}
             >
               {enviando ? 'Enviando...' : 'Enviar'}
             </button>
