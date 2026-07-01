@@ -13,6 +13,7 @@ import {
   IconeAgenda,
   IconeAusente,
 } from '@/components/icons'
+import { AvatarCliente } from '@/components/AvatarCliente'
 import type { StatusCliente } from '@/types'
 
 type ClienteRecente = {
@@ -20,6 +21,7 @@ type ClienteRecente = {
   nome: string
   ultima_visita: string | null
   status: StatusCliente
+  foto_url: string | null
 }
 
 type AgendamentoHoje = {
@@ -492,10 +494,6 @@ const INFO_STATUS_AGENDAMENTO: Record<string, { label: string; cor: string }> = 
   cancelado: { label: 'Cancelado', cor: '#94A3B8' },
 }
 
-function inicialNome(nome: string): string {
-  return nome.trim().charAt(0).toUpperCase() || '?'
-}
-
 function PilulaStatus({ label, cor }: { label: string; cor: string }) {
   return (
     <span
@@ -541,7 +539,7 @@ function ColunaClientesRecentes({
 }) {
   return (
     <div className={`dash-card dash-card-compact dash-anim-2 ${className}`}>
-      <CabecalhoColuna titulo="Clientes recentes" rotuloLink="Ver todos" href="/clientes" />
+      <CabecalhoColuna titulo="Clientes status" rotuloLink="Ver todos" href="/clientes" />
       {clientes.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
           <span className="text-3xl" aria-hidden="true">👥</span>
@@ -559,9 +557,7 @@ function ColunaClientesRecentes({
                 href="/clientes"
                 className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
               >
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-teal-500 text-sm font-semibold text-white">
-                  {inicialNome(c.nome)}
-                </span>
+                <AvatarCliente fotoUrl={c.foto_url} nome={c.nome} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
                     {c.nome}
@@ -748,7 +744,7 @@ export default function DashboardPage() {
           .eq('status_cadastro', 'pendente'),
         supabase
           .from('clientes_status')
-          .select('id, nome, ultima_visita, status')
+          .select('id, nome, ultima_visita, status, foto_url')
           .not('ultima_visita', 'is', null)
           .order('ultima_visita', { ascending: false })
           .limit(5),

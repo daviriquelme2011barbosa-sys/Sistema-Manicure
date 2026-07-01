@@ -19,6 +19,7 @@ export type Cliente = {
   observacoes: string | null
   autoriza_contato: boolean
   origem: 'manual' | 'formulario'
+  foto_url: string | null
   criado_em: string
 }
 
@@ -45,6 +46,7 @@ export type ClienteStatus = {
   status: StatusCliente
   autoriza_contato: boolean | null
   data_nascimento?: string | null
+  foto_url?: string | null
 }
 
 export type Aniversariante = {

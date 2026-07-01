@@ -10,7 +10,8 @@
       "Read(//c/Users/tfdav/.claude/plugins/**)",
       "PowerShell(node --version)",
       "PowerShell(npm --version)",
-      "mcp__plugin_playwright_playwright__browser_evaluate"
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_navigate"
     ]
   }
 }

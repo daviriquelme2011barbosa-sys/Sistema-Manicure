@@ -1,5 +1,6 @@
 import { formatarData, textoUltimaVisita } from '@/lib/formatters'
 import { IconeLapis, IconeNota } from '@/components/icons'
+import { AvatarCliente } from '@/components/AvatarCliente'
 import type { ClienteStatus, StatusCliente } from '@/types'
 
 const BORDA_STATUS: Record<StatusCliente, string> = {
@@ -20,6 +21,7 @@ export function ClienteCard({
     <li
       className={`flex gap-4 rounded-xl bg-white dark:bg-slate-800 p-5 shadow-sm border-l-4 ${BORDA_STATUS[cliente.status]}`}
     >
+      <AvatarCliente fotoUrl={cliente.foto_url} nome={cliente.nome} className="mt-0.5 h-11 w-11 text-base" />
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-slate-900 dark:text-slate-100">{cliente.nome}</p>
         <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">

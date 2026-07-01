@@ -98,10 +98,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // foto_url é buscado em consulta separada e tolera a coluna ainda não existir
+  // (pendente da migration sql/add-foto-url-clientes.sql) sem quebrar o login.
+  const { data: fotoData } = await admin
+    .from('clientes')
+    .select('foto_url')
+    .eq('id', cliente.id)
+    .maybeSingle()
+
   return NextResponse.json({
     status: 'aprovado',
     clienteId: cliente.id,
     clienteNome: cliente.nome,
+    clienteFotoUrl: (fotoData as { foto_url: string | null } | null)?.foto_url ?? null,
     diasAtivos,
   })
 }

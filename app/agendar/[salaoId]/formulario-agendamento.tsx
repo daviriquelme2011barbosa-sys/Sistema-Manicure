@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js'
 import { montarNumeroInternacional } from '@/lib/whatsapp'
 import { CampoSenha } from '@/components/CampoSenha'
 import { IconeCasa, IconeAgenda, IconeLista, IconeRelogio, IconePessoa, IconeAlerta } from '@/components/icons'
+import { AvatarCliente } from '@/components/AvatarCliente'
 
 type EstadoAuth = 'carregando' | 'login' | 'verificando' | 'pendente' | 'nao_encontrado' | 'autenticado'
 type Secao = 'inicio' | 'agendar' | 'agendamentos' | 'historico' | 'perfil'
@@ -17,7 +18,7 @@ type EtapaAgendar =
   | 'confirmando'
   | 'confirmado'
 
-type ClienteInfo = { id: string; nome: string; email: string }
+type ClienteInfo = { id: string; nome: string; email: string; fotoUrl: string | null }
 
 type AgendamentoCliente = {
   id: string
@@ -126,6 +127,7 @@ export default function FormularioAgendamento({
   // ── Perfil ───────────────────────────────────────────────────────────────────
   const [nomeEditado, setNomeEditado] = useState('')
   const [salvandoNome, setSalvandoNome] = useState(false)
+  const [enviandoFoto, setEnviandoFoto] = useState(false)
 
   // ── Toast ────────────────────────────────────────────────────────────────────
   const [toast, setToast] = useState<{ texto: string; tipo: 'sucesso' | 'erro' } | null>(null)
@@ -188,7 +190,12 @@ export default function FormularioAgendamento({
         await supabaseLocal.auth.signOut()
         return
       } else if (resultado.status === 'aprovado') {
-        setCliente({ id: resultado.clienteId, nome: resultado.clienteNome, email: '' })
+        setCliente({
+          id: resultado.clienteId,
+          nome: resultado.clienteNome,
+          email: '',
+          fotoUrl: resultado.clienteFotoUrl ?? null,
+        })
         setDiasAtivos(new Set<number>(resultado.diasAtivos as number[]))
         setEstadoAuth('autenticado')
       } else if (resultado.status === 'pendente') {
@@ -311,6 +318,45 @@ export default function FormularioAgendamento({
     }
   }
 
+  async function enviarFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0]
+    e.target.value = ''
+    if (!arquivo) return
+
+    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    if (!tiposPermitidos.includes(arquivo.type)) {
+      mostrarToast('Formato não permitido. Use JPEG, PNG, WebP ou GIF.', 'erro')
+      return
+    }
+    if (arquivo.size > 5 * 1024 * 1024) {
+      mostrarToast('A foto deve ter no máximo 5MB.', 'erro')
+      return
+    }
+
+    setEnviandoFoto(true)
+    try {
+      const dados = new FormData()
+      dados.append('arquivo', arquivo)
+      dados.append('salaoId', salaoId)
+      const resp = await fetch('/api/agendar/foto', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: dados,
+      })
+      const resultado = await resp.json()
+      if (resp.ok) {
+        setCliente((prev) => (prev ? { ...prev, fotoUrl: `${resultado.fotoUrl}?t=${Date.now()}` } : prev))
+        mostrarToast('Foto atualizada com sucesso', 'sucesso')
+      } else {
+        mostrarToast((resultado as { erro?: string }).erro ?? 'Não foi possível enviar a foto.', 'erro')
+      }
+    } catch {
+      mostrarToast('Sem conexão. Tente novamente.', 'erro')
+    } finally {
+      setEnviandoFoto(false)
+    }
+  }
+
   // ── Booking functions ────────────────────────────────────────────────────────
 
   function resetarAgendar() {
@@ -420,6 +466,8 @@ export default function FormularioAgendamento({
     })
   const proximoAgendamento = agendamentosAtivos[0] ?? null
   const realizados = agendamentos.filter((a) => a.status === 'compareceu')
+  const pendentesCount = agendamentos.filter((a) => a.status === 'pendente').length
+  const canceladosCount = agendamentos.filter((a) => a.status === 'cancelado').length
   const mesAtualNum = hoje.getMonth() + 1
   const anoAtualNum = hoje.getFullYear()
   const realizadosMesAtual = realizados.filter((a) => {
@@ -448,6 +496,31 @@ export default function FormularioAgendamento({
         <h2 className="text-xl font-bold tracking-tight text-slate-900">
           Olá, {cliente?.nome.split(' ')[0]}!
         </h2>
+
+        {/* Cards de métricas */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-600" aria-hidden="true">
+              ✓
+            </span>
+            <span className="text-lg font-bold text-slate-900">{realizados.length}</span>
+            <span className="text-[11px] leading-tight text-slate-500">Comparecidos</span>
+          </div>
+          <div className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-600" aria-hidden="true">
+              ⏳
+            </span>
+            <span className="text-lg font-bold text-slate-900">{pendentesCount}</span>
+            <span className="text-[11px] leading-tight text-slate-500">Pendentes</span>
+          </div>
+          <div className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100 text-red-600" aria-hidden="true">
+              ✕
+            </span>
+            <span className="text-lg font-bold text-slate-900">{canceladosCount}</span>
+            <span className="text-[11px] leading-tight text-slate-500">Cancelados</span>
+          </div>
+        </div>
 
         {/* Próximo agendamento */}
         <div>
@@ -876,13 +949,39 @@ export default function FormularioAgendamento({
       <div className="flex flex-col gap-5 px-4 py-5">
         <h2 className="text-base font-semibold text-slate-900">Meu Perfil</h2>
 
+        {/* Foto */}
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="mb-4 flex flex-col gap-3">
-            <div>
-              <p className="text-xs font-medium text-slate-400">E-mail</p>
-              <p className="mt-0.5 text-sm text-slate-700">{cliente?.email || '—'}</p>
-            </div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Foto</p>
+          <div className="flex items-center gap-4">
+            <AvatarCliente
+              fotoUrl={cliente?.fotoUrl}
+              nome={cliente?.nome ?? '?'}
+              className="h-16 w-16 text-xl"
+            />
+            <label
+              htmlFor="upload-foto-perfil"
+              className={`btn-secondary cursor-pointer text-sm ${enviandoFoto ? 'pointer-events-none opacity-60' : ''}`}
+            >
+              {enviandoFoto && <span className="form-spinner border-slate-400 border-t-slate-700" aria-hidden="true" />}
+              {enviandoFoto ? 'Enviando...' : cliente?.fotoUrl ? 'Alterar foto' : 'Adicionar foto'}
+            </label>
+            <input
+              id="upload-foto-perfil"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={enviarFoto}
+              disabled={enviandoFoto}
+              className="hidden"
+            />
+          </div>
+        </div>
 
+        {/* Dados da conta */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Dados da conta
+          </p>
+          <div className="flex flex-col gap-3">
             <div className="flex flex-col">
               <label htmlFor="nomeEditado" className="form-label">
                 Nome
@@ -895,6 +994,13 @@ export default function FormularioAgendamento({
                 disabled={salvandoNome}
                 className="form-input"
               />
+            </div>
+
+            <div className="flex flex-col">
+              <span className="form-label">E-mail</span>
+              <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-500">
+                {cliente?.email || '—'}
+              </p>
             </div>
 
             <button
@@ -939,14 +1045,10 @@ export default function FormularioAgendamento({
           <span className="truncate text-sm font-semibold text-slate-900">{nomeSalao}</span>
           <button
             onClick={() => setMenuAberto(true)}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors duration-200 hover:bg-slate-100"
+            className="flex items-center gap-2 rounded-full transition-opacity duration-200 hover:opacity-80"
             aria-label="Abrir menu"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <rect y="3" width="20" height="2" rx="1" fill="currentColor" />
-              <rect y="9" width="20" height="2" rx="1" fill="currentColor" />
-              <rect y="15" width="20" height="2" rx="1" fill="currentColor" />
-            </svg>
+            <AvatarCliente fotoUrl={cliente?.fotoUrl} nome={cliente?.nome ?? '?'} className="h-9 w-9 text-sm ring-1 ring-slate-200" />
           </button>
         </header>
 
@@ -986,8 +1088,9 @@ export default function FormularioAgendamento({
                   )
                 })}
               </nav>
-              <div className="absolute bottom-0 left-0 right-0 border-t border-slate-200 p-4">
-                <p className="truncate text-xs text-slate-400">{cliente?.nome}</p>
+              <div className="absolute bottom-0 left-0 right-0 flex items-center gap-3 border-t border-slate-200 p-4">
+                <AvatarCliente fotoUrl={cliente?.fotoUrl} nome={cliente?.nome ?? '?'} className="h-9 w-9 text-sm" />
+                <p className="truncate text-sm font-medium text-slate-700">{cliente?.nome}</p>
               </div>
             </div>
           </>
