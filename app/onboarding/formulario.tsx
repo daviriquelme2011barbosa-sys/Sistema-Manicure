@@ -15,6 +15,20 @@ const supabase = createClient(
 type Estado = 'verificando' | 'invalido' | 'formulario' | 'salvando' | 'confirmado'
 type ModalAberto = 'termos' | 'privacidade' | null
 
+const REGEX_CARACTERE_ESPECIAL = /[!@#$%^&*()\-_=+[\]{}|;:,.<>?]/
+
+function senhaTemOitoCaracteres(senha: string): boolean {
+  return senha.length >= 8
+}
+
+function senhaTemCaractereEspecial(senha: string): boolean {
+  return REGEX_CARACTERE_ESPECIAL.test(senha)
+}
+
+function senhaValida(senha: string): boolean {
+  return senhaTemOitoCaracteres(senha) && senhaTemCaractereEspecial(senha)
+}
+
 interface Props {
   token: string
 }
@@ -64,7 +78,9 @@ export default function FormularioOnboarding({ token }: Props) {
     if (!email.trim()) e.email = 'Informe o e-mail'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = 'E-mail inválido'
     if (!senha) e.senha = 'Crie uma senha'
-    else if (senha.length < 6) e.senha = 'A senha deve ter pelo menos 6 caracteres'
+    else if (!senhaValida(senha)) {
+      e.senha = 'A senha deve ter pelo menos 8 caracteres e 1 caractere especial'
+    }
     if (senha !== confirmarSenha) e.confirmarSenha = 'As senhas não coincidem'
     return e
   }
@@ -407,9 +423,17 @@ export default function FormularioOnboarding({ token }: Props) {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   disabled={salvando}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                   erro={!!erros.senha}
                 />
+                <div className="flex flex-col gap-0.5 text-xs">
+                  <span className={senhaTemOitoCaracteres(senha) ? 'text-green-600' : 'text-zinc-400'}>
+                    ✓ 8 caracteres
+                  </span>
+                  <span className={senhaTemCaractereEspecial(senha) ? 'text-green-600' : 'text-zinc-400'}>
+                    ✓ 1 caractere especial
+                  </span>
+                </div>
                 {erros.senha && (
                   <span role="alert" className="text-sm text-red-600">{erros.senha}</span>
                 )}
