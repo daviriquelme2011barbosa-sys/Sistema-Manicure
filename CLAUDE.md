@@ -223,3 +223,17 @@ O padrão correto está no `sql/setup.sql` e documentado em `docs/RBAC-RLS.md`.
 5. A dona é redirecionada para o dashboard com sessão ativa.
 
 A tabela `convites` não tem policies de usuário — acessada exclusivamente via `service_role` no route de onboarding. RLS habilitado bloqueia qualquer acesso via `anon`/`authenticated`.
+
+---
+
+## Design System
+
+Toda UI deve seguir `docs/design-system.md` antes de criar ou editar qualquer componente visual.
+
+- Use SEMPRE tokens semânticos (`bg-surface`, `text-secondary`, `shadow-sm`, `rounded-xl`...), nunca hex direto.
+- Componentes referenciam tokens; tokens referenciam primitivos.
+- Suportar light e dark via `data-theme`.
+- Respeitar `prefers-reduced-motion`.
+- Alvo de toque mínimo de 44px no mobile.
+
+> Nota: o código legado existente migra gradualmente. As regras acima valem obrigatoriamente para todo código NOVO criado a partir de agora. Ao editar código legado, migrar para os tokens sempre que possível sem quebrar funcionalidades.
