@@ -231,6 +231,122 @@ function CartaoDado({
   )
 }
 
+/* ── Carrossel de KPIs ─────────────────────────────── */
+
+type KpiItem = {
+  key: string
+  icone: React.ReactNode
+  numero: string | number
+  rotulo: string
+  href: string
+  cor: string
+  serie: number[]
+}
+
+function agruparEmTrios(itens: KpiItem[]): KpiItem[][] {
+  const grupos: KpiItem[][] = []
+  for (let i = 0; i < itens.length; i += 3) grupos.push(itens.slice(i, i + 3))
+  return grupos
+}
+
+function SetaCarrossel({
+  direcao,
+  onClick,
+  desabilitada,
+}: {
+  direcao: 'anterior' | 'proximo'
+  onClick: () => void
+  desabilitada: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={desabilitada}
+      aria-label={direcao === 'anterior' ? 'Grupo anterior' : 'Próximo grupo'}
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-slate-600 transition hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-300"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <polyline points={direcao === 'anterior' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
+      </svg>
+    </button>
+  )
+}
+
+function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
+  const [pagina, setPagina] = useState(0)
+  const grupos = agruparEmTrios(itens)
+  const totalPaginas = grupos.length
+  const paginaAtual = Math.min(pagina, Math.max(0, totalPaginas - 1))
+
+  return (
+    <div className="pt-4">
+      <div className="overflow-hidden px-4">
+        <div
+          className="flex transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(-${paginaAtual * 100}%)` }}
+        >
+          {grupos.map((grupo, gi) => (
+            <div
+              key={gi}
+              aria-hidden={gi !== paginaAtual}
+              className={`grid w-full flex-shrink-0 grid-cols-2 gap-3 transition-opacity duration-300 lg:grid-cols-3 ${
+                gi === paginaAtual ? 'opacity-100' : 'pointer-events-none opacity-0'
+              }`}
+            >
+              {grupo.map((kpi, idx) => (
+                <CartaoDado
+                  key={kpi.key}
+                  icone={kpi.icone}
+                  numero={kpi.numero}
+                  rotulo={kpi.rotulo}
+                  href={kpi.href}
+                  cor={kpi.cor}
+                  serie={kpi.serie}
+                  animClass={`dash-anim-${(idx % 3) + 1}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {totalPaginas > 1 && (
+        <div className="mt-4 flex items-center justify-between px-4">
+          <div className="flex items-center gap-1.5">
+            {grupos.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPagina(i)}
+                aria-label={`Ir para o grupo ${i + 1} de ${totalPaginas}`}
+                aria-current={i === paginaAtual}
+                className={`h-2 rounded-full transition-all duration-200 ${
+                  i === paginaAtual
+                    ? 'w-5 bg-primary'
+                    : 'w-2 bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-500'
+                }`}
+              />
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <SetaCarrossel
+              direcao="anterior"
+              onClick={() => setPagina((p) => Math.max(0, p - 1))}
+              desabilitada={paginaAtual === 0}
+            />
+            <SetaCarrossel
+              direcao="proximo"
+              onClick={() => setPagina((p) => Math.min(totalPaginas - 1, p + 1))}
+              desabilitada={paginaAtual === totalPaginas - 1}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function IcAtivas() {
   return (
     <svg
@@ -1061,6 +1177,18 @@ export default function DashboardPage() {
   const rotuloAtendimentos = labelPeriodo ? `Atendimentos em ${labelPeriodo}` : 'Atendimentos totais'
   const rotuloAtivas = labelPeriodo ? `Clientes ativas em ${labelPeriodo}` : 'Clientes ativas'
 
+  const kpis: KpiItem[] = dados
+    ? [
+        { key: 'ativas', icone: <IcAtivas />, numero: dados.clientesAtivasCard, rotulo: rotuloAtivas, href: '/clientes', cor: '#8B5CF6', serie: dados.series.ativas },
+        { key: 'sumidas', icone: <IcSumidas />, numero: dados.clientesSumidas, rotulo: 'Sumidas', href: '/reativar', cor: '#EF4444', serie: dados.series.sumidas },
+        { key: 'aniversariantes', icone: <IcAniversariantes />, numero: dados.aniversariantesDoMes, rotulo: 'Aniversariantes do mês', href: '/aniversariantes', cor: '#F59E0B', serie: dados.series.aniversariantes },
+        { key: 'atendimentos', icone: <IcAtendimentos />, numero: dados.atendimentosDoMes, rotulo: rotuloAtendimentos, href: '/historico', cor: '#14B8A6', serie: dados.series.atendimentos },
+        { key: 'faturamento', icone: <IcFaturamento />, numero: formatarMoedaCompacta(dados.faturamentoDoMes), rotulo: rotuloFaturamento, href: '/historico', cor: '#22C55E', serie: dados.series.faturamento },
+        { key: 'total', icone: <IcTotal />, numero: dados.totalClientes, rotulo: 'Total de clientes', href: '/cadastrados', cor: '#2563EB', serie: dados.series.total },
+        { key: 'movimentacoes', icone: <IcMovimentacao />, numero: dados.movimentacoesHoje, rotulo: 'Movimentações hoje', href: '/movimentacao', cor: '#3B82F6', serie: [] },
+      ]
+    : []
+
   return (
     <div className="dash-page">
       <div className="dash-content">
@@ -1114,86 +1242,20 @@ export default function DashboardPage() {
           </select>
         </div>
 
-        {/* Grid de resumo (cards de KPI) */}
-        <div className="grid grid-cols-2 gap-3 p-4 lg:grid-cols-3">
-          {carregando ? (
-            <>
-              {Array.from({ length: 7 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </>
-          ) : dados ? (
-            <>
-              <CartaoDado
-                icone={<IcAtivas />}
-                numero={dados.clientesAtivasCard}
-                rotulo={rotuloAtivas}
-                href="/clientes"
-                cor="#8B5CF6"
-                serie={dados.series.ativas}
-                animClass="dash-anim-1"
-              />
-              <CartaoDado
-                icone={<IcSumidas />}
-                numero={dados.clientesSumidas}
-                rotulo="Sumidas"
-                href="/reativar"
-                cor="#EF4444"
-                serie={dados.series.sumidas}
-                animClass="dash-anim-2"
-              />
-              <CartaoDado
-                icone={<IcAniversariantes />}
-                numero={dados.aniversariantesDoMes}
-                rotulo="Aniversariantes do mês"
-                href="/aniversariantes"
-                cor="#F59E0B"
-                serie={dados.series.aniversariantes}
-                animClass="dash-anim-3"
-              />
-              <CartaoDado
-                icone={<IcAtendimentos />}
-                numero={dados.atendimentosDoMes}
-                rotulo={rotuloAtendimentos}
-                href="/historico"
-                cor="#14B8A6"
-                serie={dados.series.atendimentos}
-                animClass="dash-anim-4"
-              />
-              <CartaoDado
-                icone={<IcFaturamento />}
-                numero={formatarMoedaCompacta(dados.faturamentoDoMes)}
-                rotulo={rotuloFaturamento}
-                href="/historico"
-                cor="#22C55E"
-                serie={dados.series.faturamento}
-                animClass="dash-anim-5"
-              />
-              <CartaoDado
-                icone={<IcTotal />}
-                numero={dados.totalClientes}
-                rotulo="Total de clientes"
-                href="/cadastrados"
-                cor="#2563EB"
-                serie={dados.series.total}
-                animClass="dash-anim-6"
-              />
-              <CartaoDado
-                icone={<IcMovimentacao />}
-                numero={dados.movimentacoesHoje}
-                rotulo="Movimentações hoje"
-                href="/movimentacao"
-                cor="#3B82F6"
-                serie={[]}
-                animClass="dash-anim-7"
-              />
-            </>
-          ) : null}
-        </div>
+        {/* Carrossel de KPIs (grupos de 3) */}
+        {carregando ? (
+          <div className="grid grid-cols-2 gap-3 px-4 pt-4 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        ) : dados ? (
+          <CarrosselKPIs itens={kpis} />
+        ) : null}
 
         {/* Donut de status + colunas: clientes recentes · agenda de hoje · ações rápidas */}
         {carregando ? (
-          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 px-4 pt-4 pb-4 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -1202,7 +1264,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : dados ? (
-          <div className="grid grid-cols-1 gap-3 px-4 pb-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 px-4 pt-4 pb-4 lg:grid-cols-4">
             <DonutStatus
               ativas={dados.clientesAtivas}
               atencao={dados.clientesAtencao}
