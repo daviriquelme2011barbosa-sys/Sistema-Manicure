@@ -117,5 +117,33 @@ export async function POST(request: NextRequest) {
     console.log('[cancelar] UPDATE bem-sucedido')
   }
 
-  return NextResponse.json({ sucesso: true })
+  // Notificação via WhatsApp para a manicure — exclusiva dos planos Profissional e Master.
+  const { data: config, error: erroConfig } = await admin
+    .from('salao_config')
+    .select('whatsapp, plano')
+    .eq('id', salaoId)
+    .maybeSingle()
+
+  if (erroConfig) {
+    console.error('[cancelar] erro ao buscar salao_config para notificação:', erroConfig)
+  }
+
+  let notificacao: {
+    whatsapp: string
+    data: string
+    horario: string | null
+    clienteNome: string
+  } | null = null
+
+  const plano = config?.plano
+  if (config?.whatsapp && (plano === 'profissional' || plano === 'master')) {
+    notificacao = {
+      whatsapp: config.whatsapp,
+      data: ag.data,
+      horario: ag.horario,
+      clienteNome: cliente.nome,
+    }
+  }
+
+  return NextResponse.json({ sucesso: true, notificacao })
 }

@@ -28,6 +28,13 @@ type AgendamentoCliente = {
   status: string
 }
 
+type NotificacaoCancelamento = {
+  whatsapp: string
+  data: string
+  horario: string | null
+  clienteNome: string
+}
+
 type Props = {
   salaoId: string
   nomeSalao: string
@@ -278,11 +285,15 @@ export default function FormularioAgendamento({
         body: JSON.stringify({ agendamentoId, salaoId }),
       })
       if (resp.ok) {
+        const dados = (await resp.json()) as { notificacao?: NotificacaoCancelamento | null }
         setAgendamentos((prev) =>
           prev.map((a) => (a.id === agendamentoId ? { ...a, status: 'cancelado' } : a)),
         )
         mostrarToast('Agendamento cancelado', 'sucesso')
         setConfirmandoCancelar(null)
+        if (dados.notificacao) {
+          window.open(linkNotificacaoCancelamento(dados.notificacao), '_blank')
+        }
       } else {
         const dados = (await resp.json()) as { erro?: string }
         mostrarToast(dados.erro ?? 'Erro ao cancelar. Tente novamente.', 'erro')
@@ -453,6 +464,12 @@ export default function FormularioAgendamento({
     if (!whatsappManicure) return '#'
     const mensagem = `Olá! 😊 Passando aqui para confirmar meu agendamento para ${formatarDataBR(dataSelecionada)} às ${horarioSelecionado} - ${servico}. Até lá!`
     return `https://wa.me/${montarNumeroInternacional(whatsappManicure)}?text=${encodeURIComponent(mensagem)}`
+  }
+
+  function linkNotificacaoCancelamento(notificacao: NotificacaoCancelamento): string {
+    const horario = notificacao.horario ? notificacao.horario.slice(0, 5) : ''
+    const mensagem = `Oi! Eu cliente ${notificacao.clienteNome} cancelei o agendamento do dia ${formatarDataBR(notificacao.data)} às ${horario}. O horário está disponível novamente.`
+    return `https://wa.me/${montarNumeroInternacional(notificacao.whatsapp)}?text=${encodeURIComponent(mensagem)}`
   }
 
   // ── Derived data (computed during render) ────────────────────────────────────
