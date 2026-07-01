@@ -643,7 +643,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (verificando) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg dark:bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-bg">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     )
@@ -660,7 +660,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Header fixo: hamburguer + título | busca global | notificações + avatar */}
       <header
-        className={`chrome-header fixed right-0 top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-topbar px-2 backdrop-blur-md sm:gap-3 sm:px-4 dark:border-slate-700 dark:bg-slate-800/85 left-0 ${
+        className={`chrome-header fixed right-0 top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-topbar px-2 backdrop-blur-md sm:gap-3 sm:px-4 left-0 ${
           sidebarRecolhida ? 'lg:left-[4.5rem]' : 'lg:left-64'
         }`}
       >
@@ -668,7 +668,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="flex min-w-0 flex-shrink items-center gap-1">
           <button
             onClick={alternarSidebar}
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text"
             aria-label="Recolher ou expandir menu"
           >
             <IconeHamburguer />
@@ -676,20 +676,20 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           {acaoVoltar && (
             <button
               onClick={acaoVoltar}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text"
               aria-label="Voltar"
             >
               <IconeVoltar />
             </button>
           )}
-          <h1 className="ml-1 min-w-0 truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="ml-1 min-w-0 truncate text-base font-semibold text-text">
             {tituloPagina}
           </h1>
         </div>
 
         {/* Centro: busca global (sm+) */}
         <div ref={buscaDesktopRef} className="relative mx-auto hidden w-full max-w-md sm:block">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
             <IconeLupa />
           </span>
           <input
@@ -698,7 +698,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onChange={(e) => setBuscaGlobal(e.target.value)}
             onFocus={() => setBuscaAberta(true)}
             placeholder="Buscar clientes, agendamentos..."
-            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-800"
+            className="h-10 w-full rounded-xl border border-border bg-surface-2 pl-10 pr-3 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/30"
           />
           {buscaAberta && buscaGlobal.trim().length >= 2 && (
             <PainelResultadosBusca
@@ -714,7 +714,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="ml-auto flex flex-shrink-0 items-center gap-1 sm:ml-0 sm:gap-2">
           <button
             onClick={() => setBuscaAberta(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 sm:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text sm:hidden"
             aria-label="Buscar"
           >
             <IconeLupa />
@@ -727,26 +727,26 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 setNotifAberto((v) => !v)
                 setAvatarAberto(false)
               }}
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text"
               aria-label="Notificações"
             >
               <IconeSino />
               {totalNotificacoes > 0 && (
-                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
+                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-surface">
                   {totalNotificacoes > 9 ? '9+' : totalNotificacoes}
                 </span>
               )}
             </button>
             {notifAberto && (
-              <div className="chrome-pop absolute right-0 top-12 z-40 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
-                <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <div className="chrome-pop absolute right-0 top-12 z-40 w-72 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
+                <div className="border-b border-divider px-4 py-3">
+                  <p className="text-sm font-semibold text-text">
                     Notificações
                   </p>
                 </div>
                 <div className="max-h-80 overflow-y-auto py-1">
                   {totalNotificacoes === 0 ? (
-                    <p className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+                    <p className="px-4 py-6 text-center text-sm text-text-muted">
                       Tudo em dia ✨
                     </p>
                   ) : (
@@ -801,29 +801,29 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 setAvatarAberto((v) => !v)
                 setNotifAberto(false)
               }}
-              className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-1 transition hover:bg-slate-100 sm:pr-2 dark:hover:bg-slate-800"
+              className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-1 transition hover:bg-surface-2 sm:pr-2"
               aria-label="Abrir menu da conta"
             >
               <Avatar fotoUrl={fotoUrl} nome={nomeSalao} />
               <span className="hidden min-w-0 flex-col items-start leading-tight sm:flex">
-                <span className="max-w-[10rem] truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <span className="max-w-[10rem] truncate text-sm font-semibold text-text">
                   {nomeSalao || 'Minha conta'}
                 </span>
-                <span className="text-xs text-slate-400 dark:text-slate-500">Administrador</span>
+                <span className="text-xs text-text-muted">Administrador</span>
               </span>
-              <span className="hidden text-slate-400 sm:block dark:text-slate-500">
+              <span className="hidden text-text-muted sm:block">
                 <IconeChevronBaixo />
               </span>
             </button>
             {avatarAberto && (
-              <div className="chrome-pop absolute right-0 top-14 z-40 w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
-                <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3 dark:border-slate-700">
+              <div className="chrome-pop absolute right-0 top-14 z-40 w-60 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
+                <div className="flex items-center gap-3 border-b border-divider px-4 py-3">
                   <Avatar fotoUrl={fotoUrl} nome={nomeSalao} />
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    <p className="truncate text-sm font-semibold text-text">
                       {nomeSalao || 'Minha conta'}
                     </p>
-                    <p className="truncate text-xs text-slate-400 dark:text-slate-500">{email}</p>
+                    <p className="truncate text-xs text-text-muted">{email}</p>
                   </div>
                 </div>
                 <div className="py-1">
@@ -832,23 +832,23 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       setAvatarAberto(false)
                       setPainelAberto(true)
                     }}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-text transition hover:bg-surface-2"
                   >
-                    <span className="text-slate-400 dark:text-slate-500">
+                    <span className="text-text-muted">
                       <IconeEngrenagem />
                     </span>
                     Configurações
                   </button>
                   <button
                     onClick={alternarTema}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-text transition hover:bg-surface-2"
                   >
-                    <span className="text-slate-400 dark:text-slate-500">
+                    <span className="text-text-muted">
                       {tema === 'claro' ? <IconeLua /> : <IconeSol />}
                     </span>
                     {tema === 'claro' ? 'Modo escuro' : 'Modo claro'}
                   </button>
-                  <hr className="my-1 border-slate-100 dark:border-slate-700" />
+                  <hr className="my-1 border-divider" />
                   <button
                     onClick={fazerLogout}
                     className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
@@ -869,7 +869,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             className="chrome-pop absolute inset-x-2 top-[4.25rem] z-40 sm:hidden"
           >
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
                 <IconeLupa />
               </span>
               <input
@@ -878,7 +878,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 value={buscaGlobal}
                 onChange={(e) => setBuscaGlobal(e.target.value)}
                 placeholder="Buscar clientes, agendamentos..."
-                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 shadow-lg outline-none transition placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                className="h-11 w-full rounded-xl border border-border bg-surface pl-10 pr-3 text-sm text-text shadow-lg outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
             </div>
             {buscaGlobal.trim().length >= 2 && (
@@ -904,18 +904,18 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar — drawer no mobile, fixa e recolhível no desktop */}
       <aside
-        className={`chrome-sidebar fixed left-0 top-0 z-40 flex h-[100dvh] w-72 max-w-[80vw] flex-col border-r border-border bg-sidebar dark:border-slate-700 dark:bg-slate-800 lg:max-w-none lg:translate-x-0 ${
+        className={`chrome-sidebar fixed left-0 top-0 z-40 flex h-[100dvh] w-72 max-w-[80vw] flex-col border-r border-border bg-sidebar lg:max-w-none lg:translate-x-0 ${
           menuAberto ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         } ${sidebarRecolhida ? 'lg:w-[4.5rem]' : 'lg:w-64'}`}
         aria-label="Menu de navegação"
       >
         {/* Marca + fechar (mobile) */}
-        <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-700">
+        <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b border-border px-4">
           <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-teal-500 text-sm font-bold text-white shadow-sm">
             {(nomeSalao || 'F').charAt(0).toUpperCase()}
           </div>
           <span
-            className={`chrome-label min-w-0 flex-1 truncate text-base font-semibold text-slate-900 dark:text-slate-100 ${
+            className={`chrome-label min-w-0 flex-1 truncate text-base font-semibold text-text ${
               sidebarRecolhida ? 'lg:hidden' : ''
             }`}
           >
@@ -923,7 +923,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           </span>
           <button
             onClick={() => setMenuAberto(false)}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-text-secondary transition hover:bg-surface-2 lg:hidden"
             aria-label="Fechar menu"
           >
             <IconeFechar />
@@ -971,7 +971,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <IconeEstrela />
           </MenuItem>
 
-          <hr className="my-2 border-slate-100 dark:border-slate-700" />
+          <hr className="my-2 border-divider" />
 
           <BotaoMenu icone={<IconeLivro />} label="Tutorial" recolhida={sidebarRecolhida} onClick={() => { setMenuAberto(false); setTutorialAberto(true) }} />
           <BotaoMenu icone={<IconeEngrenagem />} label="Configurações" recolhida={sidebarRecolhida} onClick={() => { setMenuAberto(false); setPainelAberto(true) }} />
@@ -980,16 +980,16 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setSubmenuSaibaMaisAberto((v) => !v)}
               title={sidebarRecolhida ? 'Saiba Mais' : undefined}
-              className={`flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 ${
+              className={`flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-text-secondary transition hover:bg-surface-2 ${
                 sidebarRecolhida ? 'lg:justify-center lg:px-0' : ''
               }`}
             >
-              <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+              <span className="flex-shrink-0 text-text-muted">
                 <IconeInfo />
               </span>
               <span className={`chrome-label ${sidebarRecolhida ? 'lg:hidden' : ''}`}>Saiba Mais</span>
               <span
-                className={`chrome-label ml-auto text-slate-400 transition-transform duration-200 dark:text-slate-500 ${
+                className={`chrome-label ml-auto text-text-muted transition-transform duration-200 ${
                   submenuSaibaMaisAberto ? 'rotate-180' : ''
                 } ${sidebarRecolhida ? 'lg:hidden' : ''}`}
               >
@@ -999,33 +999,33 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
             {submenuSaibaMaisAberto && (
               <div
-                className={`ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-slate-100 pl-3 dark:border-slate-700 ${
+                className={`ml-4 mt-1 flex flex-col gap-0.5 border-l-2 border-divider pl-3 ${
                   sidebarRecolhida ? 'lg:hidden' : ''
                 }`}
               >
                 <button
                   onClick={() => { setMenuAberto(false); setModalSaibaMais('termos') }}
-                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-surface-2"
                 >
-                  <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                  <span className="flex-shrink-0 text-text-muted">
                     <IconeDocumento />
                   </span>
                   Termos de Uso
                 </button>
                 <button
                   onClick={() => { setMenuAberto(false); setModalSaibaMais('privacidade') }}
-                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-surface-2"
                 >
-                  <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                  <span className="flex-shrink-0 text-text-muted">
                     <IconeEscudo />
                   </span>
                   Política de Privacidade
                 </button>
                 <button
                   onClick={() => { setMenuAberto(false); setModalSaibaMais('sobre') }}
-                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-surface-2"
                 >
-                  <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">
+                  <span className="flex-shrink-0 text-text-muted">
                     <IconeInfo />
                   </span>
                   Sobre o Sistema
@@ -1036,7 +1036,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Rodapé: card do plano */}
-        <div className="flex-shrink-0 border-t border-slate-200 p-3 dark:border-slate-700">
+        <div className="flex-shrink-0 border-t border-border p-3">
           <CardPlano plano={plano} recolhida={sidebarRecolhida} />
         </div>
       </aside>
@@ -1054,17 +1054,17 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={() => !salvandoNome && !salvandoWhatsapp && setPainelAberto(false)}
           />
 
-          <div className="animar-sheet relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-5 shadow-xl dark:bg-slate-800 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden" />
+          <div className="animar-sheet relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-surface px-4 pb-8 pt-5 shadow-xl sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border-strong sm:hidden" />
 
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-base font-semibold text-text">
                 Configurações
               </h2>
               <button
                 onClick={() => !salvandoNome && !salvandoWhatsapp && setPainelAberto(false)}
                 disabled={salvandoNome || salvandoWhatsapp}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 disabled:opacity-40 dark:text-slate-400 dark:hover:bg-slate-700"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface-2 disabled:opacity-40"
                 aria-label="Fechar"
               >
                 <IconeFechar />
@@ -1072,11 +1072,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
 
             {email && (
-              <div className="mb-5 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-700">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              <div className="mb-5 rounded-xl bg-surface-2 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
                   Conta
                 </p>
-                <p className="mt-0.5 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                <p className="mt-0.5 truncate text-sm font-medium text-text">
                   {email}
                 </p>
               </div>
@@ -1163,17 +1163,17 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <option value="nao_informar">Prefiro não informar</option>
                 </select>
                 {salvandoGenero && (
-                  <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">Salvando...</p>
+                  <p className="mt-1.5 text-xs text-text-muted">Salvando...</p>
                 )}
               </div>
 
               {linkFormulario && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <p className="text-sm font-medium text-text">
                     Link do seu formulário
                   </p>
-                  <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-700">
-                    <span className="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2.5">
+                    <span className="min-w-0 flex-1 truncate text-xs text-text-secondary">
                       {linkFormulario}
                     </span>
                     <button
@@ -1192,16 +1192,16 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </div>
               )}
 
-              <hr className="border-slate-200 dark:border-slate-700" />
+              <hr className="border-border" />
 
               <div className="flex flex-col gap-4">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                <p className="text-sm font-medium text-text">
                   Personalizar formulário
                 </p>
 
                 {/* Foto */}
                 <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Foto</p>
+                  <p className="text-xs font-medium text-text-secondary">Foto</p>
                   {fotoUrl && (
                     <img
                       src={fotoUrl}
@@ -1234,7 +1234,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                         type="button"
                         onClick={() => setConfirmandoRemoverFoto(false)}
                         disabled={removendoFoto}
-                        className="text-xs text-slate-500 transition hover:text-slate-700 disabled:opacity-50 dark:text-slate-400"
+                        className="text-xs text-text-secondary transition hover:text-text disabled:opacity-50"
                       >
                         Cancelar
                       </button>
@@ -1245,17 +1245,17 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     disabled={salvandoFoto}
                     className="btn-secondary text-sm"
                   >
-                    {salvandoFoto && <span className="form-spinner border-slate-400 border-t-slate-700 dark:border-slate-500 dark:border-t-slate-200" aria-hidden="true" />}
+                    {salvandoFoto && <span className="form-spinner border-border-strong border-t-text" aria-hidden="true" />}
                     {salvandoFoto ? 'Enviando...' : fotoUrl ? 'Alterar foto' : 'Escolher foto'}
                   </button>
 
                   {opcoesFotoAbertas && !salvandoFoto && (
-                    <div className="flex flex-col overflow-hidden rounded-lg border border-slate-200 dark:border-slate-600">
+                    <div className="flex flex-col overflow-hidden rounded-lg border border-border">
                       {/* câmera — apenas mobile */}
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputCameraRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700 sm:hidden"
+                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-text transition hover:bg-surface-2 sm:hidden"
                       >
                         <span aria-hidden="true">📷</span> Tirar foto
                       </button>
@@ -1263,7 +1263,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputGaleriaRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-slate-200 px-4 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 sm:hidden"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-border px-4 text-sm text-text transition hover:bg-surface-2 sm:hidden"
                       >
                         <span aria-hidden="true">🖼️</span> Escolher da galeria
                       </button>
@@ -1271,7 +1271,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputUploadRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-slate-200 px-4 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 sm:border-t-0"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-border px-4 text-sm text-text transition hover:bg-surface-2 sm:border-t-0"
                       >
                         <span aria-hidden="true">💻</span> Fazer upload
                       </button>
@@ -1281,13 +1281,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
                 {/* Cor primária */}
                 <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  <p className="text-xs font-medium text-text-secondary">
                     Cor primária
                   </p>
                   <div className="flex flex-col items-center gap-3">
                     <label className="relative block h-20 w-20 cursor-pointer">
                       <div
-                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-white dark:ring-slate-700"
+                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-surface"
                         style={{ backgroundColor: corSelecionada }}
                       />
                       <input
@@ -1300,10 +1300,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     </label>
                     <div className="flex items-center gap-2">
                       <div
-                        className="h-5 w-5 rounded-full border border-slate-200 dark:border-slate-600"
+                        className="h-5 w-5 rounded-full border border-border"
                         style={{ backgroundColor: corSelecionada }}
                       />
-                      <span className="font-mono text-sm text-slate-600 dark:text-slate-300">
+                      <span className="font-mono text-sm text-text-secondary">
                         {corSelecionada}
                       </span>
                     </div>
@@ -1319,7 +1319,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
 
-              <hr className="border-slate-200 dark:border-slate-700" />
+              <hr className="border-border" />
 
               <button
                 onClick={fazerLogout}
@@ -1351,11 +1351,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             className="animar-overlay absolute inset-0 bg-black/40"
             onClick={() => setModalSaibaMais(null)}
           />
-          <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-slate-800 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
-            <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden" />
+          <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-surface shadow-xl sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+            <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-border-strong sm:hidden" />
 
             <div className="flex flex-shrink-0 items-center justify-between px-5 pb-4 pt-2">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-base font-semibold text-text">
                 {modalSaibaMais === 'termos'
                   ? 'Termos de Uso'
                   : modalSaibaMais === 'privacidade'
@@ -1364,7 +1364,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </h2>
               <button
                 onClick={() => setModalSaibaMais(null)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface-2"
                 aria-label="Fechar"
               >
                 <IconeFechar />
@@ -1377,7 +1377,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               {modalSaibaMais === 'sobre' && <ConteudoSobre />}
             </div>
 
-            <div className="flex-shrink-0 border-t border-slate-200 px-5 pb-6 pt-4 dark:border-slate-700">
+            <div className="flex-shrink-0 border-t border-border px-5 pb-6 pt-4">
               <button
                 onClick={() => setModalSaibaMais(null)}
                 className="h-11 w-full rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
@@ -1407,7 +1407,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       <div
-        className={`chrome-shell min-h-screen bg-bg pt-16 dark:bg-slate-900 ${
+        className={`chrome-shell min-h-screen bg-bg pt-16 ${
           sidebarRecolhida ? 'lg:pl-[4.5rem]' : 'lg:pl-64'
         }`}
       >
@@ -1420,10 +1420,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 function SecaoLegal({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
         {titulo}
       </h3>
-      <div className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{children}</div>
+      <div className="text-sm leading-relaxed text-text-secondary">{children}</div>
     </div>
   )
 }
@@ -1431,7 +1431,7 @@ function SecaoLegal({ titulo, children }: { titulo: string; children: React.Reac
 function ConteudoTermos() {
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-xs text-slate-400 dark:text-slate-500">Última atualização: 19/06/2026</p>
+      <p className="text-xs text-text-muted">Última atualização: 19/06/2026</p>
       <SecaoLegal titulo="1. Aceitação dos Termos">
         Ao acessar e utilizar a plataforma Facilitaai, o usuário declara ter lido, compreendido e
         concordado com os presentes Termos de Uso. Caso não concorde com alguma condição, o uso da
@@ -1488,7 +1488,7 @@ function ConteudoTermos() {
 function ConteudoPrivacidade() {
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-xs text-slate-400 dark:text-slate-500">Última atualização: 19/06/2026</p>
+      <p className="text-xs text-text-muted">Última atualização: 19/06/2026</p>
       <SecaoLegal titulo="Seção I — Informações Gerais">
         Esta Política de Privacidade descreve como os dados pessoais dos usuários são coletados,
         utilizados e protegidos na plataforma Facilitaai. Esta política foi elaborada em
@@ -1531,7 +1531,7 @@ function ConteudoPrivacidade() {
 
 function ConteudoSobre() {
   return (
-    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+    <p className="text-sm leading-relaxed text-text-secondary">
       A Facilitaai é uma plataforma de gestão e reativação de clientes criada para profissionais
       autônomos e pequenos negócios. Organize suas clientes, veja quem está sumindo e reconecte
       com um clique via WhatsApp.
@@ -1557,9 +1557,9 @@ function BlocoLink({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{rotulo}</p>
-      <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-700">
-        <span className="min-w-0 flex-1 break-all text-xs text-slate-500 dark:text-slate-400">
+      <p className="text-sm font-medium text-text">{rotulo}</p>
+      <div className="flex items-center gap-2 rounded-xl bg-surface-2 px-3 py-3">
+        <span className="min-w-0 flex-1 break-all text-xs text-text-secondary">
           {link}
         </span>
         <button
@@ -1603,17 +1603,17 @@ function ModalPrimeirosPassos({
     >
       <div className="animar-overlay absolute inset-0 bg-black/50" />
 
-      <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-slate-800 sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
-        <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-slate-200 dark:bg-slate-600 sm:hidden" />
+      <div className="animar-sheet relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-surface shadow-xl sm:max-h-[85vh] sm:max-w-md sm:rounded-2xl">
+        <div className="mx-auto mb-2 mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-border-strong sm:hidden" />
 
         <div className="flex-shrink-0 px-5 pb-2 pt-4">
           <div className="mb-1 flex items-center gap-2">
             <span className="text-2xl" aria-hidden="true">🚀</span>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <h2 className="text-lg font-bold text-text">
               Primeiros passos
             </h2>
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-text-secondary">
             Guarde estes links — você vai precisar deles para divulgar o sistema para suas clientes.
           </p>
         </div>
@@ -1636,13 +1636,13 @@ function ModalPrimeirosPassos({
               />
             )}
 
-            <p className="text-xs text-slate-400 dark:text-slate-500">
+            <p className="text-xs text-text-muted">
               Você também encontra esses links nas Configurações a qualquer momento.
             </p>
           </div>
         </div>
 
-        <div className="flex-shrink-0 border-t border-slate-200 px-5 pb-6 pt-4 dark:border-slate-700">
+        <div className="flex-shrink-0 border-t border-border px-5 pb-6 pt-4">
           <button
             onClick={onFechar}
             className="h-11 w-full rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
@@ -1662,7 +1662,7 @@ function Avatar({ fotoUrl, nome }: { fotoUrl: string; nome: string }) {
       <img
         src={fotoUrl}
         alt={nome || 'Foto da conta'}
-        className="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+        className="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-1 ring-border"
       />
     )
   }
@@ -1687,7 +1687,7 @@ function NotifItem({
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+      className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-surface-2"
     >
       <span
         className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
@@ -1695,7 +1695,7 @@ function NotifItem({
       >
         {children}
       </span>
-      <span className="flex-1 text-sm text-slate-700 dark:text-slate-200">{texto}</span>
+      <span className="flex-1 text-sm text-text">{texto}</span>
     </button>
   )
 }
@@ -1715,11 +1715,11 @@ function BotaoMenu({
     <button
       onClick={onClick}
       title={recolhida ? label : undefined}
-      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 ${
+      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-text-secondary transition hover:bg-surface-2 ${
         recolhida ? 'lg:justify-center lg:px-0' : ''
       }`}
     >
-      <span className="flex-shrink-0 text-slate-400 dark:text-slate-500">{icone}</span>
+      <span className="flex-shrink-0 text-text-muted">{icone}</span>
       <span className={`chrome-label ${recolhida ? 'lg:hidden' : ''}`}>{label}</span>
     </button>
   )
@@ -1733,7 +1733,7 @@ function CardPlano({ plano, recolhida }: { plano: string; recolhida: boolean }) 
   return (
     <>
       <div
-        className={`flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60 ${
+        className={`flex items-center gap-3 rounded-xl border border-border bg-surface-2 p-3 ${
           recolhida ? 'lg:hidden' : ''
         }`}
       >
@@ -1744,8 +1744,8 @@ function CardPlano({ plano, recolhida }: { plano: string; recolhida: boolean }) 
           <IconeCoroa />
         </span>
         <div className="min-w-0">
-          <p className="text-xs text-slate-400 dark:text-slate-500">Seu plano</p>
-          <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <p className="text-xs text-text-muted">Seu plano</p>
+          <p className="truncate text-sm font-semibold text-text">
             {rotulo}
           </p>
         </div>
@@ -1806,14 +1806,14 @@ function MenuItem({
       className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
         ativo
           ? 'font-semibold shadow-sm'
-          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+          : 'text-text-secondary hover:bg-surface-2'
       } ${recolhida ? 'lg:justify-center lg:px-0' : ''}`}
     >
       <span className="relative flex-shrink-0" style={{ color: ativo ? '#fff' : cor }}>
         {children}
         {badge ? (
           <span
-            className={`absolute -right-1 -top-1 hidden h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-slate-900 ${
+            className={`absolute -right-1 -top-1 hidden h-2.5 w-2.5 rounded-full ring-2 ring-surface ${
               recolhida ? 'lg:block' : ''
             }`}
             style={{ backgroundColor: cor }}
@@ -1850,27 +1850,27 @@ function PainelResultadosBusca({
   const vazio = clientes.length === 0 && agendamentos.length === 0
 
   return (
-    <div className="chrome-pop absolute left-0 right-0 top-full z-40 mt-2 max-h-[24rem] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
+    <div className="chrome-pop absolute left-0 right-0 top-full z-40 mt-2 max-h-[24rem] overflow-y-auto rounded-2xl border border-border bg-surface shadow-xl">
       {buscando && vazio ? (
-        <p className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+        <p className="px-4 py-6 text-center text-sm text-text-muted">
           Buscando…
         </p>
       ) : vazio ? (
-        <p className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+        <p className="px-4 py-6 text-center text-sm text-text-muted">
           Nada encontrado
         </p>
       ) : (
         <div className="py-1">
           {clientes.length > 0 && (
             <>
-              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
                 Clientes
               </p>
               {clientes.map((c) => (
                 <button
                   key={`c-${c.id}`}
                   onClick={() => onIr(`/clientes?q=${encodeURIComponent(c.nome)}`)}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-surface-2"
                 >
                   <span
                     className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
@@ -1878,7 +1878,7 @@ function PainelResultadosBusca({
                   >
                     <IconePessoa />
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-text">
                     {c.nome}
                   </span>
                 </button>
@@ -1888,14 +1888,14 @@ function PainelResultadosBusca({
 
           {agendamentos.length > 0 && (
             <>
-              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
                 Agendamentos
               </p>
               {agendamentos.map((a) => (
                 <button
                   key={`a-${a.id}`}
                   onClick={() => onIr('/agenda')}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-surface-2"
                 >
                   <span
                     className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
@@ -1903,10 +1903,10 @@ function PainelResultadosBusca({
                   >
                     <IconeAgenda />
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-text">
                     {a.nome}
                   </span>
-                  <span className="flex-shrink-0 text-xs text-slate-400 dark:text-slate-500">
+                  <span className="flex-shrink-0 text-xs text-text-muted">
                     {formatarDataBusca(a.data)}
                     {a.horario ? ` · ${a.horario}` : ''}
                   </span>

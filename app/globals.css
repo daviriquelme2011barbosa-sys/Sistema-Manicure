@@ -99,6 +99,7 @@
   --shadow-md:0 6px 20px rgba(0,0,0,.45);
   --shadow-lg:0 16px 40px rgba(0,0,0,.55);
   --shadow-xl:0 24px 56px rgba(0,0,0,.6);
+  --glow-primary:0 0 0 1px rgba(124,92,255,.35), 0 0 24px rgba(124,92,255,.28);
 }
 
 body {
@@ -588,15 +589,12 @@ html.dark .dash-greeting {
 }
 .dash-card:active { transform: scale(0.98); }
 
-/* Dark mode: surface slate-800 com borda slate-700 */
-html.dark .dash-card {
-  background: #1E293B;
-  border: 1px solid #334155;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
+/* Dark: elevação por borda + glow sutil no hover (sem sombra preta pesada).
+   Em repouso, o card herda os tokens base (--color-surface / --color-border /
+   --shadow-sm), então não há override de fundo/sombra aqui. */
 html.dark .dash-card:hover {
-  border-color: #475569;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--glow-primary);
 }
 
 /* Cards de KPI — versão compacta do .dash-card para caber mais lado a lado */

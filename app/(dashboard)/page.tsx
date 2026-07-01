@@ -71,7 +71,7 @@ function gradienteGreeting(): string {
     return 'from-sky-50 via-primary-soft to-indigo-50 dark:from-sky-950/20 dark:via-primary-soft dark:to-indigo-950/20'
   if (hora < 18)
     return 'from-primary-soft via-sky-50 to-cyan-50 dark:from-primary-soft dark:via-sky-950/20 dark:to-cyan-950/20'
-  return 'from-indigo-50 via-primary-soft to-slate-100 dark:from-indigo-950/20 dark:via-primary-soft dark:to-slate-900/40'
+  return 'from-indigo-50 via-primary-soft to-slate-100 dark:from-indigo-950/20 dark:via-primary-soft'
 }
 
 function formatarMoedaCompacta(valor: number): string {
@@ -144,7 +144,7 @@ function contarAtivosDistintosPorMes(
 
 function SkeletonCard() {
   return (
-    <div className="shimmer h-[116px] rounded-2xl bg-slate-100 dark:bg-slate-800" />
+    <div className="shimmer h-[116px] rounded-2xl bg-surface-2" />
   )
 }
 
@@ -224,10 +224,10 @@ function CartaoDado({
       >
         {icone}
       </div>
-      <span className="text-2xl font-bold leading-none tracking-tight text-slate-900 dark:text-slate-50 lg:text-3xl">
+      <span className="text-2xl font-bold leading-none tracking-tight text-text lg:text-3xl">
         {numero}
       </span>
-      <span className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+      <span className="mt-2 text-xs font-medium text-text-secondary">
         {rotulo}
       </span>
       <Sparkline data={serie} cor={cor} />
@@ -270,7 +270,7 @@ function SetaCarrossel({
       onClick={onClick}
       disabled={desabilitada}
       aria-label={direcao === 'anterior' ? 'Grupo anterior' : 'Próximo grupo'}
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-slate-600 transition hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-300"
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40"
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <polyline points={direcao === 'anterior' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
@@ -332,7 +332,7 @@ function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
                 className={`h-2 rounded-full transition-all duration-200 ${
                   i === paginaAtual
                     ? 'w-5 bg-primary'
-                    : 'w-2 bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-500'
+                    : 'w-2 bg-border-strong hover:bg-text-muted'
                 }`}
               />
             ))}
@@ -505,10 +505,10 @@ function TooltipDonut({
   const f = payload[0].payload
   const pct = total > 0 ? Math.round((f.valor / total) * 100) : 0
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-lg backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/95">
+    <div className="rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-lg backdrop-blur-sm">
       <p className="text-sm font-medium" style={{ color: f.cor }}>
         {f.nome}: <span className="font-bold">{f.valor}</span>{' '}
-        <span className="text-slate-400 dark:text-slate-500">({pct}%)</span>
+        <span className="text-text-muted">({pct}%)</span>
       </p>
     </div>
   )
@@ -534,16 +534,16 @@ function DonutStatus({
   return (
     <div className="dash-card dash-card-compact dash-anim-1">
       <div className="mb-1">
-        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+        <p className="text-sm font-semibold text-text">
           Clientes por status
         </p>
-        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+        <p className="mt-0.5 text-xs text-text-muted">
           Distribuição atual da sua base
         </p>
       </div>
 
       {total === 0 ? (
-        <p className="py-12 text-center text-sm text-slate-400 dark:text-slate-500">
+        <p className="py-12 text-center text-sm text-text-muted">
           Nenhuma cliente para exibir ainda.
         </p>
       ) : (
@@ -581,10 +581,10 @@ function DonutStatus({
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold leading-none text-slate-900 dark:text-slate-50">
+              <span className="text-3xl font-bold leading-none text-text">
                 {total}
               </span>
-              <span className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <span className="mt-1 text-xs font-medium text-text-secondary">
                 clientes
               </span>
             </div>
@@ -601,11 +601,11 @@ function DonutStatus({
                     style={{ backgroundColor: f.cor }}
                     aria-hidden="true"
                   />
-                  <span className="flex-1 text-sm text-slate-600 dark:text-slate-300">{f.nome}</span>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="flex-1 text-sm text-text-secondary">{f.nome}</span>
+                  <span className="text-sm font-semibold text-text">
                     {f.valor}
                   </span>
-                  <span className="w-10 text-right text-xs text-slate-400 dark:text-slate-500">
+                  <span className="w-10 text-right text-xs text-text-muted">
                     {pct}%
                   </span>
                 </div>
@@ -658,7 +658,7 @@ function CabecalhoColuna({
 }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-2">
-      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{titulo}</p>
+      <p className="text-sm font-semibold text-text">{titulo}</p>
       {href && rotuloLink && (
         <Link
           href={href}
@@ -684,7 +684,7 @@ function ColunaClientesRecentes({
       {clientes.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
           <span className="text-3xl" aria-hidden="true">👥</span>
-          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500">
+          <p className="mt-2 text-sm text-text-muted">
             Nenhum atendimento registrado ainda
           </p>
         </div>
@@ -696,14 +696,14 @@ function ColunaClientesRecentes({
               <Link
                 key={c.id}
                 href="/clientes"
-                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-surface-2"
               >
                 <AvatarCliente fotoUrl={c.foto_url} nome={c.nome} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <p className="truncate text-sm font-medium text-text">
                     {c.nome}
                   </p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                  <p className="text-xs text-text-muted">
                     {c.ultima_visita
                       ? `Último atendimento: ${formatarData(c.ultima_visita)}`
                       : '—'}
@@ -726,7 +726,7 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
       {agendamentos.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
           <span className="text-3xl" aria-hidden="true">📅</span>
-          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500">
+          <p className="mt-2 text-sm text-text-muted">
             Nenhum agendamento para hoje
           </p>
         </div>
@@ -738,20 +738,20 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
             return (
               <li
                 key={a.id}
-                className="flex flex-col gap-1.5 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                className="flex flex-col gap-1.5 rounded-xl px-2 py-2 transition hover:bg-surface-2"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="flex h-6 flex-shrink-0 items-center rounded-lg bg-slate-100 px-2 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                  <span className="flex h-6 flex-shrink-0 items-center rounded-lg bg-surface-2 px-2 text-xs font-semibold text-text-secondary">
                     {a.horario ? a.horario.slice(0, 5) : '—'}
                   </span>
                   <PilulaStatus label={info.label} cor={info.cor} />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <p className="truncate text-sm font-medium text-text">
                     {a.clientes?.nome ?? '—'}
                   </p>
                   {a.servico && (
-                    <p className="truncate text-xs text-slate-400 dark:text-slate-500">
+                    <p className="truncate text-xs text-text-muted">
                       {a.servico}
                     </p>
                   )}
@@ -779,7 +779,7 @@ function AcaoRapida({
   onClick?: () => void
 }) {
   const classes =
-    'flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-sm dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600 dark:hover:bg-slate-800'
+    'flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-2 p-2.5 text-center transition hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface hover:shadow-sm'
   const conteudo = (
     <>
       <span
@@ -789,7 +789,7 @@ function AcaoRapida({
       >
         {icone}
       </span>
-      <span className="text-xs font-medium leading-tight text-slate-600 dark:text-slate-300">{label}</span>
+      <span className="text-xs font-medium leading-tight text-text-secondary">{label}</span>
     </>
   )
   if (href) {
@@ -809,7 +809,7 @@ function AcaoRapida({
 function ColunaAcoesRapidas({ temAgenda }: { temAgenda: boolean }) {
   return (
     <div className="dash-card dash-card-compact dash-anim-4">
-      <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
+      <p className="mb-3 text-sm font-semibold text-text">
         Ações rápidas
       </p>
       <div className="grid grid-cols-2 gap-2">
@@ -1207,10 +1207,10 @@ export default function DashboardPage() {
       <div className="dash-content">
         {/* Saudação com gradiente horário — transparente no dark */}
         <div className={`dash-greeting bg-gradient-to-br ${gradiente} px-5 py-7`}>
-          <p className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <p className="text-2xl font-bold tracking-tight text-text">
             {cumprimento}{nome ? `, ${nome}` : ''}!
           </p>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm text-text-secondary">
             Aqui está o resumo do seu salão hoje
           </p>
         </div>
@@ -1239,7 +1239,7 @@ export default function DashboardPage() {
 
         {/* Cabeçalho do resumo + filtro de período */}
         <div className="flex items-center justify-between gap-3 px-4 pt-4">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Resumo geral</h2>
+          <h2 className="text-base font-semibold text-text">Resumo geral</h2>
           <select
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
@@ -1272,7 +1272,7 @@ export default function DashboardPage() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="shimmer h-64 rounded-2xl bg-slate-100 dark:bg-slate-800"
+                className="shimmer h-64 rounded-2xl bg-surface-2"
               />
             ))}
           </div>
