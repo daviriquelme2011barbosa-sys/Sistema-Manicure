@@ -68,10 +68,10 @@ function saudacao(): string {
 function gradienteGreeting(): string {
   const hora = new Date().getHours()
   if (hora < 12)
-    return 'from-sky-50 via-blue-50 to-indigo-50 dark:from-sky-950/20 dark:via-blue-950/20 dark:to-indigo-950/20'
+    return 'from-sky-50 via-primary-soft to-indigo-50 dark:from-sky-950/20 dark:via-primary-soft dark:to-indigo-950/20'
   if (hora < 18)
-    return 'from-blue-50 via-sky-50 to-cyan-50 dark:from-blue-950/20 dark:via-sky-950/20 dark:to-cyan-950/20'
-  return 'from-indigo-50 via-blue-50 to-slate-100 dark:from-indigo-950/20 dark:via-blue-950/20 dark:to-slate-900/40'
+    return 'from-primary-soft via-sky-50 to-cyan-50 dark:from-primary-soft dark:via-sky-950/20 dark:to-cyan-950/20'
+  return 'from-indigo-50 via-primary-soft to-slate-100 dark:from-indigo-950/20 dark:via-primary-soft dark:to-slate-900/40'
 }
 
 function formatarMoedaCompacta(valor: number): string {
@@ -538,7 +538,7 @@ function CabecalhoColuna({
       {href && rotuloLink && (
         <Link
           href={href}
-          className="flex-shrink-0 text-xs font-medium text-blue-600 transition hover:text-blue-700 hover:underline dark:text-blue-400"
+          className="flex-shrink-0 text-xs font-medium text-primary transition hover:text-primary-hover hover:underline dark:text-primary"
         >
           {rotuloLink}
         </Link>

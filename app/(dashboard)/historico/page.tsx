@@ -97,7 +97,7 @@ export default function HistoricoPage() {
         <select
           value={mes}
           onChange={(e) => setMes(Number(e.target.value))}
-          className="h-11 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="h-11 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         >
           {MESES.map((nome, i) => (
             <option key={i + 1} value={i + 1}>
@@ -109,7 +109,7 @@ export default function HistoricoPage() {
         <select
           value={ano}
           onChange={(e) => setAno(Number(e.target.value))}
-          className="h-11 w-28 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="h-11 w-28 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         >
           {anos.map((a) => (
             <option key={a} value={a}>

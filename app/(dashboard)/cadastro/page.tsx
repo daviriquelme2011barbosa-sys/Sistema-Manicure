@@ -70,7 +70,7 @@ function BuscaCliente({
               <button
                 type="button"
                 onClick={() => onSelecionar(c)}
-                className="w-full px-4 py-3 text-left text-sm font-medium text-slate-800 dark:text-slate-100 transition hover:bg-blue-50 dark:hover:bg-blue-950/20 active:bg-blue-100"
+                className="w-full px-4 py-3 text-left text-sm font-medium text-slate-800 dark:text-slate-100 transition hover:bg-primary-soft dark:hover:bg-primary-soft active:bg-primary-soft"
               >
                 {c.nome}
               </button>

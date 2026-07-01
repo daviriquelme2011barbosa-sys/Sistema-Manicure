@@ -547,8 +547,8 @@ export default function FormularioAgendamento({
           {carregandoAgendamentos ? (
             <div className="h-24 animate-pulse rounded-2xl bg-slate-100" />
           ) : proximoAgendamento ? (
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-              <p className="text-sm font-semibold text-blue-700">
+            <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
+              <p className="text-sm font-semibold text-primary">
                 📅 {formatarDataBR(proximoAgendamento.data)}
                 {proximoAgendamento.horario ? ` às ${proximoAgendamento.horario}` : ''}
               </p>
@@ -566,7 +566,7 @@ export default function FormularioAgendamento({
               <p className="text-sm text-slate-400">Nenhum agendamento futuro</p>
               <button
                 onClick={() => setSecao('agendar')}
-                className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
+                className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
               >
                 Agendar agora
               </button>
@@ -608,7 +608,7 @@ export default function FormularioAgendamento({
         {/* Atalho rápido */}
         <button
           onClick={() => { setSecao('agendar'); resetarAgendar() }}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
         >
           📅 Fazer novo agendamento
         </button>
@@ -623,7 +623,7 @@ export default function FormularioAgendamento({
         : 'Confirmando agendamento…'
       return (
         <div className="flex flex-col items-center gap-4 py-16 px-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="text-sm text-slate-500">{label}</p>
         </div>
       )
@@ -684,9 +684,9 @@ export default function FormularioAgendamento({
                     disabled={!disponivel}
                     className={`h-10 w-full rounded-lg text-sm font-medium transition-colors duration-200 ${
                       selecionado
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-primary text-white'
                         : disponivel
-                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                        ? 'bg-primary-soft text-primary hover:bg-primary-soft'
                         : 'cursor-default text-slate-300'
                     }`}
                   >
@@ -724,7 +724,7 @@ export default function FormularioAgendamento({
               <p className="text-xs text-slate-400">Escolha outro dia</p>
               <button
                 onClick={() => setEtapaAgendar('calendario')}
-                className="mt-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
+                className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
               >
                 Voltar ao calendário
               </button>
@@ -739,8 +739,8 @@ export default function FormularioAgendamento({
                     onClick={() => setHorarioSelecionado(h)}
                     className={`flex h-12 items-center justify-center rounded-xl border text-sm font-semibold transition-colors duration-200 ${
                       selecionado
-                        ? 'border-blue-600 bg-blue-600 text-white'
-                        : 'border-blue-200 bg-white text-blue-600 hover:bg-blue-50'
+                        ? 'border-primary bg-primary text-white'
+                        : 'border-primary/30 bg-white text-primary hover:bg-primary-soft'
                     }`}
                   >
                     {h}
@@ -753,7 +753,7 @@ export default function FormularioAgendamento({
           {horarioSelecionado && (
             <button
               onClick={() => setEtapaAgendar('servico')}
-              className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
+              className="flex h-12 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
             >
               Continuar → {horarioSelecionado}
             </button>
@@ -776,8 +776,8 @@ export default function FormularioAgendamento({
             <h2 className="text-base font-semibold text-slate-900">Qual serviço você quer fazer?</h2>
           </div>
 
-          <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-            <p className="text-sm font-medium text-blue-700">
+          <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
+            <p className="text-sm font-medium text-primary">
               📅 {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
             </p>
           </div>
@@ -807,7 +807,7 @@ export default function FormularioAgendamento({
 
           <button
             onClick={confirmarAgendamento}
-            className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
           >
             Confirmar agendamento
           </button>
@@ -827,7 +827,7 @@ export default function FormularioAgendamento({
             </p>
           </div>
 
-          <div className="w-full rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left">
+          <div className="w-full rounded-2xl border border-primary/30 bg-primary-soft p-4 text-left">
             <p className="text-sm font-medium text-slate-700">
               📅 {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
             </p>
@@ -848,7 +848,7 @@ export default function FormularioAgendamento({
 
           <button
             onClick={() => { setSecao('agendamentos'); resetarAgendar() }}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-primary-hover"
           >
             Ver meus agendamentos
           </button>
@@ -877,7 +877,7 @@ export default function FormularioAgendamento({
             <p className="text-xs text-slate-400">Seus próximos agendamentos aparecerão aqui.</p>
             <button
               onClick={() => { setSecao('agendar'); resetarAgendar() }}
-              className="mt-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
+              className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
             >
               Agendar agora
             </button>
@@ -1023,7 +1023,7 @@ export default function FormularioAgendamento({
             <button
               onClick={salvarNome}
               disabled={salvandoNome || !nomeEditado.trim() || nomeEditado.trim() === cliente?.nome}
-              className="flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 items-center justify-center gap-2 rounded-xl bg-primary text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {salvandoNome && <span className="form-spinner" aria-hidden="true" />}
               {salvandoNome ? 'Salvando...' : 'Salvar nome'}
@@ -1093,7 +1093,7 @@ export default function FormularioAgendamento({
                       }}
                       className={`flex items-center gap-3 px-4 py-3.5 text-left text-sm font-medium transition-colors duration-200 ${
                         ativo
-                          ? 'bg-blue-50 font-semibold text-blue-700'
+                          ? 'bg-primary-soft font-semibold text-primary'
                           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
                       }`}
                     >
@@ -1170,7 +1170,7 @@ export default function FormularioAgendamento({
     if (estadoAuth === 'carregando' || estadoAuth === 'verificando') {
       return (
         <div className="flex flex-col items-center gap-4 py-16">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="text-sm text-slate-500">
             {estadoAuth === 'carregando' ? 'Carregando…' : 'Verificando seu cadastro…'}
           </p>
@@ -1221,7 +1221,7 @@ export default function FormularioAgendamento({
 
           <button
             type="submit"
-            className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700"
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-primary-hover"
           >
             Entrar
           </button>
@@ -1230,7 +1230,7 @@ export default function FormularioAgendamento({
             Não tem cadastro?{' '}
             <Link
               href={`/cadastro/${salaoId}`}
-              className="font-semibold text-blue-600 underline hover:text-blue-700"
+              className="font-semibold text-primary underline hover:text-primary-hover"
             >
               Fazer cadastro
             </Link>
@@ -1264,7 +1264,7 @@ export default function FormularioAgendamento({
           </p>
           <Link
             href={`/cadastro/${salaoId}`}
-            className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700"
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-primary-hover"
           >
             Fazer cadastro
           </Link>
@@ -1279,7 +1279,7 @@ export default function FormularioAgendamento({
   }
 
   return (
-    <div style={estiloScroll} className="bg-gradient-to-b from-blue-50/60 via-white to-slate-50">
+    <div style={estiloScroll} className="bg-gradient-to-b from-primary-soft via-white to-slate-50">
       <div className="relative flex min-h-full flex-col items-center justify-center px-4 py-10">
         <div className="w-full max-w-sm rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/60">
           <div className="mb-6 text-center">

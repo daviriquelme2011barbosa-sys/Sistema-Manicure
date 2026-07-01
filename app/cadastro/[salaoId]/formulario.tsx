@@ -446,7 +446,7 @@ export default function FormularioCadastroPublico({
                 checked={autorizaContato}
                 onChange={(e) => setAutorizaContato(e.target.checked)}
                 disabled={enviando}
-                className="mt-0.5 h-5 w-5 flex-shrink-0 accent-blue-600"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 accent-primary"
               />
               <span className="text-sm text-slate-600">
                 Autorizo o salão a entrar em contato comigo via WhatsApp para

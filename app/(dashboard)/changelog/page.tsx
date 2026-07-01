@@ -69,7 +69,7 @@ export default function ChangelogPage() {
           <ol className="animar-lista relative flex flex-col gap-0 border-l border-slate-200 pl-5 dark:border-slate-700">
             {entradas.map((entrada) => (
               <li key={entrada.id} className="relative pb-6 last:pb-0">
-                <span className="absolute -left-[21px] flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-600 ring-4 ring-slate-100 dark:ring-slate-900" />
+                <span className="absolute -left-[21px] flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary ring-4 ring-slate-100 dark:ring-slate-900" />
                 <time className="mb-1 block text-xs font-medium text-slate-400 dark:text-slate-500">
                   {formatarData(entrada.criado_em.slice(0, 10))}
                 </time>

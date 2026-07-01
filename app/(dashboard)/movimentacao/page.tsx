@@ -282,7 +282,7 @@ export default function MovimentacaoPage() {
               onClick={() => setFiltro(opcao.valor)}
               className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${
                 filtro === opcao.valor
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-primary text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-600'
               }`}
             >
@@ -337,7 +337,7 @@ function CardMovimentacao({ item }: { item: ItemMovimentacao }) {
         </p>
       </div>
       {item.href && (
-        <span className="flex-shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400">
+        <span className="flex-shrink-0 text-xs font-medium text-primary dark:text-primary">
           Ver →
         </span>
       )}

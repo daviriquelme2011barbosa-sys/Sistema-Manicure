@@ -276,7 +276,7 @@ export default function AgendaPage() {
   if (carregando) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     )
   }
@@ -318,7 +318,7 @@ export default function AgendaPage() {
           onClick={() => setAba('configurar')}
           className={`flex-1 py-3 text-sm font-medium transition ${
             aba === 'configurar'
-              ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+              ? 'border-b-2 border-primary text-primary dark:text-primary'
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
@@ -328,13 +328,13 @@ export default function AgendaPage() {
           onClick={() => setAba('agendamentos')}
           className={`flex-1 py-3 text-sm font-medium transition ${
             aba === 'agendamentos'
-              ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+              ? 'border-b-2 border-primary text-primary dark:text-primary'
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Agendamentos
           {agendamentosPendentes.length > 0 && (
-            <span className="ml-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+            <span className="ml-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
               {agendamentosPendentes.length}
             </span>
           )}
@@ -359,7 +359,7 @@ export default function AgendaPage() {
                   </span>
                   <button
                     onClick={copiarLink}
-                    className="flex-shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                    className="flex-shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
                   >
                     {copiado ? 'Copiado!' : 'Copiar'}
                   </button>
@@ -380,7 +380,7 @@ export default function AgendaPage() {
                   <select
                     value={duracaoAtendimento}
                     onChange={(e) => setDuracaoAtendimento(Number(e.target.value))}
-                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
                     <option value={30}>30 minutos</option>
                     <option value={45}>45 minutos</option>
@@ -396,7 +396,7 @@ export default function AgendaPage() {
                   <select
                     value={intervaloEntre}
                     onChange={(e) => setIntervaloEntre(Number(e.target.value))}
-                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
                     <option value={0}>Sem intervalo</option>
                     <option value={10}>10 minutos</option>
@@ -419,7 +419,7 @@ export default function AgendaPage() {
                     key={key}
                     className={`rounded-xl border bg-white p-4 transition dark:bg-slate-800 ${
                       dia.ativo
-                        ? 'border-blue-200 dark:border-blue-900/40'
+                        ? 'border-primary/30 dark:border-primary/30'
                         : 'border-slate-200 dark:border-slate-700'
                     }`}
                   >
@@ -432,7 +432,7 @@ export default function AgendaPage() {
                         aria-checked={dia.ativo}
                         onClick={() => atualizarDia(key, 'ativo', !dia.ativo)}
                         className={`relative flex h-6 w-11 flex-shrink-0 items-center rounded-full transition ${
-                          dia.ativo ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
+                          dia.ativo ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700'
                         }`}
                       >
                         <span
@@ -454,7 +454,7 @@ export default function AgendaPage() {
                               type="time"
                               value={dia.inicio}
                               onChange={(e) => atualizarDia(key, 'inicio', e.target.value)}
-                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
@@ -465,7 +465,7 @@ export default function AgendaPage() {
                               type="time"
                               value={dia.fim}
                               onChange={(e) => atualizarDia(key, 'fim', e.target.value)}
-                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                             />
                           </div>
                         </div>
@@ -476,7 +476,7 @@ export default function AgendaPage() {
                             aria-checked={dia.pausaAtivo}
                             onClick={() => atualizarDia(key, 'pausaAtivo', !dia.pausaAtivo)}
                             className={`relative flex h-5 w-9 flex-shrink-0 items-center rounded-full transition ${
-                              dia.pausaAtivo ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
+                              dia.pausaAtivo ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700'
                             }`}
                           >
                             <span
@@ -502,7 +502,7 @@ export default function AgendaPage() {
                                 onChange={(e) =>
                                   atualizarDia(key, 'pausaInicio', e.target.value)
                                 }
-                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               />
                             </div>
                             <div className="flex flex-col gap-1.5">
@@ -513,7 +513,7 @@ export default function AgendaPage() {
                                 type="time"
                                 value={dia.pausaFim}
                                 onChange={(e) => atualizarDia(key, 'pausaFim', e.target.value)}
-                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               />
                             </div>
                           </div>
@@ -528,7 +528,7 @@ export default function AgendaPage() {
             <button
               onClick={salvarConfig}
               disabled={salvandoConfig}
-              className="flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {salvandoConfig ? 'Salvando…' : 'Salvar configuração'}
             </button>

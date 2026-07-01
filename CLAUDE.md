@@ -230,6 +230,8 @@ A tabela `convites` não tem policies de usuário — acessada exclusivamente vi
 
 Toda UI deve seguir `docs/design-system.md` antes de criar ou editar qualquer componente visual.
 
+Antes de qualquer reforma visual, ler também `docs/auditoria-ui.md` e seguir suas diretrizes de auditoria crítica de UI/UX.
+
 - Use SEMPRE tokens semânticos (`bg-surface`, `text-secondary`, `shadow-sm`, `rounded-xl`...), nunca hex direto.
 - Componentes referenciam tokens; tokens referenciam primitivos.
 - Suportar light e dark via `data-theme`.

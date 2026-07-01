@@ -130,7 +130,7 @@ export default function FormularioOnboarding({ token }: Props) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fdf2f8] px-4">
         <div className="w-full max-w-sm text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="mt-4 text-sm text-zinc-500">Verificando seu convite…</p>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function FormularioOnboarding({ token }: Props) {
             <button
               type="button"
               onClick={() => router.replace('/login')}
-              className="mt-6 h-12 w-full rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
+              className="mt-6 h-12 w-full rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
             >
               Entendido
             </button>
@@ -329,7 +329,7 @@ export default function FormularioOnboarding({ token }: Props) {
               <button
                 type="button"
                 onClick={() => setModalAberto(null)}
-                className="h-11 w-full rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700"
+                className="h-11 w-full rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover"
               >
                 Entendi
               </button>
@@ -362,7 +362,7 @@ export default function FormularioOnboarding({ token }: Props) {
                   onChange={(e) => setNomeSalao(e.target.value)}
                   disabled={salvando}
                   placeholder="Seu nome"
-                  className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-zinc-100 ${
+                  className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-primary/40 disabled:bg-zinc-100 ${
                     erros.nomeSalao ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
                   }`}
                 />
@@ -404,7 +404,7 @@ export default function FormularioOnboarding({ token }: Props) {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={salvando}
                   placeholder="seu@email.com"
-                  className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-blue-500 disabled:bg-zinc-100 ${
+                  className={`h-12 rounded-xl border px-4 text-base text-zinc-900 placeholder:text-zinc-400 shadow-sm outline-none transition focus:ring-2 focus:ring-primary/40 disabled:bg-zinc-100 ${
                     erros.email ? 'border-red-500 focus:ring-red-400' : 'border-zinc-300'
                   }`}
                 />
@@ -469,14 +469,14 @@ export default function FormularioOnboarding({ token }: Props) {
                   checked={termosAceitos}
                   onChange={(e) => setTermosAceitos(e.target.checked)}
                   disabled={salvando}
-                  className="mt-0.5 h-5 w-5 flex-shrink-0 accent-blue-600"
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 accent-primary"
                 />
                 <span className="text-sm text-zinc-600 leading-relaxed">
                   Li e aceito os{' '}
                   <button
                     type="button"
                     onClick={() => setModalAberto('termos')}
-                    className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
+                    className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
                   >
                     Termos de Uso
                   </button>
@@ -484,7 +484,7 @@ export default function FormularioOnboarding({ token }: Props) {
                   <button
                     type="button"
                     onClick={() => setModalAberto('privacidade')}
-                    className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
+                    className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
                   >
                     Política de Privacidade
                   </button>
@@ -494,7 +494,7 @@ export default function FormularioOnboarding({ token }: Props) {
               <button
                 type="submit"
                 disabled={salvando || !termosAceitos}
-                className="mt-1 h-12 rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-1 h-12 rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {salvando ? 'Criando conta…' : 'Criar minha conta'}
               </button>

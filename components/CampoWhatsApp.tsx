@@ -22,25 +22,25 @@ const ESTILOS: Record<
 > = {
   publico: {
     container:
-      'border-slate-200 bg-white focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20',
+      'border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30',
     containerErro:
       'border-red-500 bg-white focus-within:ring-2 focus-within:ring-red-500/20',
     texto: 'text-slate-900',
     placeholder: 'placeholder:text-slate-400',
     dropdown: 'border-slate-200 bg-white',
     opcao: 'text-slate-700 hover:bg-slate-50',
-    opcaoAtiva: 'bg-blue-50 text-blue-700',
+    opcaoAtiva: 'bg-primary-soft text-primary',
   },
   painel: {
     container:
-      'border-slate-200 bg-white focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800',
+      'border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30 dark:border-slate-700 dark:bg-slate-800',
     containerErro:
       'border-red-500 bg-white focus-within:ring-2 focus-within:ring-red-500/20 dark:bg-slate-800',
     texto: 'text-slate-900 dark:text-slate-100',
     placeholder: 'placeholder:text-slate-400 dark:placeholder:text-slate-500',
     dropdown: 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800',
     opcao: 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700',
-    opcaoAtiva: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
+    opcaoAtiva: 'bg-primary-soft text-primary dark:bg-primary-soft dark:text-primary',
   },
 }
 

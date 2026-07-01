@@ -124,7 +124,7 @@ export default function ClientesPage() {
           placeholder="Buscar pelo nome…"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          className="h-11 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-blue-500"
+          className="h-11 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-primary/40"
         />
       </div>
 

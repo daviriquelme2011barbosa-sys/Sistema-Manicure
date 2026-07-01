@@ -51,7 +51,7 @@ type ModalSaibaMais = 'termos' | 'privacidade' | 'sobre' | null
 
 // Cores por módulo — usadas apenas em ícones, indicadores e destaques de navegação
 const COR_MODULO: Record<string, string> = {
-  '/': '#2563EB', // Início (Dashboard)
+  '/': '#7C5CFF', // Início (Dashboard) — cor primária da marca
   '/clientes': '#8B5CF6', // Clientes
   '/cadastrados': '#8B5CF6',
   '/agenda': '#14B8A6', // Agenda
@@ -643,8 +643,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (verificando) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-bg dark:bg-slate-900">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     )
   }
@@ -660,7 +660,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Header fixo: hamburguer + título | busca global | notificações + avatar */}
       <header
-        className={`chrome-header fixed right-0 top-0 z-30 flex h-16 items-center gap-2 border-b border-slate-200 bg-white/85 px-2 backdrop-blur-md sm:gap-3 sm:px-4 dark:border-slate-700 dark:bg-slate-800/85 left-0 ${
+        className={`chrome-header fixed right-0 top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-topbar px-2 backdrop-blur-md sm:gap-3 sm:px-4 dark:border-slate-700 dark:bg-slate-800/85 left-0 ${
           sidebarRecolhida ? 'lg:left-[4.5rem]' : 'lg:left-64'
         }`}
       >
@@ -698,7 +698,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onChange={(e) => setBuscaGlobal(e.target.value)}
             onFocus={() => setBuscaAberta(true)}
             placeholder="Buscar clientes, agendamentos..."
-            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-800"
+            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-800"
           />
           {buscaAberta && buscaGlobal.trim().length >= 2 && (
             <PainelResultadosBusca
@@ -878,7 +878,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 value={buscaGlobal}
                 onChange={(e) => setBuscaGlobal(e.target.value)}
                 placeholder="Buscar clientes, agendamentos..."
-                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 shadow-lg outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 shadow-lg outline-none transition placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
             </div>
             {buscaGlobal.trim().length >= 2 && (
@@ -904,14 +904,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar — drawer no mobile, fixa e recolhível no desktop */}
       <aside
-        className={`chrome-sidebar fixed left-0 top-0 z-40 flex h-[100dvh] w-72 max-w-[80vw] flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 lg:max-w-none lg:translate-x-0 ${
+        className={`chrome-sidebar fixed left-0 top-0 z-40 flex h-[100dvh] w-72 max-w-[80vw] flex-col border-r border-border bg-sidebar dark:border-slate-700 dark:bg-slate-800 lg:max-w-none lg:translate-x-0 ${
           menuAberto ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         } ${sidebarRecolhida ? 'lg:w-[4.5rem]' : 'lg:w-64'}`}
         aria-label="Menu de navegação"
       >
         {/* Marca + fechar (mobile) */}
         <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-700">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 text-sm font-bold text-white shadow-sm">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-teal-500 text-sm font-bold text-white shadow-sm">
             {(nomeSalao || 'F').charAt(0).toUpperCase()}
           </div>
           <span
@@ -1178,14 +1178,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     </span>
                     <button
                       onClick={copiarLink}
-                      className="flex-shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                      className="flex-shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
                     >
                       {copiado ? 'Copiado!' : 'Copiar link'}
                     </button>
                   </div>
                   <button
                     onClick={baixarQrCode}
-                    className="self-start text-sm text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400"
+                    className="self-start text-sm text-primary hover:text-primary-hover hover:underline dark:text-primary"
                   >
                     Baixar QR Code
                   </button>
@@ -1380,7 +1380,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="flex-shrink-0 border-t border-slate-200 px-5 pb-6 pt-4 dark:border-slate-700">
               <button
                 onClick={() => setModalSaibaMais(null)}
-                className="h-11 w-full rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                className="h-11 w-full rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
               >
                 Fechar
               </button>
@@ -1407,7 +1407,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       <div
-        className={`chrome-shell min-h-screen bg-slate-50 pt-16 dark:bg-slate-900 ${
+        className={`chrome-shell min-h-screen bg-bg pt-16 dark:bg-slate-900 ${
           sidebarRecolhida ? 'lg:pl-[4.5rem]' : 'lg:pl-64'
         }`}
       >
@@ -1564,7 +1564,7 @@ function BlocoLink({
         </span>
         <button
           onClick={onCopiar}
-          className="flex-shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
+          className="flex-shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
         >
           {copiado ? 'Copiado!' : 'Copiar'}
         </button>
@@ -1645,7 +1645,7 @@ function ModalPrimeirosPassos({
         <div className="flex-shrink-0 border-t border-slate-200 px-5 pb-6 pt-4 dark:border-slate-700">
           <button
             onClick={onFechar}
-            className="h-11 w-full rounded-xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700 active:bg-blue-800"
+            className="h-11 w-full rounded-xl bg-primary font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
           >
             Entendido
           </button>
@@ -1667,7 +1667,7 @@ function Avatar({ fotoUrl, nome }: { fotoUrl: string; nome: string }) {
     )
   }
   return (
-    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-teal-500 text-sm font-semibold text-white">
+    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-teal-500 text-sm font-semibold text-white">
       {(nome || 'A').charAt(0).toUpperCase()}
     </div>
   )
@@ -1802,14 +1802,14 @@ function MenuItem({
       href={href}
       onClick={onNavegar}
       title={recolhida ? label : undefined}
-      style={ativo ? { backgroundColor: `${cor}14`, color: cor } : undefined}
+      style={ativo ? { backgroundImage: 'var(--gradient-primary)', color: '#fff' } : undefined}
       className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
         ativo
-          ? 'font-semibold'
+          ? 'font-semibold shadow-sm'
           : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
       } ${recolhida ? 'lg:justify-center lg:px-0' : ''}`}
     >
-      <span className="relative flex-shrink-0" style={{ color: cor }}>
+      <span className="relative flex-shrink-0" style={{ color: ativo ? '#fff' : cor }}>
         {children}
         {badge ? (
           <span

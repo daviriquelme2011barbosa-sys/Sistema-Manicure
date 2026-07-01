@@ -366,7 +366,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
             {carregandoPreco ? (
               <div className="h-12 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-700/50 animate-pulse" />
             ) : cliente.ultima_visita ? (
-              <div className={`flex h-12 items-center overflow-hidden rounded-lg border border-slate-200 transition-colors duration-200 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-700 ${salvandoEdicao || excluindo ? 'bg-slate-100 dark:bg-slate-700/50' : 'bg-white dark:bg-slate-800'}`}>
+              <div className={`flex h-12 items-center overflow-hidden rounded-lg border border-slate-200 transition-colors duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30 dark:border-slate-700 ${salvandoEdicao || excluindo ? 'bg-slate-100 dark:bg-slate-700/50' : 'bg-white dark:bg-slate-800'}`}>
                 <span className="flex-shrink-0 pl-4 pr-2 text-sm select-none text-slate-500 dark:text-slate-400">
                   R$
                 </span>
@@ -416,7 +416,7 @@ export function ModalEdicaoCliente({ cliente, onFechar, onSalvo, onExcluido, mos
               checked={edicao.autorizaContato}
               onChange={(e) => setEdicao((prev) => ({ ...prev, autorizaContato: e.target.checked }))}
               disabled={salvandoEdicao || excluindo}
-              className="mt-0.5 h-5 w-5 flex-shrink-0 accent-blue-600"
+              className="mt-0.5 h-5 w-5 flex-shrink-0 accent-primary"
             />
             <span className="text-sm text-slate-600 dark:text-slate-400">
               Cliente autoriza contato via WhatsApp

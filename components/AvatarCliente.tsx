@@ -20,7 +20,7 @@ export function AvatarCliente({ fotoUrl, nome, className = 'h-9 w-9 text-sm' }: 
 
   return (
     <span
-      className={`flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-teal-500 font-semibold text-white ${className}`}
+      className={`flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-teal-500 font-semibold text-white ${className}`}
       aria-hidden="true"
     >
       {inicial}
