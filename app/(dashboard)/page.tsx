@@ -296,7 +296,7 @@ function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
             <div
               key={gi}
               aria-hidden={gi !== paginaAtual}
-              className={`grid w-full flex-shrink-0 grid-cols-2 gap-3 transition-opacity duration-300 lg:grid-cols-3 ${
+              className={`grid w-full flex-shrink-0 grid-cols-2 gap-5 transition-opacity duration-300 lg:grid-cols-3 ${
                 gi === paginaAtual ? 'opacity-100' : 'pointer-events-none opacity-0'
               }`}
             >
@@ -1257,7 +1257,7 @@ export default function DashboardPage() {
 
         {/* Carrossel de KPIs (grupos de 3) */}
         {carregando ? (
-          <div className="grid grid-cols-2 gap-3 px-4 pt-4 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-5 px-4 pt-4 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
@@ -1268,7 +1268,7 @@ export default function DashboardPage() {
 
         {/* Donut de status + colunas: clientes recentes · agenda de hoje · ações rápidas */}
         {carregando ? (
-          <div className="grid grid-cols-1 gap-3 px-4 pt-4 pb-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 px-4 pt-6 pb-4 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -1277,7 +1277,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : dados ? (
-          <div className="grid grid-cols-1 gap-3 px-4 pt-4 pb-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 px-4 pt-6 pb-4 lg:grid-cols-4">
             <DonutStatus
               ativas={dados.clientesAtivas}
               atencao={dados.clientesAtencao}
