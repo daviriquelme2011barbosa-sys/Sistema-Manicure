@@ -1192,7 +1192,7 @@ export default function DashboardPage() {
 
   const kpis: KpiItem[] = dados
     ? [
-        { key: 'ativas', icone: <IcAtivas />, numero: dados.clientesAtivasCard, rotulo: rotuloAtivas, href: '/clientes', cor: '#8B5CF6', ...iconeMarca, serie: dados.series.ativas },
+        { key: 'ativas', icone: <IcAtivas />, numero: dados.clientesAtivasCard, rotulo: rotuloAtivas, href: '/clientes', cor: '#7C3AE3', ...iconeMarca, serie: dados.series.ativas },
         { key: 'sumidas', icone: <IcSumidas />, numero: dados.clientesSumidas, rotulo: 'Sumidas', href: '/reativar', cor: '#EF4444', ...iconeSumidas, serie: dados.series.sumidas },
         { key: 'aniversariantes', icone: <IcAniversariantes />, numero: dados.aniversariantesDoMes, rotulo: 'Aniversariantes do mês', href: '/aniversariantes', cor: '#F59E0B', ...iconeMarca, serie: dados.series.aniversariantes },
         { key: 'atendimentos', icone: <IcAtendimentos />, numero: dados.atendimentosDoMes, rotulo: rotuloAtendimentos, href: '/historico', cor: '#14B8A6', ...iconeMarca, serie: dados.series.atendimentos },

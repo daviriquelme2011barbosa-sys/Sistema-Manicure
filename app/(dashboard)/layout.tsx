@@ -51,14 +51,14 @@ type ModalSaibaMais = 'termos' | 'privacidade' | 'sobre' | null
 
 // Cores por módulo — usadas apenas em ícones, indicadores e destaques de navegação
 const COR_MODULO: Record<string, string> = {
-  '/': '#7C5CFF', // Início (Dashboard) — cor primária da marca
-  '/clientes': '#8B5CF6', // Clientes
-  '/cadastrados': '#8B5CF6',
+  '/': '#7C3AE3', // Início (Dashboard) — cor primária da marca
+  '/clientes': '#BB5CF6', // Clientes
+  '/cadastrados': '#BB5CF6',
   '/agenda': '#14B8A6', // Agenda
   '/faltaram': '#F59E0B',
   '/cadastro': '#22C55E', // Registrar Atendimento
   '/reativar': '#EF4444',
-  '/aniversariantes': '#8B5CF6',
+  '/aniversariantes': '#BB5CF6',
   '/historico': '#64748B',
   '/movimentacao': '#3B82F6',
   '/changelog': '#F59E0B',
@@ -753,7 +753,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     <>
                       {badgeCadastrados > 0 && (
                         <NotifItem
-                          cor="#8B5CF6"
+                          cor="#BB5CF6"
                           texto={`${badgeCadastrados} ${badgeCadastrados === 1 ? 'cliente aguardando' : 'clientes aguardando'} aprovação`}
                           onClick={() => irPara('/cadastrados')}
                         >
@@ -1874,7 +1874,7 @@ function PainelResultadosBusca({
                 >
                   <span
                     className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: '#8B5CF61A', color: '#8B5CF6' }}
+                    style={{ backgroundColor: '#BB5CF61A', color: '#BB5CF6' }}
                   >
                     <IconePessoa />
                   </span>

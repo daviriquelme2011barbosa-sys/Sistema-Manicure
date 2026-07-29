@@ -20,6 +20,7 @@ export default {
         surface: { DEFAULT: "var(--color-surface)", 2: "var(--color-surface-2)" },
         sidebar: "var(--color-sidebar)",
         topbar: "var(--color-topbar)",
+        hover: "var(--color-hover)",
         border: { DEFAULT: "var(--color-border)", strong: "var(--color-border-strong)" },
         divider: "var(--color-divider)",
         text: {

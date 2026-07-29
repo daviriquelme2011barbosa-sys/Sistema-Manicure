@@ -55,7 +55,7 @@ const SECOES_MENU: { id: Secao; label: string; Icone: () => React.ReactElement; 
   { id: 'agendar', label: 'Agendar', Icone: IconeAgenda, cor: '#14B8A6' },
   { id: 'agendamentos', label: 'Meus Agendamentos', Icone: IconeLista, cor: '#F59E0B' },
   { id: 'historico', label: 'Histórico', Icone: IconeRelogio, cor: '#64748B' },
-  { id: 'perfil', label: 'Meu Perfil', Icone: IconePessoa, cor: '#8B5CF6' },
+  { id: 'perfil', label: 'Meu Perfil', Icone: IconePessoa, cor: '#BB5CF6' },
 ]
 
 function formatarDataBR(dataISO: string): string {

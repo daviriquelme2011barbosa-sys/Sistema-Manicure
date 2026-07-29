@@ -191,27 +191,30 @@ Estes são os **valores brutos**. Nunca use um primitivo direto no componente �
 
 Regra de ouro: **componentes referenciam tokens semânticos, tokens semânticos referenciam primitivos.** Trocar o tema = trocar o mapeamento, sem tocar nos componentes.
 
+> **Paleta canônica dark — navy (não neutro):** o dark theme deste projeto usa um fundo **navy profundo**, não o near-black neutro genérico descrito na Parte 1/2 como filosofia geral de "cinza frio". Os valores desta tabela são a fonte da verdade; onde a Parte 2 mencionar hex antigo (`#0B0C0F`, `#7C5CFF`), prevalece o valor abaixo.
+
 | Token semântico | Light | Dark | Uso |
 |---|---|---|---|
-| `--color-primary`        | `violet-500` | `violet-500` | Ação principal, marca |
-| `--color-primary-hover`  | `violet-600` | `violet-400` | Hover do primário |
-| `--color-primary-pressed`| `violet-700` | `violet-500` | Estado pressionado |
-| `--color-primary-soft`   | `violet-50`  | `rgba(124,92,255,.14)` | Fundo suave (ícone ativo, tag) |
+| `--color-primary`        | `#7C3AE3` | `#7C3AE3` | Ação principal, marca |
+| `--color-primary-hover`  | `#6B27D4` | `#BB5CF6` | Hover do primário |
+| `--color-primary-pressed`| `#5A16BA` | `#7C3AE3` | Estado pressionado |
+| `--color-primary-soft`   | `#F3EAFE`  | `rgba(124,58,227,.16)` | Fundo suave (ícone ativo, tag) |
 | `--color-secondary`      | `teal-500`   | `teal-400`   | Segunda ação (agendar/reservar) |
 | `--color-secondary-hover`| `teal-600`   | `teal-300`   | Hover secundário |
-| `--color-bg`             | `slate-100` `#F6F7F9` | `slate-950` `#0B0C0F` | Fundo do app |
-| `--color-surface`        | `slate-0` `#FFFFFF` | `slate-900` `#16181D` | Card, painel |
-| `--color-surface-2`      | `slate-50` `#F9FAFB` | `slate-850` `#171A21` | Fundo interno, hover de linha |
-| `--color-sidebar`        | `#FFFFFF` | `#0E0F13` | Fundo da sidebar |
-| `--color-topbar`         | `#FFFFFF` | `#0E0F13` | Fundo da topbar |
-| `--color-border`         | `#E8EAEE` | `rgba(255,255,255,.08)` | Borda hairline padrão |
-| `--color-border-strong`  | `slate-200` `#E5E7EB` | `rgba(255,255,255,.14)` | Borda de ênfase |
-| `--color-divider`        | `#EEF0F3` | `rgba(255,255,255,.06)` | Separadores internos |
-| `--color-text`           | `#16181D` | `#F5F6F8` | Texto primário |
-| `--color-text-secondary` | `slate-500` `#667085` | `#A0A6B2` | Texto de apoio |
-| `--color-text-muted`     | `slate-400` `#98A2B3` | `#6B7280` | Legendas, metadados |
+| `--color-bg`             | `slate-100` `#F6F7F9` | **navy** `#0B1220` | Fundo do app |
+| `--color-surface`        | `slate-0` `#FFFFFF` | **navy** `#111827` | Card, painel |
+| `--color-surface-2`      | `slate-50` `#F9FAFB` | **navy** `#1A2333` | Fundo interno, modal, disabled |
+| `--color-hover`          | `slate-150` `#EEF0F3` | **navy** `#202B3E` | Hover de item/linha (camada acima do surface-2) |
+| `--color-sidebar`        | `#FFFFFF` | `#0D1524` | Fundo da sidebar |
+| `--color-topbar`         | `#FFFFFF` | `#0E1728` | Fundo da topbar |
+| `--color-border`         | `#E8EAEE` | `rgba(148,163,184,.12)` | Borda hairline padrão |
+| `--color-border-strong`  | `slate-200` `#E5E7EB` | `rgba(148,163,184,.20)` | Borda de ênfase |
+| `--color-divider`        | `#EEF0F3` | `rgba(148,163,184,.08)` | Separadores internos |
+| `--color-text`           | `#16181D` | `#F8FAFC` | Texto primário |
+| `--color-text-secondary` | `slate-500` `#667085` | `#94A3B8` | Texto de apoio |
+| `--color-text-muted`     | `slate-400` `#98A2B3` | `#64748B` | Legendas, metadados |
 | `--color-text-on-primary`| `#FFFFFF` | `#FFFFFF` | Texto sobre botão/marca |
-| `--color-icon`           | `slate-500` | `#A0A6B2` | Ícone inerte |
+| `--color-icon`           | `slate-500` | `#94A3B8` | Ícone inerte |
 | `--color-icon-active`    | `--color-primary` | `--color-primary` | Ícone ativo |
 | `--color-success`        | `green-500` | `green-400` | Positivo |
 | `--color-success-soft`   | `green-50`  | `rgba(34,197,94,.14)` | Fundo de badge sucesso |
@@ -221,8 +224,9 @@ Regra de ouro: **componentes referenciam tokens semânticos, tokens semânticos 
 | `--color-danger-soft`    | `red-50`    | `rgba(239,68,68,.14)` | Fundo badge erro |
 | `--color-info`           | `blue-500`  | `blue-400`  | Informação neutra |
 | `--color-overlay`        | `rgba(16,18,29,.48)` | `rgba(0,0,0,.64)` | Fundo de modal |
-| `--color-glass`          | `rgba(255,255,255,.72)` | `rgba(22,24,29,.72)` | Vidro (blur) |
-| `--color-focus`          | `rgba(124,92,255,.45)` | `rgba(124,92,255,.55)` | Anel de foco |
+| `--color-glass`          | `rgba(255,255,255,.72)` | `rgba(17,24,39,.72)` | Vidro (blur, tingido de navy) |
+| `--color-focus`          | `rgba(124,58,227,.45)` | `rgba(124,58,227,.55)` | Anel de foco |
+| `--glow-primary` (só dark)| — | `0 0 0 1px rgba(124,58,227,.35), 0 0 28px rgba(124,58,227,.25)` | Elevação de card no hover (substitui sombra escura) |
 
 ### Mapa de status → semântica de negócio
 Fixe isto e nunca mude:
@@ -901,16 +905,16 @@ Princípio: **mesma linguagem, densidade menor, polegar no comando.** Nada de "e
   --ease-spring: cubic-bezier(.34,1.56,.64,1);
 
   /* brand gradient */
-  --gradient-primary: linear-gradient(135deg,#7C5CFF 0%,#6D3BEE 100%);
+  --gradient-primary: linear-gradient(135deg,#7C3AE3 0%,#6423BE 100%);
 }
 
 /* LIGHT (default) */
 :root {
-  --color-primary:#7C5CFF; --color-primary-hover:#6B45F0; --color-primary-pressed:#5A34D6;
-  --color-primary-soft:#F3F0FF;
+  --color-primary:#7C3AE3; --color-primary-hover:#6B27D4; --color-primary-pressed:#5A16BA;
+  --color-primary-soft:#F3EAFE;
   --color-secondary:#14B8A6; --color-secondary-hover:#0D9488;
   --color-bg:#F6F7F9; --color-surface:#FFFFFF; --color-surface-2:#F9FAFB;
-  --color-sidebar:#FFFFFF; --color-topbar:#FFFFFF;
+  --color-sidebar:#FFFFFF; --color-topbar:#FFFFFF; --color-hover:#EEF0F3;
   --color-border:#E8EAEE; --color-border-strong:#E5E7EB; --color-divider:#EEF0F3;
   --color-text:#16181D; --color-text-secondary:#667085; --color-text-muted:#98A2B3;
   --color-text-on-primary:#FFFFFF; --color-icon:#667085;
@@ -919,34 +923,35 @@ Princípio: **mesma linguagem, densidade menor, polegar no comando.** Nada de "e
   --color-danger:#EF4444;  --color-danger-soft:#FDECEC;
   --color-info:#3B82F6;
   --color-overlay:rgba(16,18,29,.48); --color-glass:rgba(255,255,255,.72);
-  --color-focus:rgba(124,92,255,.45);
+  --color-focus:rgba(124,58,227,.45);
   --shadow-sm:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04);
   --shadow-md:0 4px 12px rgba(16,24,40,.08);
   --shadow-lg:0 12px 28px rgba(16,24,40,.12);
   --shadow-xl:0 24px 48px rgba(16,24,40,.16);
 }
 
-/* DARK */
+/* DARK — navy canônico (não neutro genérico) */
 :root[data-theme="dark"], .dark {
-  --color-primary:#7C5CFF; --color-primary-hover:#957AFF; --color-primary-pressed:#7C5CFF;
-  --color-primary-soft:rgba(124,92,255,.14);
+  --color-primary:#7C3AE3; --color-primary-hover:#BB5CF6; --color-primary-pressed:#7C3AE3;
+  --color-primary-soft:rgba(124,58,227,.16);
   --color-secondary:#2DD4BF; --color-secondary-hover:#5EE7D2;
-  --color-bg:#0B0C0F; --color-surface:#16181D; --color-surface-2:#171A21;
-  --color-sidebar:#0E0F13; --color-topbar:#0E0F13;
-  --color-border:rgba(255,255,255,.08); --color-border-strong:rgba(255,255,255,.14);
-  --color-divider:rgba(255,255,255,.06);
-  --color-text:#F5F6F8; --color-text-secondary:#A0A6B2; --color-text-muted:#6B7280;
-  --color-text-on-primary:#FFFFFF; --color-icon:#A0A6B2;
+  --color-bg:#0B1220; --color-surface:#111827; --color-surface-2:#1A2333;
+  --color-sidebar:#0D1524; --color-topbar:#0E1728; --color-hover:#202B3E;
+  --color-border:rgba(148,163,184,.12); --color-border-strong:rgba(148,163,184,.20);
+  --color-divider:rgba(148,163,184,.08);
+  --color-text:#F8FAFC; --color-text-secondary:#94A3B8; --color-text-muted:#64748B;
+  --color-text-on-primary:#FFFFFF; --color-icon:#94A3B8;
   --color-success:#4ADE80; --color-success-soft:rgba(34,197,94,.14);
   --color-warning:#FBBF24; --color-warning-soft:rgba(245,158,11,.14);
   --color-danger:#F87171;  --color-danger-soft:rgba(239,68,68,.14);
   --color-info:#60A5FA;
-  --color-overlay:rgba(0,0,0,.64); --color-glass:rgba(22,24,29,.72);
-  --color-focus:rgba(124,92,255,.55);
+  --color-overlay:rgba(0,0,0,.64); --color-glass:rgba(17,24,39,.72);
+  --color-focus:rgba(124,58,227,.55);
   --shadow-sm:0 1px 2px rgba(0,0,0,.40);
   --shadow-md:0 6px 20px rgba(0,0,0,.45);
   --shadow-lg:0 16px 40px rgba(0,0,0,.55);
   --shadow-xl:0 24px 56px rgba(0,0,0,.6);
+  --glow-primary:0 0 0 1px rgba(124,58,227,.35), 0 0 28px rgba(124,58,227,.25);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -979,6 +984,7 @@ export default {
         surface: { DEFAULT: "var(--color-surface)", 2: "var(--color-surface-2)" },
         sidebar: "var(--color-sidebar)",
         topbar: "var(--color-topbar)",
+        hover: "var(--color-hover)",
         border: { DEFAULT: "var(--color-border)", strong: "var(--color-border-strong)" },
         divider: "var(--color-divider)",
         text: {
