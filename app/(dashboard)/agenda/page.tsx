@@ -275,20 +275,20 @@ export default function AgendaPage() {
 
   if (carregando) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-bg">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-secondary border-t-transparent" />
       </div>
     )
   }
 
   if (plano !== 'profissional' && plano !== 'master') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 text-center dark:bg-slate-900">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-4 text-center">
         <p className="text-4xl">🔒</p>
-        <h1 className="mt-4 text-base font-semibold text-slate-900 dark:text-slate-100">
+        <h1 className="mt-4 text-base font-semibold text-text">
           Recurso exclusivo
         </h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-sm text-text-secondary">
           A Agenda está disponível nos planos Profissional e Master.
         </p>
       </div>
@@ -302,24 +302,24 @@ export default function AgendaPage() {
   const agendamentosCancelados = agendamentos.filter((a) => a.status === 'cancelado')
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 pb-24 dark:bg-slate-900">
+    <div className="flex min-h-screen flex-col bg-bg pb-24">
       <ToastView toast={toast} />
 
-      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
-        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Agenda</h1>
-        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+      <header className="border-b border-border bg-surface px-4 py-4">
+        <h1 className="text-base font-semibold text-text">Agenda</h1>
+        <p className="mt-0.5 text-xs text-text-muted">
           Configure seus horários e gerencie agendamentos
         </p>
       </header>
 
-      {/* Abas */}
-      <div className="sticky top-14 z-10 flex border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+      {/* Abas — acento do módulo Agenda é teal (secondary) */}
+      <div className="sticky top-14 z-10 flex border-b border-border bg-surface">
         <button
           onClick={() => setAba('configurar')}
           className={`flex-1 py-3 text-sm font-medium transition ${
             aba === 'configurar'
-              ? 'border-b-2 border-primary text-primary dark:text-primary'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              ? 'border-b-2 border-secondary text-secondary'
+              : 'text-text-secondary hover:text-text'
           }`}
         >
           Configurar
@@ -328,13 +328,13 @@ export default function AgendaPage() {
           onClick={() => setAba('agendamentos')}
           className={`flex-1 py-3 text-sm font-medium transition ${
             aba === 'agendamentos'
-              ? 'border-b-2 border-primary text-primary dark:text-primary'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              ? 'border-b-2 border-secondary text-secondary'
+              : 'text-text-secondary hover:text-text'
           }`}
         >
           Agendamentos
           {agendamentosPendentes.length > 0 && (
-            <span className="ml-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+            <span className="ml-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-bold text-white">
               {agendamentosPendentes.length}
             </span>
           )}
@@ -346,20 +346,20 @@ export default function AgendaPage() {
           <div className="flex flex-col gap-5">
             {/* Link de agendamento */}
             {linkAgendamento && (
-              <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <div className="rounded-xl border border-border bg-surface p-4">
+                <p className="text-sm font-medium text-text">
                   Link de agendamento
                 </p>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                <p className="mt-0.5 text-xs text-text-secondary">
                   Compartilhe para que suas clientes possam agendar online
                 </p>
-                <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-800">
-                  <span className="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-2 flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2.5">
+                  <span className="min-w-0 flex-1 truncate text-xs text-text-secondary">
                     {linkAgendamento}
                   </span>
                   <button
                     onClick={copiarLink}
-                    className="flex-shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
+                    className="flex-shrink-0 rounded-md bg-secondary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-secondary-hover"
                   >
                     {copiado ? 'Copiado!' : 'Copiar'}
                   </button>
@@ -368,19 +368,19 @@ export default function AgendaPage() {
             )}
 
             {/* Configurações gerais */}
-            <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-              <p className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <p className="mb-3 text-sm font-medium text-text">
                 Configurações gerais
               </p>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                  <label className="text-xs font-medium text-text-secondary">
                     Duração do atendimento
                   </label>
                   <select
                     value={duracaoAtendimento}
                     onChange={(e) => setDuracaoAtendimento(Number(e.target.value))}
-                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="form-select h-11 text-sm"
                   >
                     <option value={30}>30 minutos</option>
                     <option value={45}>45 minutos</option>
@@ -390,13 +390,13 @@ export default function AgendaPage() {
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                  <label className="text-xs font-medium text-text-secondary">
                     Intervalo entre atendimentos
                   </label>
                   <select
                     value={intervaloEntre}
                     onChange={(e) => setIntervaloEntre(Number(e.target.value))}
-                    className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="form-select h-11 text-sm"
                   >
                     <option value={0}>Sem intervalo</option>
                     <option value={10}>10 minutos</option>
@@ -409,7 +409,7 @@ export default function AgendaPage() {
 
             {/* Dias da semana */}
             <div className="flex flex-col gap-3">
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              <p className="text-sm font-medium text-text">
                 Dias e horários
               </p>
               {DIAS.map(({ key, label }) => {
@@ -417,14 +417,12 @@ export default function AgendaPage() {
                 return (
                   <div
                     key={key}
-                    className={`rounded-xl border bg-white p-4 transition dark:bg-slate-800 ${
-                      dia.ativo
-                        ? 'border-primary/30 dark:border-primary/30'
-                        : 'border-slate-200 dark:border-slate-700'
+                    className={`rounded-xl border bg-surface p-4 transition ${
+                      dia.ativo ? 'border-secondary/40' : 'border-border'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                      <span className="text-sm font-medium text-text">
                         {label}
                       </span>
                       <button
@@ -432,7 +430,7 @@ export default function AgendaPage() {
                         aria-checked={dia.ativo}
                         onClick={() => atualizarDia(key, 'ativo', !dia.ativo)}
                         className={`relative flex h-6 w-11 flex-shrink-0 items-center rounded-full transition ${
-                          dia.ativo ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700'
+                          dia.ativo ? 'bg-secondary' : 'bg-surface-2'
                         }`}
                       >
                         <span
@@ -447,25 +445,25 @@ export default function AgendaPage() {
                       <div className="mt-4 flex flex-col gap-4">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                            <label className="text-xs font-medium text-text-secondary">
                               Início
                             </label>
                             <input
                               type="time"
                               value={dia.inicio}
                               onChange={(e) => atualizarDia(key, 'inicio', e.target.value)}
-                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                              className="form-input h-10 text-sm"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                            <label className="text-xs font-medium text-text-secondary">
                               Fim
                             </label>
                             <input
                               type="time"
                               value={dia.fim}
                               onChange={(e) => atualizarDia(key, 'fim', e.target.value)}
-                              className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                              className="form-input h-10 text-sm"
                             />
                           </div>
                         </div>
@@ -476,7 +474,7 @@ export default function AgendaPage() {
                             aria-checked={dia.pausaAtivo}
                             onClick={() => atualizarDia(key, 'pausaAtivo', !dia.pausaAtivo)}
                             className={`relative flex h-5 w-9 flex-shrink-0 items-center rounded-full transition ${
-                              dia.pausaAtivo ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700'
+                              dia.pausaAtivo ? 'bg-secondary' : 'bg-surface-2'
                             }`}
                           >
                             <span
@@ -485,7 +483,7 @@ export default function AgendaPage() {
                               }`}
                             />
                           </button>
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                          <span className="text-xs font-medium text-text-secondary">
                             Pausa / almoço
                           </span>
                         </div>
@@ -493,7 +491,7 @@ export default function AgendaPage() {
                         {dia.pausaAtivo && (
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              <label className="text-xs font-medium text-text-secondary">
                                 Pausa início
                               </label>
                               <input
@@ -502,18 +500,18 @@ export default function AgendaPage() {
                                 onChange={(e) =>
                                   atualizarDia(key, 'pausaInicio', e.target.value)
                                 }
-                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="form-input h-10 text-sm"
                               />
                             </div>
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              <label className="text-xs font-medium text-text-secondary">
                                 Pausa fim
                               </label>
                               <input
                                 type="time"
                                 value={dia.pausaFim}
                                 onChange={(e) => atualizarDia(key, 'pausaFim', e.target.value)}
-                                className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="form-input h-10 text-sm"
                               />
                             </div>
                           </div>
@@ -528,7 +526,7 @@ export default function AgendaPage() {
             <button
               onClick={salvarConfig}
               disabled={salvandoConfig}
-              className="flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-primary h-12 w-full"
             >
               {salvandoConfig ? 'Salvando…' : 'Salvar configuração'}
             </button>
@@ -540,10 +538,10 @@ export default function AgendaPage() {
             {agendamentos.length === 0 ? (
               <div className="flex flex-col items-center py-16 text-center px-4">
                 <span className="text-4xl" aria-hidden="true">📅</span>
-                <p className="mt-4 font-medium text-slate-700 dark:text-slate-300">
+                <p className="mt-4 font-medium text-text">
                   Nenhum agendamento ainda
                 </p>
-                <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
+                <p className="mt-1 text-sm text-text-muted">
                   Configure seus horários de trabalho acima e compartilhe o link de agendamento com suas clientes. Os agendamentos marcados aparecerão aqui.
                 </p>
               </div>
@@ -551,30 +549,30 @@ export default function AgendaPage() {
               <>
                 {agendamentosPendentes.length > 0 && (
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    <h2 className="mb-3 text-sm font-semibold text-text">
                       Aguardando confirmação
                     </h2>
                     <ul className="flex flex-col gap-3">
                       {agendamentosPendentes.map((ag) => (
                         <li
                           key={ag.id}
-                          className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-900/30 dark:bg-amber-950/20"
+                          className="rounded-xl border-l-[3px] border-warning bg-warning-soft px-4 py-4 transition hover:bg-hover"
                         >
-                          <p className="font-medium text-slate-900 dark:text-slate-100">
+                          <p className="font-medium text-text">
                             {ag.clientes?.nome ?? '—'}
                           </p>
                           <div className="mt-1.5 flex flex-col gap-0.5">
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                            <p className="text-sm text-text-secondary">
                               📅 {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
-                              <p className="text-sm text-slate-500 dark:text-slate-400">
+                              <p className="text-sm text-text-secondary">
                                 ✂️ {ag.servico}
                               </p>
                             )}
                             {ag.observacoes && (
-                              <p className="text-sm text-slate-500 dark:text-slate-400">
+                              <p className="text-sm text-text-secondary">
                                 📝 {ag.observacoes}
                               </p>
                             )}
@@ -583,14 +581,14 @@ export default function AgendaPage() {
                             <button
                               onClick={() => { setModalCompareceu(ag); setPrecoInput(''); setFormaPagamentoModal('') }}
                               disabled={processando[ag.id]}
-                              className="flex h-9 flex-1 items-center justify-center rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="btn-primary h-9 flex-1 text-sm"
                             >
                               {processando[ag.id] ? '…' : '✅ Compareceu'}
                             </button>
                             <button
                               onClick={() => marcarFaltou(ag.id)}
                               disabled={processando[ag.id]}
-                              className="flex h-9 flex-1 items-center justify-center rounded-lg border border-red-200 bg-white text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/40 dark:bg-transparent dark:text-red-400 dark:hover:bg-red-950/30"
+                              className="btn-secondary h-9 flex-1 text-sm"
                             >
                               {processando[ag.id] ? '…' : '❌ Faltou'}
                             </button>
@@ -603,36 +601,38 @@ export default function AgendaPage() {
 
                 {agendamentosProcessados.length > 0 && (
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    <h2 className="mb-3 text-sm font-semibold text-text">
                       Concluídos
                     </h2>
                     <ul className="flex flex-col gap-3">
                       {agendamentosProcessados.map((ag) => (
                         <li
                           key={ag.id}
-                          className="rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800"
+                          className={`rounded-xl border-l-[3px] bg-surface px-4 py-4 transition hover:bg-hover ${
+                            ag.status === 'compareceu' ? 'border-success' : 'border-danger'
+                          }`}
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="font-medium text-slate-900 dark:text-slate-100">
+                            <p className="font-medium text-text">
                               {ag.clientes?.nome ?? '—'}
                             </p>
                             <span
                               className={`mt-0.5 flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${
                                 ag.status === 'compareceu'
-                                  ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400'
-                                  : 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400'
+                                  ? 'bg-success-soft text-success'
+                                  : 'bg-danger-soft text-danger'
                               }`}
                             >
                               {ag.status === 'compareceu' ? 'Compareceu' : 'Faltou'}
                             </span>
                           </div>
                           <div className="mt-1.5 flex flex-col gap-0.5">
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                            <p className="text-sm text-text-secondary">
                               📅 {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
-                              <p className="text-sm text-slate-500 dark:text-slate-400">
+                              <p className="text-sm text-text-secondary">
                                 ✂️ {ag.servico}
                               </p>
                             )}
@@ -645,30 +645,30 @@ export default function AgendaPage() {
 
                 {agendamentosCancelados.length > 0 && (
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    <h2 className="mb-3 text-sm font-semibold text-text">
                       Cancelados pela cliente
                     </h2>
                     <ul className="flex flex-col gap-3">
                       {agendamentosCancelados.map((ag) => (
                         <li
                           key={ag.id}
-                          className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 opacity-75 dark:border-slate-700 dark:bg-slate-800/50"
+                          className="rounded-xl border-l-[3px] border-border-strong bg-surface px-4 py-4 opacity-75 transition hover:bg-hover hover:opacity-100"
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="font-medium text-slate-500 line-through dark:text-slate-400">
+                            <p className="font-medium text-text-muted line-through">
                               {ag.clientes?.nome ?? '—'}
                             </p>
-                            <span className="mt-0.5 flex-shrink-0 rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+                            <span className="mt-0.5 flex-shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-text-muted">
                               Cancelado
                             </span>
                           </div>
                           <div className="mt-1.5 flex flex-col gap-0.5">
-                            <p className="text-sm text-slate-400 dark:text-slate-500">
+                            <p className="text-sm text-text-muted">
                               📅 {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
-                              <p className="text-sm text-slate-400 dark:text-slate-500">
+                              <p className="text-sm text-text-muted">
                                 ✂️ {ag.servico}
                               </p>
                             )}
@@ -686,17 +686,18 @@ export default function AgendaPage() {
 
       {modalCompareceu && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:px-4 sm:pb-4"
+          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:px-4 sm:pb-4"
+          style={{ background: 'var(--color-overlay)' }}
           onClick={() => setModalCompareceu(null)}
         >
           <div
-            className="w-full max-w-sm rounded-t-2xl bg-white p-6 dark:bg-slate-800 sm:rounded-2xl"
+            className="w-full max-w-sm rounded-t-2xl bg-surface p-6 sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h2 className="text-base font-semibold text-text">
               Registrar atendimento
             </h2>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-sm text-text-secondary">
               {modalCompareceu.clientes?.nome ?? '—'}
             </p>
             <div className="mt-4 flex flex-col gap-3">
@@ -738,7 +739,7 @@ export default function AgendaPage() {
                   setModalCompareceu(null)
                   marcarCompareceu(ag, null, null)
                 }}
-                className="flex h-11 flex-1 items-center justify-center rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="btn-secondary h-11 flex-1 rounded-xl"
               >
                 Pular
               </button>
@@ -752,7 +753,7 @@ export default function AgendaPage() {
                   setFormaPagamentoModal('')
                   marcarCompareceu(ag, preco, fp)
                 }}
-                className="flex h-11 flex-1 items-center justify-center rounded-xl bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600"
+                className="btn-primary h-11 flex-1 rounded-xl"
               >
                 Confirmar
               </button>

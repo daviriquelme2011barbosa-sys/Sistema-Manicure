@@ -13,25 +13,25 @@ function calcularCutoff(filtro: FiltroMovimentacao): Date {
   return new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000)
 }
 
-function formatarDataHora(iso: string): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(iso))
+// Tempo relativo (há X min/h/dias) — mesmo padrão de textoUltimaVisita/textoSemAparecer
+// em lib/formatters.ts, só que para timestamps completos em vez de contagem de dias.
+function tempoRelativo(iso: string): string {
+  const diffMin = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
+  if (diffMin < 1) return 'agora mesmo'
+  if (diffMin < 60) return `há ${diffMin} min`
+  const diffHoras = Math.round(diffMin / 60)
+  if (diffHoras < 24) return `há ${diffHoras}h`
+  const diffDias = Math.round(diffHoras / 24)
+  return `há ${diffDias} ${diffDias === 1 ? 'dia' : 'dias'}`
 }
 
-function iconeParaTipo(tipo: TipoMovimentacao): string {
-  const mapa: Record<TipoMovimentacao, string> = {
-    cadastro: '👤',
-    atendimento: '✂️',
-    reativacao: '💬',
-    aniversario: '🎂',
-    resumo_mes: '📅',
-    cancelamento: '❌',
-  }
-  return mapa[tipo]
+const CONFIG_TIPO: Record<TipoMovimentacao, { emoji: string; bg: string; cor: string }> = {
+  cadastro: { emoji: '👤', bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
+  atendimento: { emoji: '✂️', bg: 'var(--color-success-soft)', cor: 'var(--color-success)' },
+  reativacao: { emoji: '💬', bg: 'var(--color-warning-soft)', cor: 'var(--color-warning)' },
+  aniversario: { emoji: '🎂', bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
+  resumo_mes: { emoji: '📅', bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
+  cancelamento: { emoji: '❌', bg: 'var(--color-danger-soft)', cor: 'var(--color-danger)' },
 }
 
 const OPCOES_FILTRO: { valor: FiltroMovimentacao; rotulo: string }[] = [
@@ -264,17 +264,17 @@ export default function MovimentacaoPage() {
   }, [carregar])
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
-        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <header className="border-b border-border bg-surface px-4 py-4">
+        <h1 className="text-base font-semibold text-text">
           Movimentação
         </h1>
-        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-0.5 text-sm text-text-secondary">
           Atividades recentes do seu salão
         </p>
       </header>
 
-      <div className="border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+      <div className="border-b border-border bg-surface px-4 py-3">
         <div className="flex gap-2">
           {OPCOES_FILTRO.map((opcao) => (
             <button
@@ -283,7 +283,7 @@ export default function MovimentacaoPage() {
               className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${
                 filtro === opcao.valor
                   ? 'bg-primary text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-600'
+                  : 'bg-surface-2 text-text-secondary hover:bg-hover'
               }`}
             >
               {opcao.rotulo}
@@ -296,16 +296,16 @@ export default function MovimentacaoPage() {
         {carregando ? (
           <SkeletonLista itens={5} />
         ) : erro ? (
-          <p role="alert" className="mt-8 text-center text-sm text-red-600">
+          <p role="alert" className="mt-8 text-center text-sm text-danger">
             {erro}
           </p>
         ) : itens.length === 0 && !cardResumoMes ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
             <span className="text-4xl" aria-hidden="true">🔍</span>
-            <p className="font-medium text-slate-700 dark:text-slate-300">
+            <p className="font-medium text-text">
               Nenhuma movimentação ainda
             </p>
-            <p className="text-sm text-slate-400 dark:text-slate-500">
+            <p className="text-sm text-text-muted">
               As ações do sistema aparecerão aqui automaticamente.
             </p>
           </div>
@@ -323,21 +323,26 @@ export default function MovimentacaoPage() {
 }
 
 function CardMovimentacao({ item }: { item: ItemMovimentacao }) {
+  const config = CONFIG_TIPO[item.tipo]
   const conteudo = (
-    <div className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm transition dark:bg-slate-800">
-      <span className="flex-shrink-0 text-xl" aria-hidden="true">
-        {iconeParaTipo(item.tipo)}
+    <div className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm transition hover:bg-hover">
+      <span
+        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-lg"
+        style={{ backgroundColor: config.bg, color: config.cor }}
+        aria-hidden="true"
+      >
+        {config.emoji}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
+        <p className="text-sm font-medium text-text">
           {item.descricao}
         </p>
-        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-          {formatarDataHora(item.criado_em)}
+        <p className="mt-0.5 text-xs text-text-muted">
+          {tempoRelativo(item.criado_em)}
         </p>
       </div>
       {item.href && (
-        <span className="flex-shrink-0 text-xs font-medium text-primary dark:text-primary">
+        <span className="flex-shrink-0 text-xs font-medium text-primary">
           Ver →
         </span>
       )}

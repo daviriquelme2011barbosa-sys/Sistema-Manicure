@@ -77,9 +77,9 @@ export default function AniversariantesPage() {
   const semNenhum = deHoje.length === 0 && doMes.length === 0
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
-        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <header className="border-b border-border bg-surface px-4 py-4">
+        <h1 className="text-base font-semibold text-text">
           Aniversariantes do mês
         </h1>
       </header>
@@ -88,16 +88,16 @@ export default function AniversariantesPage() {
         {carregando ? (
           <SkeletonLista itens={4} comBotao />
         ) : erro ? (
-          <p role="alert" className="mt-8 text-center text-sm text-red-600">
+          <p role="alert" className="mt-8 text-center text-sm text-danger">
             {erro}
           </p>
         ) : semNenhum ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
-            <span className="text-4xl" aria-hidden="true">🎂</span>
-            <p className="font-medium text-slate-700 dark:text-slate-300">
+            <span className="text-5xl" aria-hidden="true">🎂</span>
+            <p className="font-medium text-text">
               Nenhum aniversariante este mês
             </p>
-            <p className="text-sm text-slate-400 dark:text-slate-500">
+            <p className="text-sm text-text-muted">
               As clientes precisam informar a data de nascimento no formulário de cadastro.
             </p>
           </div>
@@ -106,22 +106,22 @@ export default function AniversariantesPage() {
             {/* Aniversariantes de hoje */}
             {deHoje.length > 0 && (
               <section>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-warning">
                   🎂 Hoje
                 </p>
                 <ul className="animar-lista flex flex-col gap-3">
                   {deHoje.map((cliente) => (
                     <li
                       key={cliente.id}
-                      className="rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 p-4 ring-1 ring-amber-200 shadow-sm dark:from-amber-950/30 dark:to-yellow-950/30 dark:ring-amber-800/50"
+                      className="rounded-xl border border-warning/30 bg-warning-soft p-4 shadow-sm"
                     >
                       <div className="flex items-center gap-3">
                         <span className="flex-shrink-0 text-2xl" aria-hidden="true">🎂</span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
+                          <p className="truncate font-semibold text-text">
                             {cliente.nome}
                           </p>
-                          <span className="mt-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                          <span className="mt-1 inline-flex items-center rounded-full bg-warning px-2 py-0.5 text-xs font-medium text-white">
                             🎉 Aniversário hoje!
                           </span>
                         </div>
@@ -130,7 +130,7 @@ export default function AniversariantesPage() {
                         href={montarLinkWhatsApp(cliente)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98]"
+                        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] text-sm font-semibold text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] active:bg-[#1AA34C] active:scale-[0.98]"
                       >
                         <IconeWhatsApp />
                         Mandar mensagem
@@ -146,17 +146,17 @@ export default function AniversariantesPage() {
               <section>
                 <button
                   onClick={() => setMesExpandido((v) => !v)}
-                  className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 shadow-sm transition hover:bg-slate-50 active:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-600 dark:active:bg-slate-600"
+                  className="flex w-full items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 shadow-sm transition hover:bg-hover"
                   aria-expanded={mesExpandido}
                 >
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <span className="text-sm font-medium text-text">
                     🎁{' '}
                     {doMes.length === 1
                       ? '1 aniversariante este mês'
                       : `${doMes.length} aniversariantes este mês`}
                   </span>
                   <IconeChevronBaixo
-                    className={`flex-shrink-0 text-slate-400 transition-transform duration-200 dark:text-slate-500 ${mesExpandido ? 'rotate-180' : ''}`}
+                    className={`flex-shrink-0 text-text-muted transition-transform duration-200 ${mesExpandido ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -165,24 +165,24 @@ export default function AniversariantesPage() {
                     {doMes.map((cliente) => (
                       <li
                         key={cliente.id}
-                        className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800"
+                        className="rounded-xl border border-border bg-surface p-4 shadow-sm transition hover:bg-hover"
                       >
                         <div className="flex items-center gap-3">
                           <span className="flex-shrink-0 text-xl" aria-hidden="true">🎂</span>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate font-medium text-slate-900 dark:text-slate-100">
+                            <p className="truncate font-medium text-text">
                               {cliente.nome}
                             </p>
-                            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                            <span className="mt-1 inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-text-secondary">
                               {formatarDiaMes(cliente.data_nascimento)}
-                            </p>
+                            </span>
                           </div>
                         </div>
                         <a
                           href={montarLinkWhatsApp(cliente)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98]"
+                          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] text-sm font-semibold text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] active:bg-[#1AA34C] active:scale-[0.98]"
                         >
                           <IconeWhatsApp />
                           Mandar mensagem

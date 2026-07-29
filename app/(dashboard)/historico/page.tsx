@@ -3,8 +3,26 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { SkeletonLista } from '@/components/SkeletonLista'
-import { formatarData, formatarPreco } from '@/lib/formatters'
+import { formatarData, formatarPreco, dataHoje } from '@/lib/formatters'
 import type { AtendimentoHistorico } from '@/types'
+
+// Data de ontem no formato yyyy-mm-dd (fuso local) — só para o rótulo de
+// agrupamento visual da timeline (Hoje/Ontem/data); não afeta a consulta.
+function dataOntem(): string {
+  const d = new Date()
+  d.setDate(d.getDate() - 1)
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+
+function rotuloGrupo(dataISO: string, hojeStr: string, ontemStr: string): string {
+  if (dataISO === hojeStr) return 'Hoje'
+  if (dataISO === ontemStr) return 'Ontem'
+  return formatarData(dataISO)
+}
 
 const FORMA_PAGAMENTO_LABEL: Record<string, string> = {
   pix: 'Pix',
@@ -84,11 +102,14 @@ export default function HistoricoPage() {
     carregarAtendimentos()
   }, [mes, ano])
 
+  const hojeStr = dataHoje()
+  const ontemStr = dataOntem()
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
-        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Histórico</h1>
-        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <header className="border-b border-border bg-surface px-4 py-4">
+        <h1 className="text-base font-semibold text-text">Histórico</h1>
+        <p className="mt-0.5 text-xs text-text-muted">
           Todos os atendimentos do período
         </p>
       </header>
@@ -97,7 +118,7 @@ export default function HistoricoPage() {
         <select
           value={mes}
           onChange={(e) => setMes(Number(e.target.value))}
-          className="h-11 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="form-select h-11 flex-1 text-sm"
         >
           {MESES.map((nome, i) => (
             <option key={i + 1} value={i + 1}>
@@ -109,7 +130,7 @@ export default function HistoricoPage() {
         <select
           value={ano}
           onChange={(e) => setAno(Number(e.target.value))}
-          className="h-11 w-28 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-primary/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="form-select h-11 w-28 text-sm"
         >
           {anos.map((a) => (
             <option key={a} value={a}>
@@ -123,58 +144,69 @@ export default function HistoricoPage() {
         {carregando ? (
           <SkeletonLista />
         ) : erro ? (
-          <p role="alert" className="mt-8 text-center text-sm text-red-600">
+          <p role="alert" className="mt-8 text-center text-sm text-danger">
             {erro}
           </p>
         ) : atendimentos.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
             <span className="text-4xl" aria-hidden="true">📋</span>
-            <p className="font-medium text-slate-700 dark:text-slate-300">
+            <p className="font-medium text-text">
               Nenhum atendimento em {MESES[mes - 1]} {ano}
             </p>
-            <p className="text-sm text-slate-400 dark:text-slate-500">
+            <p className="text-sm text-text-muted">
               Registre atendimentos para visualizar o histórico aqui.
             </p>
           </div>
         ) : (
-          <ul className="animar-lista flex flex-col gap-3">
-            {atendimentos.map((atendimento) => (
-              <li
-                key={atendimento.id}
-                className="rounded-xl bg-white px-4 py-4 shadow-sm dark:bg-slate-800"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-slate-900 dark:text-slate-100">
-                      {atendimento.clientes.nome}
+          <ul className="animar-lista flex flex-col gap-4">
+            {atendimentos.map((atendimento, i) => {
+              const grupo = rotuloGrupo(atendimento.data_atendimento, hojeStr, ontemStr)
+              const grupoMudou =
+                i === 0 ||
+                rotuloGrupo(atendimentos[i - 1].data_atendimento, hojeStr, ontemStr) !== grupo
+
+              return (
+                <li key={atendimento.id}>
+                  {grupoMudou && (
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
+                      {grupo}
                     </p>
-                    <p className="mt-0.5 truncate text-sm text-slate-500 dark:text-slate-400">
-                      {atendimento.servico}
-                    </p>
-                    {atendimento.horario && (
-                      <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                        {atendimento.horario}
-                      </p>
-                    )}
+                  )}
+                  <div className="rounded-xl border border-border bg-surface px-4 py-4 shadow-sm transition hover:bg-hover">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-text">
+                          {atendimento.clientes.nome}
+                        </p>
+                        <p className="mt-0.5 truncate text-sm text-text-secondary">
+                          {atendimento.servico}
+                        </p>
+                        {atendimento.horario && (
+                          <p className="mt-0.5 text-xs text-text-muted">
+                            {atendimento.horario}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 text-right">
+                        <p className="text-xs text-text-muted">
+                          {formatarData(atendimento.data_atendimento)}
+                        </p>
+                        {atendimento.preco !== null && (
+                          <p className="mt-0.5 text-sm font-semibold tabular-nums text-text">
+                            {formatarPreco(atendimento.preco)}
+                          </p>
+                        )}
+                        {atendimento.forma_pagamento && (
+                          <p className="mt-0.5 text-xs text-text-muted">
+                            {FORMA_PAGAMENTO_LABEL[atendimento.forma_pagamento] ?? atendimento.forma_pagamento}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      {formatarData(atendimento.data_atendimento)}
-                    </p>
-                    {atendimento.preco !== null && (
-                      <p className="mt-0.5 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                        {formatarPreco(atendimento.preco)}
-                      </p>
-                    )}
-                    {atendimento.forma_pagamento && (
-                      <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                        {FORMA_PAGAMENTO_LABEL[atendimento.forma_pagamento] ?? atendimento.forma_pagamento}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              )
+            })}
           </ul>
         )}
       </main>

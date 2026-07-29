@@ -59,10 +59,10 @@ export default function FaltaramPage() {
   }, [router])
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
-      <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-4">
-        <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">Faltaram</h1>
-        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <header className="border-b border-border bg-surface px-4 py-4">
+        <h1 className="text-base font-semibold text-text">Faltaram</h1>
+        <p className="mt-0.5 text-xs text-text-muted">
           Clientes com horário marcado que não compareceram
         </p>
       </header>
@@ -71,16 +71,16 @@ export default function FaltaramPage() {
         {carregando ? (
           <div className="flex flex-col gap-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="shimmer h-20 rounded-xl bg-slate-200 dark:bg-slate-800" />
+              <div key={i} className="shimmer h-20 rounded-xl bg-surface-2" />
             ))}
           </div>
         ) : faltaram.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-            <span className="text-4xl" aria-hidden="true">✅</span>
-            <p className="mt-3 font-medium text-slate-700 dark:text-slate-300">
+            <span className="text-5xl" aria-hidden="true">✅</span>
+            <p className="mt-3 font-medium text-text">
               Nenhuma cliente faltou ainda
             </p>
-            <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
+            <p className="mt-1 text-sm text-text-muted">
               Quando uma cliente não comparecer ao horário marcado, ela aparecerá aqui.
             </p>
           </div>
@@ -92,13 +92,18 @@ export default function FaltaramPage() {
               return (
                 <li
                   key={ag.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 transition hover:bg-hover"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {nome}
-                    </p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-sm font-semibold text-text">
+                        {nome}
+                      </p>
+                      <span className="inline-flex flex-shrink-0 items-center rounded-full bg-warning-soft px-2 py-0.5 text-[11px] font-medium text-warning">
+                        Faltou
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-text-secondary">
                       {formatarData(ag.data)}
                       {ag.horario && ` às ${ag.horario.slice(0, 5)}`}
                       {ag.servico && ` · ${ag.servico}`}
@@ -110,7 +115,7 @@ export default function FaltaramPage() {
                       href={construirLinkWhatsApp(whatsapp, nome)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600 active:bg-green-700"
+                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] active:bg-[#1AA34C]"
                       aria-label={`Enviar mensagem para ${nome}`}
                     >
                       <IconeWhatsApp />
