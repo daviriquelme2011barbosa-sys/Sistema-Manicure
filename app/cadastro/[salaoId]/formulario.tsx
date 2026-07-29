@@ -189,13 +189,15 @@ export default function FormularioCadastroPublico({
         <div aria-hidden="true" className="aurora-bg-salao pointer-events-none" style={estiloAurora} />
         <div style={estiloScroll}>
           <div className="relative flex min-h-full flex-col items-center justify-center px-6 text-center">
-            <p className="text-5xl" style={{ color: corPrimaria }}>💗</p>
-            <h2 className="text-lg font-semibold" style={{ color: corPrimaria }}>
-              Obrigado pelo seu cadastro! 💗
-            </h2>
-            <p className="mt-2 text-sm text-zinc-500">
-              Seus dados foram registrados. Até a próxima visita!
-            </p>
+            <div className="w-full max-w-sm rounded-2xl bg-surface p-8 shadow-lg">
+              <p className="text-5xl" style={{ color: corPrimaria }}>💗</p>
+              <h2 className="mt-3 text-lg font-semibold" style={{ color: corPrimaria }}>
+                Obrigado pelo seu cadastro! 💗
+              </h2>
+              <p className="mt-2 text-sm text-text-secondary">
+                Seus dados foram registrados. Até a próxima visita!
+              </p>
+            </div>
           </div>
         </div>
       </>
@@ -214,7 +216,7 @@ export default function FormularioCadastroPublico({
             role="status"
             aria-live="polite"
             className={`animar-toast fixed left-4 right-4 top-4 z-50 rounded-xl px-4 py-3 text-sm font-medium shadow-lg sm:left-auto sm:right-4 sm:w-80 ${
-              toast.tipo === 'sucesso' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+              toast.tipo === 'sucesso' ? 'bg-success text-white' : 'bg-danger text-white'
             }`}
           >
             {toast.mensagem}
@@ -277,7 +279,7 @@ export default function FormularioCadastroPublico({
             {/* Nome */}
             <div className="campo-formulario flex flex-col" style={{ animationDelay: '60ms' }}>
               <label htmlFor="nome" className="form-label">
-                Nome <span aria-hidden="true" className="text-red-500">*</span>
+                Nome <span aria-hidden="true" className="text-danger">*</span>
               </label>
               <input
                 id="nome"
@@ -290,7 +292,7 @@ export default function FormularioCadastroPublico({
                 placeholder="Nome completo"
                 className={`form-input${erros.nome ? ' form-input-erro' : ''}`}
               />
-              <p className="mt-1.5 text-sm text-slate-400 dark:text-slate-500">
+              <p className="mt-1.5 text-sm text-text-muted">
                 Por favor, informe seu nome completo para evitar confusões
               </p>
               {erros.nome && (
@@ -304,7 +306,7 @@ export default function FormularioCadastroPublico({
             {/* WhatsApp */}
             <div className="campo-formulario flex flex-col" style={{ animationDelay: '140ms' }}>
               <label htmlFor="whatsapp" className="form-label">
-                WhatsApp <span aria-hidden="true" className="text-red-500">*</span>
+                WhatsApp <span aria-hidden="true" className="text-danger">*</span>
               </label>
               <CampoWhatsApp
                 id="whatsapp"
@@ -326,7 +328,7 @@ export default function FormularioCadastroPublico({
                 </span>
               )}
               {avisoWhatsApp && !erros.whatsapp && (
-                <span role="status" className="mt-1.5 block text-sm text-amber-600">
+                <span role="status" className="mt-1.5 block text-sm text-warning">
                   {avisoWhatsApp}
                 </span>
               )}
@@ -335,7 +337,7 @@ export default function FormularioCadastroPublico({
             {/* E-mail */}
             <div className="campo-formulario flex flex-col" style={{ animationDelay: '220ms' }}>
               <label htmlFor="email" className="form-label">
-                E-mail <span aria-hidden="true" className="text-red-500">*</span>
+                E-mail <span aria-hidden="true" className="text-danger">*</span>
               </label>
               <input
                 id="email"
@@ -359,7 +361,7 @@ export default function FormularioCadastroPublico({
             <div className="campo-formulario flex flex-col" style={{ animationDelay: '300ms' }}>
               <label htmlFor="data_nascimento" className="form-label">
                 Data de nascimento
-                <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
+                <span className="ml-1 text-xs font-normal text-text-muted">(opcional)</span>
               </label>
               <input
                 id="data_nascimento"
@@ -375,7 +377,7 @@ export default function FormularioCadastroPublico({
             <div className="campo-formulario flex flex-col" style={{ animationDelay: '380ms' }}>
               <label htmlFor="observacoes" className="form-label">
                 Observações
-                <span className="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500">(opcional)</span>
+                <span className="ml-1 text-xs font-normal text-text-muted">(opcional)</span>
               </label>
               <textarea
                 id="observacoes"
@@ -392,7 +394,7 @@ export default function FormularioCadastroPublico({
             {ehPro && (
               <div className="campo-formulario flex flex-col" style={{ animationDelay: '460ms' }}>
                 <label htmlFor="senha" className="form-label">
-                  Senha <span aria-hidden="true" className="text-red-500">*</span>
+                  Senha <span aria-hidden="true" className="text-danger">*</span>
                 </label>
                 <CampoSenha
                   id="senha"
@@ -403,7 +405,7 @@ export default function FormularioCadastroPublico({
                   autoComplete="new-password"
                   erro={!!erros.senha}
                 />
-                <p className="mt-1.5 text-sm text-slate-400 dark:text-slate-500">
+                <p className="mt-1.5 text-sm text-text-muted">
                   Você usará essa senha para acessar o agendamento online
                 </p>
                 {erros.senha && (
@@ -419,7 +421,7 @@ export default function FormularioCadastroPublico({
             {ehPro && (
               <div className="campo-formulario flex flex-col" style={{ animationDelay: '540ms' }}>
                 <label htmlFor="confirmar-senha" className="form-label">
-                  Confirmar senha <span aria-hidden="true" className="text-red-500">*</span>
+                  Confirmar senha <span aria-hidden="true" className="text-danger">*</span>
                 </label>
                 <CampoSenha
                   id="confirmar-senha"
@@ -448,15 +450,15 @@ export default function FormularioCadastroPublico({
                 disabled={enviando}
                 className="mt-0.5 h-5 w-5 flex-shrink-0 accent-primary"
               />
-              <span className="text-sm text-slate-600">
+              <span className="text-sm text-text-secondary">
                 Autorizo o salão a entrar em contato comigo via WhatsApp para
                 agendamentos e reativação
-                <span aria-hidden="true" className="text-red-500"> *</span>
+                <span aria-hidden="true" className="text-danger"> *</span>
               </span>
             </label>
 
             {!autorizaContato && (
-              <p role="alert" className="text-center text-xs text-amber-600">
+              <p role="alert" className="text-center text-xs text-warning">
                 Marque o consentimento para habilitar o envio.
               </p>
             )}
@@ -470,7 +472,7 @@ export default function FormularioCadastroPublico({
               {enviando ? 'Enviando...' : 'Enviar'}
             </button>
 
-            <p className="text-center text-xs leading-relaxed text-slate-400">
+            <p className="text-center text-xs leading-relaxed text-text-muted">
               Seus dados são usados exclusivamente para gestão interna do salão,
               conforme a{' '}
               <abbr title="Lei Geral de Proteção de Dados">LGPD</abbr>.

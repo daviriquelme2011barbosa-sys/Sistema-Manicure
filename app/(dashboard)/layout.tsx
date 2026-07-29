@@ -1071,133 +1071,139 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
-            {email && (
-              <div className="mb-5 rounded-xl bg-surface-2 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-                  Conta
-                </p>
-                <p className="mt-0.5 truncate text-sm font-medium text-text">
-                  {email}
-                </p>
-              </div>
-            )}
-
             <div className="flex flex-col gap-5">
 
-              <div className="flex flex-col">
-                <label htmlFor="config-nome-salao" className="form-label">
-                  Nome do profissional
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    id="config-nome-salao"
-                    type="text"
-                    autoCapitalize="words"
-                    value={novoNomeSalao}
-                    onChange={(e) => setNovoNomeSalao(e.target.value)}
-                    disabled={salvandoNome}
-                    className="form-input min-w-0 flex-1"
-                  />
-                  <button
-                    onClick={salvarNomeSalao}
-                    disabled={
-                      salvandoNome ||
-                      !novoNomeSalao.trim() ||
-                      novoNomeSalao.trim() === nomeSalao
-                    }
-                    className="btn-primary flex-shrink-0 px-4 text-sm"
-                  >
-                    {salvandoNome && <span className="form-spinner" aria-hidden="true" />}
-                    {salvandoNome ? 'Salvando...' : 'Salvar'}
-                  </button>
-                </div>
-              </div>
+              {/* Conta */}
+              <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-2 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                  Conta
+                </p>
 
-              <div className="flex flex-col">
-                <label htmlFor="config-whatsapp" className="form-label">
-                  WhatsApp do profissional
-                </label>
-                <div className="flex gap-2">
-                  <div className="min-w-0 flex-1">
-                    <CampoWhatsApp
-                      id="config-whatsapp"
-                      variante="painel"
-                      ddi={ddiWhatsapp}
-                      numero={numeroWhatsapp}
-                      onChange={(novoDdi, novoNumero) => {
-                        setDdiWhatsapp(novoDdi)
-                        setNumeroWhatsapp(novoNumero)
-                      }}
-                      disabled={salvandoWhatsapp}
-                    />
+                {email && (
+                  <div className="rounded-xl bg-surface px-4 py-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
+                      E-mail de acesso
+                    </p>
+                    <p className="mt-0.5 truncate text-sm font-medium text-text">
+                      {email}
+                    </p>
                   </div>
-                  <button
-                    onClick={salvarWhatsapp}
-                    disabled={
-                      salvandoWhatsapp ||
-                      !validarNumeroWhatsApp(ddiWhatsapp, numeroWhatsapp).valido ||
-                      normalizarWhatsAppCompleto(ddiWhatsapp, numeroWhatsapp) ===
-                        montarNumeroInternacional(whatsapp)
-                    }
-                    className="btn-primary flex-shrink-0 px-4 text-sm"
-                  >
-                    {salvandoWhatsapp && <span className="form-spinner" aria-hidden="true" />}
-                    {salvandoWhatsapp ? 'Salvando...' : 'Salvar'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                <label htmlFor="config-genero" className="form-label">
-                  Gênero do profissional
-                </label>
-                <select
-                  id="config-genero"
-                  value={genero}
-                  onChange={(e) => salvarGenero(e.target.value as 'feminino' | 'masculino' | 'nao_informar')}
-                  disabled={salvandoGenero}
-                  className="form-select"
-                >
-                  <option value="feminino">Feminino</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="nao_informar">Prefiro não informar</option>
-                </select>
-                {salvandoGenero && (
-                  <p className="mt-1.5 text-xs text-text-muted">Salvando...</p>
                 )}
-              </div>
 
-              {linkFormulario && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium text-text">
-                    Link do seu formulário
-                  </p>
-                  <div className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2.5">
-                    <span className="min-w-0 flex-1 truncate text-xs text-text-secondary">
-                      {linkFormulario}
-                    </span>
+                <div className="flex flex-col">
+                  <label htmlFor="config-nome-salao" className="form-label">
+                    Nome do profissional
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      id="config-nome-salao"
+                      type="text"
+                      autoCapitalize="words"
+                      value={novoNomeSalao}
+                      onChange={(e) => setNovoNomeSalao(e.target.value)}
+                      disabled={salvandoNome}
+                      className="form-input min-w-0 flex-1"
+                    />
                     <button
-                      onClick={copiarLink}
-                      className="flex-shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
+                      onClick={salvarNomeSalao}
+                      disabled={
+                        salvandoNome ||
+                        !novoNomeSalao.trim() ||
+                        novoNomeSalao.trim() === nomeSalao
+                      }
+                      className="btn-primary flex-shrink-0 px-4 text-sm"
                     >
-                      {copiado ? 'Copiado!' : 'Copiar link'}
+                      {salvandoNome && <span className="form-spinner" aria-hidden="true" />}
+                      {salvandoNome ? 'Salvando...' : 'Salvar'}
                     </button>
                   </div>
-                  <button
-                    onClick={baixarQrCode}
-                    className="self-start text-sm text-primary hover:text-primary-hover hover:underline dark:text-primary"
-                  >
-                    Baixar QR Code
-                  </button>
                 </div>
-              )}
 
-              <hr className="border-border" />
+                <div className="flex flex-col">
+                  <label htmlFor="config-whatsapp" className="form-label">
+                    WhatsApp do profissional
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="min-w-0 flex-1">
+                      <CampoWhatsApp
+                        id="config-whatsapp"
+                        variante="painel"
+                        ddi={ddiWhatsapp}
+                        numero={numeroWhatsapp}
+                        onChange={(novoDdi, novoNumero) => {
+                          setDdiWhatsapp(novoDdi)
+                          setNumeroWhatsapp(novoNumero)
+                        }}
+                        disabled={salvandoWhatsapp}
+                      />
+                    </div>
+                    <button
+                      onClick={salvarWhatsapp}
+                      disabled={
+                        salvandoWhatsapp ||
+                        !validarNumeroWhatsApp(ddiWhatsapp, numeroWhatsapp).valido ||
+                        normalizarWhatsAppCompleto(ddiWhatsapp, numeroWhatsapp) ===
+                          montarNumeroInternacional(whatsapp)
+                      }
+                      className="btn-primary flex-shrink-0 px-4 text-sm"
+                    >
+                      {salvandoWhatsapp && <span className="form-spinner" aria-hidden="true" />}
+                      {salvandoWhatsapp ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                </div>
 
-              <div className="flex flex-col gap-4">
-                <p className="text-sm font-medium text-text">
-                  Personalizar formulário
+                <div className="flex flex-col">
+                  <label htmlFor="config-genero" className="form-label">
+                    Gênero do profissional
+                  </label>
+                  <select
+                    id="config-genero"
+                    value={genero}
+                    onChange={(e) => salvarGenero(e.target.value as 'feminino' | 'masculino' | 'nao_informar')}
+                    disabled={salvandoGenero}
+                    className="form-select"
+                  >
+                    <option value="feminino">Feminino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="nao_informar">Prefiro não informar</option>
+                  </select>
+                  {salvandoGenero && (
+                    <p className="mt-1.5 text-xs text-text-muted">Salvando...</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Perfil público */}
+              <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-2 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                  Perfil público
                 </p>
+
+                {linkFormulario && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium text-text">
+                      Link do seu formulário
+                    </p>
+                    <div className="flex items-center gap-2 rounded-lg bg-surface px-3 py-2.5">
+                      <span className="min-w-0 flex-1 truncate text-xs text-text-secondary">
+                        {linkFormulario}
+                      </span>
+                      <button
+                        onClick={copiarLink}
+                        className="flex-shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-hover active:bg-primary-pressed"
+                      >
+                        {copiado ? 'Copiado!' : 'Copiar link'}
+                      </button>
+                    </div>
+                    <button
+                      onClick={baixarQrCode}
+                      className="self-start text-sm text-primary hover:text-primary-hover hover:underline"
+                    >
+                      Baixar QR Code
+                    </button>
+                  </div>
+                )}
 
                 {/* Foto */}
                 <div className="flex flex-col gap-2">
@@ -1214,19 +1220,19 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       type="button"
                       onClick={() => setConfirmandoRemoverFoto(true)}
                       disabled={salvandoFoto}
-                      className="self-start text-xs text-red-500 transition hover:text-red-600 hover:underline disabled:opacity-50"
+                      className="self-start text-xs text-danger transition hover:underline disabled:opacity-50"
                     >
                       Remover foto
                     </button>
                   )}
                   {fotoUrl && confirmandoRemoverFoto && (
-                    <div className="flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2 dark:bg-red-950/30">
-                      <span className="flex-1 text-xs text-red-700 dark:text-red-300">Remover a foto?</span>
+                    <div className="flex items-center gap-3 rounded-lg bg-danger-soft px-3 py-2">
+                      <span className="flex-1 text-xs text-danger">Remover a foto?</span>
                       <button
                         type="button"
                         onClick={removerFoto}
                         disabled={removendoFoto}
-                        className="text-xs font-semibold text-red-600 transition hover:text-red-700 disabled:opacity-50 dark:text-red-400"
+                        className="text-xs font-semibold text-danger transition hover:underline disabled:opacity-50"
                       >
                         {removendoFoto ? 'Removendo…' : 'Sim, remover'}
                       </button>
@@ -1255,7 +1261,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputCameraRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-text transition hover:bg-surface-2 sm:hidden"
+                        className="flex h-11 cursor-pointer items-center gap-3 px-4 text-sm text-text transition hover:bg-hover sm:hidden"
                       >
                         <span aria-hidden="true">📷</span> Tirar foto
                       </button>
@@ -1263,7 +1269,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputGaleriaRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-border px-4 text-sm text-text transition hover:bg-surface-2 sm:hidden"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-border px-4 text-sm text-text transition hover:bg-hover sm:hidden"
                       >
                         <span aria-hidden="true">🖼️</span> Escolher da galeria
                       </button>
@@ -1271,23 +1277,29 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       <button
                         type="button"
                         onClick={() => { setOpcoesFotoAbertas(false); inputUploadRef.current?.click() }}
-                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-border px-4 text-sm text-text transition hover:bg-surface-2 sm:border-t-0"
+                        className="flex h-11 cursor-pointer items-center gap-3 border-t border-border px-4 text-sm text-text transition hover:bg-hover sm:border-t-0"
                       >
                         <span aria-hidden="true">💻</span> Fazer upload
                       </button>
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Cor primária */}
+              {/* Aparência */}
+              <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-2 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                  Aparência
+                </p>
+
                 <div className="flex flex-col gap-2">
                   <p className="text-xs font-medium text-text-secondary">
-                    Cor primária
+                    Cor primária do seu formulário público
                   </p>
-                  <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface p-4">
                     <label className="relative block h-20 w-20 cursor-pointer">
                       <div
-                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-surface"
+                        className="h-20 w-20 rounded-full shadow-lg ring-4 ring-surface-2"
                         style={{ backgroundColor: corSelecionada }}
                       />
                       <input
@@ -1323,7 +1335,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
               <button
                 onClick={fazerLogout}
-                className="flex h-11 items-center justify-center gap-2 rounded-lg border border-red-200 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/50"
+                className="btn-danger flex h-11 items-center justify-center gap-2 rounded-lg text-sm"
               >
                 <IconeSair />
                 Sair da conta
