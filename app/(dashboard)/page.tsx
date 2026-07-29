@@ -216,7 +216,7 @@ function CartaoDado({
   animClass: string
 }) {
   return (
-    <Link href={href} className={`dash-card dash-card-kpi ${animClass}`}>
+    <Link href={href} className={`dash-card dash-card-kpi dash-card-interactive ${animClass}`}>
       <div
         className="dash-icon-badge"
         style={{ backgroundColor: fundoIcone, color: corIcone }}

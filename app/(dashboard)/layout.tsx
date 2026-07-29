@@ -668,7 +668,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="flex min-w-0 flex-shrink items-center gap-1">
           <button
             onClick={alternarSidebar}
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-hover hover:text-text"
             aria-label="Recolher ou expandir menu"
           >
             <IconeHamburguer />
@@ -676,7 +676,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           {acaoVoltar && (
             <button
               onClick={acaoVoltar}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-hover hover:text-text"
               aria-label="Voltar"
             >
               <IconeVoltar />
@@ -698,7 +698,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             onChange={(e) => setBuscaGlobal(e.target.value)}
             onFocus={() => setBuscaAberta(true)}
             placeholder="Buscar clientes, agendamentos..."
-            className="h-10 w-full rounded-xl border border-border bg-surface-2 pl-10 pr-3 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/30"
+            className="h-10 w-full rounded-xl border border-border bg-surface-2 pl-10 pr-3 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20"
           />
           {buscaAberta && buscaGlobal.trim().length >= 2 && (
             <PainelResultadosBusca
@@ -714,7 +714,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="ml-auto flex flex-shrink-0 items-center gap-1 sm:ml-0 sm:gap-2">
           <button
             onClick={() => setBuscaAberta(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text sm:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition hover:bg-hover hover:text-text sm:hidden"
             aria-label="Buscar"
           >
             <IconeLupa />
@@ -727,7 +727,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 setNotifAberto((v) => !v)
                 setAvatarAberto(false)
               }}
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition hover:bg-surface-2 hover:text-text"
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition hover:bg-hover hover:text-text"
               aria-label="Notificações"
             >
               <IconeSino />
@@ -801,7 +801,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 setAvatarAberto((v) => !v)
                 setNotifAberto(false)
               }}
-              className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-1 transition hover:bg-surface-2 sm:pr-2"
+              className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-1 transition hover:bg-hover sm:pr-2"
               aria-label="Abrir menu da conta"
             >
               <Avatar fotoUrl={fotoUrl} nome={nomeSalao} />
@@ -878,7 +878,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 value={buscaGlobal}
                 onChange={(e) => setBuscaGlobal(e.target.value)}
                 placeholder="Buscar clientes, agendamentos..."
-                className="h-11 w-full rounded-xl border border-border bg-surface pl-10 pr-3 text-sm text-text shadow-lg outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/30"
+                className="h-11 w-full rounded-xl border border-border bg-surface pl-10 pr-3 text-sm text-text shadow-lg outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
             {buscaGlobal.trim().length >= 2 && (
@@ -923,7 +923,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           </span>
           <button
             onClick={() => setMenuAberto(false)}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-text-secondary transition hover:bg-surface-2 lg:hidden"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-text-secondary transition hover:bg-hover lg:hidden"
             aria-label="Fechar menu"
           >
             <IconeFechar />
@@ -980,7 +980,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setSubmenuSaibaMaisAberto((v) => !v)}
               title={sidebarRecolhida ? 'Saiba Mais' : undefined}
-              className={`flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-text-secondary transition hover:bg-surface-2 ${
+              className={`flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-text-secondary transition hover:bg-hover ${
                 sidebarRecolhida ? 'lg:justify-center lg:px-0' : ''
               }`}
             >
@@ -1005,7 +1005,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               >
                 <button
                   onClick={() => { setMenuAberto(false); setModalSaibaMais('termos') }}
-                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-surface-2"
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-hover"
                 >
                   <span className="flex-shrink-0 text-text-muted">
                     <IconeDocumento />
@@ -1014,7 +1014,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </button>
                 <button
                   onClick={() => { setMenuAberto(false); setModalSaibaMais('privacidade') }}
-                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-surface-2"
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-hover"
                 >
                   <span className="flex-shrink-0 text-text-muted">
                     <IconeEscudo />
@@ -1023,7 +1023,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </button>
                 <button
                   onClick={() => { setMenuAberto(false); setModalSaibaMais('sobre') }}
-                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-surface-2"
+                  className="flex h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-text-secondary transition hover:bg-hover"
                 >
                   <span className="flex-shrink-0 text-text-muted">
                     <IconeInfo />
@@ -1715,7 +1715,7 @@ function BotaoMenu({
     <button
       onClick={onClick}
       title={recolhida ? label : undefined}
-      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-text-secondary transition hover:bg-surface-2 ${
+      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-text-secondary transition hover:bg-hover ${
         recolhida ? 'lg:justify-center lg:px-0' : ''
       }`}
     >
@@ -1802,14 +1802,19 @@ function MenuItem({
       href={href}
       onClick={onNavegar}
       title={recolhida ? label : undefined}
-      style={ativo ? { backgroundImage: 'var(--gradient-primary)', color: '#fff' } : undefined}
-      className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
+      className={`relative flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
         ativo
-          ? 'font-semibold shadow-sm'
-          : 'text-text-secondary hover:bg-surface-2'
+          ? 'bg-primary-soft font-semibold text-text'
+          : 'text-text-secondary hover:bg-hover'
       } ${recolhida ? 'lg:justify-center lg:px-0' : ''}`}
     >
-      <span className="relative flex-shrink-0" style={{ color: ativo ? '#fff' : cor }}>
+      {ativo && (
+        <span
+          className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-primary"
+          aria-hidden="true"
+        />
+      )}
+      <span className="relative flex-shrink-0" style={{ color: ativo ? '#BB5CF6' : 'var(--color-text-secondary)' }}>
         {children}
         {badge ? (
           <span
