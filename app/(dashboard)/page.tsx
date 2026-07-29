@@ -65,15 +65,6 @@ function saudacao(): string {
   return 'Boa noite'
 }
 
-function gradienteGreeting(): string {
-  const hora = new Date().getHours()
-  if (hora < 12)
-    return 'from-sky-50 via-primary-soft to-indigo-50 dark:from-sky-950/20 dark:via-primary-soft dark:to-indigo-950/20'
-  if (hora < 18)
-    return 'from-primary-soft via-sky-50 to-cyan-50 dark:from-primary-soft dark:via-sky-950/20 dark:to-cyan-950/20'
-  return 'from-indigo-50 via-primary-soft to-slate-100 dark:from-indigo-950/20 dark:via-primary-soft'
-}
-
 function formatarMoedaCompacta(valor: number): string {
   if (valor >= 10000) return `R$ ${Math.round(valor / 1000)}k`
   if (valor >= 1000)
@@ -224,10 +215,10 @@ function CartaoDado({
       >
         {icone}
       </div>
-      <span className="text-2xl font-bold leading-none tracking-tight text-text lg:text-3xl">
+      <span className="text-3xl font-bold leading-none tracking-tight tabular-nums text-text">
         {numero}
       </span>
-      <span className="mt-2 text-xs font-medium text-text-secondary">
+      <span className="mt-2 text-sm font-medium text-text-muted">
         {rotulo}
       </span>
       <Sparkline data={serie} cor={cor} />
@@ -525,9 +516,9 @@ function DonutStatus({
 }) {
   const total = ativas + atencao + sumidas
   const fatias: FatiaStatus[] = [
-    { nome: 'Ativas', valor: ativas, cor: '#22C55E' },
-    { nome: 'Atenção', valor: atencao, cor: '#F59E0B' },
-    { nome: 'Sumidas', valor: sumidas, cor: '#EF4444' },
+    { nome: 'Ativas', valor: ativas, cor: 'var(--color-success)' },
+    { nome: 'Atenção', valor: atencao, cor: 'var(--color-warning)' },
+    { nome: 'Sumidas', valor: sumidas, cor: 'var(--color-danger)' },
   ]
   const fatiasComValor = fatias.filter((f) => f.valor > 0)
 
@@ -547,9 +538,9 @@ function DonutStatus({
           Nenhuma cliente para exibir ainda.
         </p>
       ) : (
-        <div className="mt-3 flex flex-col items-center gap-6 sm:flex-row sm:gap-8 lg:flex-col lg:gap-5">
+        <div className="mt-3 flex flex-col items-center gap-6 sm:flex-row sm:gap-8 lg:flex-col lg:gap-6">
           {/* Donut */}
-          <div className="relative h-44 w-44 flex-shrink-0">
+          <div className="relative h-48 w-48 flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -558,8 +549,8 @@ function DonutStatus({
                   nameKey="nome"
                   cx="50%"
                   cy="50%"
-                  innerRadius={62}
-                  outerRadius={86}
+                  innerRadius={66}
+                  outerRadius={92}
                   paddingAngle={fatiasComValor.length > 1 ? 3 : 0}
                   startAngle={90}
                   endAngle={-270}
@@ -591,7 +582,7 @@ function DonutStatus({
           </div>
 
           {/* Legenda */}
-          <div className="flex w-full flex-1 flex-col gap-3">
+          <div className="flex w-full flex-1 flex-col gap-4">
             {fatias.map((f) => {
               const pct = total > 0 ? Math.round((f.valor / total) * 100) : 0
               return (
@@ -621,18 +612,18 @@ function DonutStatus({
 /* ── Colunas inferiores (recentes · agenda · ações) ─ */
 
 const INFO_STATUS_CLIENTE: Record<StatusCliente, { label: string; cor: string }> = {
-  verde: { label: 'Ativa', cor: '#22C55E' },
-  amarelo: { label: 'Atenção', cor: '#F59E0B' },
-  vermelho: { label: 'Sumida', cor: '#EF4444' },
-  sem_atendimento: { label: 'Nova', cor: '#94A3B8' },
+  verde: { label: 'Ativa', cor: 'var(--color-success)' },
+  amarelo: { label: 'Atenção', cor: 'var(--color-warning)' },
+  vermelho: { label: 'Sumida', cor: 'var(--color-danger)' },
+  sem_atendimento: { label: 'Nova', cor: 'var(--color-text-muted)' },
 }
 
 const INFO_STATUS_AGENDAMENTO: Record<string, { label: string; cor: string }> = {
-  pendente: { label: 'Pendente', cor: '#F59E0B' },
-  confirmado: { label: 'Confirmado', cor: '#2563EB' },
-  compareceu: { label: 'Compareceu', cor: '#22C55E' },
-  faltou: { label: 'Faltou', cor: '#EF4444' },
-  cancelado: { label: 'Cancelado', cor: '#94A3B8' },
+  pendente: { label: 'Pendente', cor: 'var(--color-warning)' },
+  confirmado: { label: 'Confirmado', cor: 'var(--color-info)' },
+  compareceu: { label: 'Compareceu', cor: 'var(--color-success)' },
+  faltou: { label: 'Faltou', cor: 'var(--color-danger)' },
+  cancelado: { label: 'Cancelado', cor: 'var(--color-text-muted)' },
 }
 
 function PilulaStatus({ label, cor }: { label: string; cor: string }) {
@@ -696,7 +687,7 @@ function ColunaClientesRecentes({
               <Link
                 key={c.id}
                 href="/clientes"
-                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-surface-2"
+                className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-hover"
               >
                 <AvatarCliente fotoUrl={c.foto_url} nome={c.nome} />
                 <div className="min-w-0 flex-1">
@@ -738,7 +729,7 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
             return (
               <li
                 key={a.id}
-                className="flex flex-col gap-1.5 rounded-xl px-2 py-2 transition hover:bg-surface-2"
+                className="flex flex-col gap-1.5 rounded-xl px-2 py-2 transition hover:bg-hover"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex h-6 flex-shrink-0 items-center rounded-lg bg-surface-2 px-2 text-xs font-semibold text-text-secondary">
@@ -768,23 +759,20 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
 function AcaoRapida({
   icone,
   label,
-  cor,
   href,
   onClick,
 }: {
   icone: React.ReactNode
   label: string
-  cor: string
   href?: string
   onClick?: () => void
 }) {
   const classes =
-    'flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-2 p-2.5 text-center transition hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface hover:shadow-sm'
+    'flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-2 p-2.5 text-center transition hover:-translate-y-0.5 hover:border-border-strong hover:bg-primary-soft hover:shadow-sm'
   const conteudo = (
     <>
       <span
-        className="flex h-9 w-9 items-center justify-center rounded-xl"
-        style={{ backgroundColor: `${cor}1A`, color: cor }}
+        className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary"
         aria-hidden="true"
       >
         {icone}
@@ -813,20 +801,19 @@ function ColunaAcoesRapidas({ temAgenda }: { temAgenda: boolean }) {
         Ações rápidas
       </p>
       <div className="grid grid-cols-2 gap-2">
-        <AcaoRapida icone={<IconePessoa />} label="Novo cliente" cor="#22C55E" href="/cadastrados" />
-        <AcaoRapida icone={<IconeCoracao />} label="Reativar clientes" cor="#EF4444" href="/reativar" />
-        <AcaoRapida icone={<IconeRelogio />} label="Ver histórico" cor="#64748B" href="/historico" />
+        <AcaoRapida icone={<IconePessoa />} label="Novo cliente" href="/cadastrados" />
+        <AcaoRapida icone={<IconeCoracao />} label="Reativar clientes" href="/reativar" />
+        <AcaoRapida icone={<IconeRelogio />} label="Ver histórico" href="/historico" />
         <AcaoRapida
           icone={<IconeEngrenagem />}
           label="Configurações"
-          cor="#3B82F6"
           onClick={() => window.dispatchEvent(new CustomEvent('abrir-configuracoes'))}
         />
         {temAgenda && (
-          <AcaoRapida icone={<IconeAgenda />} label="Novo agendamento" cor="#14B8A6" href="/agenda" />
+          <AcaoRapida icone={<IconeAgenda />} label="Novo agendamento" href="/agenda" />
         )}
         {temAgenda && (
-          <AcaoRapida icone={<IconeAusente />} label="Ver faltaram" cor="#F59E0B" href="/faltaram" />
+          <AcaoRapida icone={<IconeAusente />} label="Ver faltaram" href="/faltaram" />
         )}
       </div>
     </div>
@@ -1176,7 +1163,6 @@ export default function DashboardPage() {
     carregar()
   }, [periodo])
 
-  const gradiente = gradienteGreeting()
   const cumprimento = saudacao()
   const temAgenda = dados?.plano === 'profissional' || dados?.plano === 'master'
   const opcoesPeriodo = gerarOpcoesPeriodo()
@@ -1205,8 +1191,8 @@ export default function DashboardPage() {
   return (
     <div className="dash-page">
       <div className="dash-content">
-        {/* Saudação com gradiente horário — transparente no dark */}
-        <div className={`dash-greeting bg-gradient-to-br ${gradiente} px-5 py-7`}>
+        {/* Saudação com faixa neutra sutil de marca — transparente no dark */}
+        <div className="dash-greeting bg-primary-soft px-5 py-7">
           <p className="text-2xl font-bold tracking-tight text-text">
             {cumprimento}{nome ? `, ${nome}` : ''}!
           </p>

@@ -94,7 +94,7 @@ export default function ClientesPage() {
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
+    <div className="flex min-h-screen flex-col bg-bg">
       <ToastView toast={toast} />
 
       {clienteEditando && (
@@ -111,8 +111,8 @@ export default function ClientesPage() {
       )}
 
       {/* Barra superior */}
-      <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-4 pr-14">
-        <h1 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+      <header className="border-b border-border bg-surface px-4 py-4 pr-14">
+        <h1 className="truncate text-base font-semibold text-text">
           {nomeSalao || 'Meu salão'}
         </h1>
       </header>
@@ -124,20 +124,20 @@ export default function ClientesPage() {
           placeholder="Buscar pelo nome…"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          className="h-11 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-primary/40"
+          className="form-input h-11 text-base"
         />
       </div>
 
-      {/* Filtros rápidos */}
+      {/* Filtros rápidos — segmented control */}
       <div className="flex gap-2 overflow-x-auto px-4 pb-1 pt-3">
         {FILTROS.map(({ chave, label }) => (
           <button
             key={chave}
             onClick={() => setFiltro(chave)}
-            className={`flex-shrink-0 h-9 rounded-full px-4 text-sm font-medium transition ${
+            className={`flex-shrink-0 h-9 rounded-full border px-4 text-sm font-medium transition ${
               filtro === chave
-                ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900'
-                : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600'
+                ? 'border-primary bg-primary-soft text-primary'
+                : 'border-border bg-surface text-text-secondary hover:bg-hover'
             }`}
           >
             {label} ({contadores[chave] ?? contadores.todos})
@@ -150,21 +150,21 @@ export default function ClientesPage() {
         {carregando ? (
           <SkeletonLista />
         ) : erro ? (
-          <p role="alert" className="mt-8 text-center text-sm text-red-600">
+          <p role="alert" className="mt-8 text-center text-sm text-danger">
             {erro}
           </p>
         ) : clientesFiltrados.length === 0 ? (
           busca || filtro !== 'todos' ? (
-            <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-8 text-center text-sm text-text-secondary">
               Nenhuma cliente encontrada para essa busca.
             </p>
           ) : (
             <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
-              <span className="text-4xl" aria-hidden="true">👥</span>
-              <p className="font-medium text-slate-700 dark:text-slate-300">
+              <span className="text-5xl" aria-hidden="true">👥</span>
+              <p className="font-medium text-text">
                 Nenhuma cliente ainda
               </p>
-              <p className="text-sm text-slate-400 dark:text-slate-500">
+              <p className="text-sm text-text-muted">
                 Suas clientes aparecerão aqui depois de se cadastrarem pelo formulário ou após você registrar um atendimento. Compartilhe o link do formulário com elas!
               </p>
             </div>

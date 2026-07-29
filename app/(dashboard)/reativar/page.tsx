@@ -13,7 +13,7 @@ function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
   return (
     <span
       className={`mt-1 inline-block h-3 w-3 flex-shrink-0 rounded-full ${
-        status === 'vermelho' ? 'bg-red-500 animar-dot' : 'bg-yellow-400'
+        status === 'vermelho' ? 'bg-danger animar-dot' : 'bg-warning'
       }`}
     />
   )
@@ -69,24 +69,34 @@ export default function ReativarPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-800">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <header className="border-b border-border bg-surface px-4 py-4">
         <div className="flex items-center gap-3">
           <Link
             href="/clientes"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-text-secondary transition hover:bg-hover"
             aria-label="Voltar para lista de clientes"
           >
             <IconeVoltar />
           </Link>
-          <div>
-            <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base font-semibold text-text">
               Clientes para reativar
             </h1>
             {!carregando && !erro && (
-              <p className="text-sm text-slate-500 dark:text-slate-400">{subtitulo()}</p>
+              <p className="text-sm text-text-secondary">{subtitulo()}</p>
             )}
           </div>
+          {!carregando && !erro && clientes.length > 0 && (
+            <div className="flex flex-shrink-0 flex-col items-end">
+              <span className="text-2xl font-bold leading-none tabular-nums text-danger">
+                {clientes.length}
+              </span>
+              <span className="text-[11px] font-medium text-text-muted">
+                para reativar
+              </span>
+            </div>
+          )}
         </div>
       </header>
 
@@ -94,16 +104,16 @@ export default function ReativarPage() {
         {carregando ? (
           <SkeletonLista itens={4} comBotao />
         ) : erro ? (
-          <p role="alert" className="mt-8 text-center text-sm text-red-600">
+          <p role="alert" className="mt-8 text-center text-sm text-danger">
             {erro}
           </p>
         ) : clientes.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
-            <span className="text-4xl" aria-hidden="true">🎉</span>
-            <p className="font-medium text-slate-700 dark:text-slate-300">
+            <span className="text-5xl" aria-hidden="true">🎉</span>
+            <p className="font-medium text-text">
               Nenhuma cliente sumida no momento
             </p>
-            <p className="text-sm text-slate-400 dark:text-slate-500">
+            <p className="text-sm text-text-muted">
               Continue registrando os atendimentos para manter o controle!
             </p>
           </div>
@@ -112,15 +122,15 @@ export default function ReativarPage() {
             {clientes.map((cliente) => (
               <li
                 key={cliente.id}
-                className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800"
+                className="rounded-xl border border-border bg-surface p-4 shadow-sm transition hover:bg-hover"
               >
                 <div className="flex gap-3">
                   <BadgeStatus status={cliente.status} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-slate-900 dark:text-slate-100">
+                    <p className="truncate font-medium text-text">
                       {cliente.nome}
                     </p>
-                    <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                    <p className="mt-0.5 text-sm text-text-secondary">
                       {textoSemAparecer(cliente.dias_desde_ultima_visita)}
                     </p>
                   </div>
@@ -136,7 +146,7 @@ export default function ReativarPage() {
                         .insert({ salao_id: salaoId, cliente_id: cliente.id })
                     }
                   }}
-                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-500 text-sm font-semibold text-white transition hover:bg-green-600 active:bg-green-700 active:scale-[0.98]"
+                  className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] text-base font-semibold text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] hover:shadow-[0_4px_14px_rgba(37,211,102,0.4)] active:bg-[#1AA34C] active:scale-[0.98]"
                 >
                   <IconeWhatsApp />
                   Mandar mensagem

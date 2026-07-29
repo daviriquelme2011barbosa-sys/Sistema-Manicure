@@ -605,7 +605,7 @@ html.dark .dash-card-interactive:hover {
   padding: 16px; /* space-4 */
 }
 @media (min-width: 1024px) {
-  .dash-card-kpi { padding: 12px; } /* space-3 */
+  .dash-card-kpi { padding: 20px; } /* space-5 — mais respiro no desktop, nunca menos que o mobile */
 }
 
 /* Cards da fileira Donut · Recentes · Agenda · Ações — levemente mais compactos */
