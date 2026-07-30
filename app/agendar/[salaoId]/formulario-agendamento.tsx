@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { montarNumeroInternacional } from '@/lib/whatsapp'
 import { CampoSenha } from '@/components/CampoSenha'
@@ -89,6 +90,8 @@ export default function FormularioAgendamento({
   nomeManicure,
   whatsappManicure,
 }: Props) {
+  const router = useRouter()
+
   const [supabaseLocal] = useState(() =>
     createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
@@ -180,12 +183,14 @@ export default function FormularioAgendamento({
   async function executarVerificacao(token: string) {
     setAccessToken(token)
     try {
+      console.log('[verificar-cliente] iniciando verificação', { salaoId })
       const resp = await fetch('/api/agendar/verificar-cliente', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ salaoId }),
       })
       const resultado = await resp.json()
+      console.log('[verificar-cliente] resposta recebida', { ok: resp.ok, status: resultado?.status })
 
       if (!resp.ok) {
         setErroLogin('Erro ao verificar cadastro. Tente novamente.')
@@ -194,7 +199,9 @@ export default function FormularioAgendamento({
       }
 
       if (resultado.status === 'is_owner') {
+        // Conta de dona de salão não deve acessar a área da cliente — desloga e sai da página.
         await supabaseLocal.auth.signOut()
+        router.replace('/')
         return
       } else if (resultado.status === 'aprovado') {
         setCliente({
@@ -207,10 +214,15 @@ export default function FormularioAgendamento({
         setEstadoAuth('autenticado')
       } else if (resultado.status === 'pendente') {
         setEstadoAuth('pendente')
-      } else {
+      } else if (resultado.status === 'nao_encontrado') {
         setEstadoAuth('nao_encontrado')
+      } else {
+        console.error('[verificar-cliente] status desconhecido na resposta', resultado)
+        setErroLogin('Erro ao verificar cadastro. Tente novamente.')
+        setEstadoAuth('login')
       }
-    } catch {
+    } catch (erro) {
+      console.error('[verificar-cliente] falha na verificação', erro)
       setErroLogin('Sem conexão. Verifique a internet e tente novamente.')
       setEstadoAuth('login')
     }
