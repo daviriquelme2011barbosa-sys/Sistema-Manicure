@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/useToast'
 import { ToastView } from '@/components/Toast'
+import { IconeCadeado, IconeAgenda, IconeTesoura, IconeCheck, IconeFechar } from '@/components/icons'
 
 type ChaveDia = 'segunda' | 'terca' | 'quarta' | 'quinta' | 'sexta' | 'sabado' | 'domingo'
 
@@ -284,7 +285,7 @@ export default function AgendaPage() {
   if (plano !== 'profissional' && plano !== 'master') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-4 text-center">
-        <p className="text-4xl">🔒</p>
+        <IconeCadeado size={40} className="mx-auto text-text-muted" />
         <h1 className="mt-4 text-base font-semibold text-text">
           Recurso exclusivo
         </h1>
@@ -537,7 +538,7 @@ export default function AgendaPage() {
           <div className="flex flex-col gap-4">
             {agendamentos.length === 0 ? (
               <div className="flex flex-col items-center py-16 text-center px-4">
-                <span className="text-4xl" aria-hidden="true">📅</span>
+                <IconeAgenda size={40} className="text-text-muted" />
                 <p className="mt-4 font-medium text-text">
                   Nenhum agendamento ainda
                 </p>
@@ -563,12 +564,14 @@ export default function AgendaPage() {
                           </p>
                           <div className="mt-1.5 flex flex-col gap-0.5">
                             <p className="text-sm text-text-secondary">
-                              📅 {formatarDataBR(ag.data)}
+                              <IconeAgenda size={13} className="mr-1 inline-block -translate-y-px" />
+                              {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
                               <p className="text-sm text-text-secondary">
-                                ✂️ {ag.servico}
+                                <IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />
+                                {ag.servico}
                               </p>
                             )}
                             {ag.observacoes && (
@@ -583,14 +586,24 @@ export default function AgendaPage() {
                               disabled={processando[ag.id]}
                               className="btn-primary h-9 flex-1 text-sm"
                             >
-                              {processando[ag.id] ? '…' : '✅ Compareceu'}
+                              {processando[ag.id] ? '…' : (
+                                <>
+                                  <IconeCheck size={14} className="mr-1 inline-block -translate-y-px" />
+                                  Compareceu
+                                </>
+                              )}
                             </button>
                             <button
                               onClick={() => marcarFaltou(ag.id)}
                               disabled={processando[ag.id]}
                               className="btn-secondary h-9 flex-1 text-sm"
                             >
-                              {processando[ag.id] ? '…' : '❌ Faltou'}
+                              {processando[ag.id] ? '…' : (
+                                <>
+                                  <IconeFechar size={14} className="mr-1 inline-block -translate-y-px" />
+                                  Faltou
+                                </>
+                              )}
                             </button>
                           </div>
                         </li>
@@ -628,12 +641,14 @@ export default function AgendaPage() {
                           </div>
                           <div className="mt-1.5 flex flex-col gap-0.5">
                             <p className="text-sm text-text-secondary">
-                              📅 {formatarDataBR(ag.data)}
+                              <IconeAgenda size={13} className="mr-1 inline-block -translate-y-px" />
+                              {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
                               <p className="text-sm text-text-secondary">
-                                ✂️ {ag.servico}
+                                <IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />
+                                {ag.servico}
                               </p>
                             )}
                           </div>
@@ -664,12 +679,14 @@ export default function AgendaPage() {
                           </div>
                           <div className="mt-1.5 flex flex-col gap-0.5">
                             <p className="text-sm text-text-muted">
-                              📅 {formatarDataBR(ag.data)}
+                              <IconeAgenda size={13} className="mr-1 inline-block -translate-y-px" />
+                              {formatarDataBR(ag.data)}
                               {ag.horario ? ` às ${ag.horario}` : ''}
                             </p>
                             {ag.servico && (
                               <p className="text-sm text-text-muted">
-                                ✂️ {ag.servico}
+                                <IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />
+                                {ag.servico}
                               </p>
                             )}
                           </div>

@@ -223,8 +223,8 @@ export default function FormularioCadastroPublico({
           </div>
         )}
 
-        {/* Conteúdo */}
-        <div className="relative flex min-h-full flex-col">
+        {/* Conteúdo — largura máxima para não esticar em telas largas (auditoria Fase 5) */}
+        <div className="relative mx-auto flex w-full max-w-[560px] min-h-full flex-col">
 
         {/* Cabeçalho */}
         <header

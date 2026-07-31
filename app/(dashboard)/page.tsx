@@ -278,7 +278,7 @@ function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
 
   return (
     <div className="pt-4">
-      <div className="overflow-hidden px-4">
+      <div className="overflow-hidden px-4 lg:px-8">
         <div
           className="flex transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${paginaAtual * 100}%)` }}
@@ -287,7 +287,7 @@ function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
             <div
               key={gi}
               aria-hidden={gi !== paginaAtual}
-              className={`grid w-full flex-shrink-0 grid-cols-2 gap-5 transition-opacity duration-300 lg:grid-cols-3 ${
+              className={`grid w-full flex-shrink-0 grid-cols-2 gap-5 transition-opacity duration-300 lg:grid-cols-3 lg:gap-6 ${
                 gi === paginaAtual ? 'opacity-100' : 'pointer-events-none opacity-0'
               }`}
             >
@@ -311,7 +311,7 @@ function CarrosselKPIs({ itens }: { itens: KpiItem[] }) {
       </div>
 
       {totalPaginas > 1 && (
-        <div className="mt-4 flex items-center justify-between px-4">
+        <div className="mt-4 flex items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-1.5">
             {grupos.map((_, i) => (
               <button
@@ -653,7 +653,7 @@ function CabecalhoColuna({
       {href && rotuloLink && (
         <Link
           href={href}
-          className="flex-shrink-0 text-xs font-medium text-primary transition hover:text-primary-hover hover:underline dark:text-primary"
+          className="flex-shrink-0 text-xs font-medium text-primary transition hover:text-primary-hover hover:underline"
         >
           {rotuloLink}
         </Link>
@@ -716,10 +716,16 @@ function ColunaAgendaHoje({ agendamentos }: { agendamentos: AgendamentoHoje[] })
       <CabecalhoColuna titulo="Agenda de hoje" rotuloLink="Ver agenda" href="/agenda" />
       {agendamentos.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
-          <span className="text-3xl" aria-hidden="true">📅</span>
+          <IconeAgenda size={28} className="text-text-muted" />
           <p className="mt-2 text-sm text-text-muted">
             Nenhum agendamento para hoje
           </p>
+          <Link
+            href="/agenda"
+            className="mt-3 text-xs font-medium text-primary transition hover:text-primary-hover hover:underline"
+          >
+            Ver agenda
+          </Link>
         </div>
       ) : (
         <ul className="flex flex-col gap-1">
@@ -1205,7 +1211,7 @@ export default function DashboardPage() {
         {dados && dados.clientesPendentes > 0 && (
           <Link
             href="/cadastrados"
-            className="mx-4 mt-4 flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 transition hover:bg-amber-100 dark:border-amber-700/50 dark:bg-amber-900/20 dark:hover:bg-amber-900/30"
+            className="mx-4 mt-4 flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 transition hover:bg-amber-100 dark:border-amber-700/50 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 lg:mx-8"
           >
             <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-800/40 dark:text-amber-400" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1224,7 +1230,7 @@ export default function DashboardPage() {
         )}
 
         {/* Cabeçalho do resumo + filtro de período */}
-        <div className="flex items-center justify-between gap-3 px-4 pt-4">
+        <div className="flex items-center justify-between gap-3 px-4 pt-4 lg:px-8">
           <h2 className="text-base font-semibold text-text">Resumo geral</h2>
           <select
             value={periodo}
@@ -1243,7 +1249,7 @@ export default function DashboardPage() {
 
         {/* Carrossel de KPIs (grupos de 3) */}
         {carregando ? (
-          <div className="grid grid-cols-2 gap-5 px-4 pt-4 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-5 px-4 pt-4 lg:grid-cols-3 lg:gap-6 lg:px-8">
             {Array.from({ length: 3 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
@@ -1254,7 +1260,7 @@ export default function DashboardPage() {
 
         {/* Donut de status + colunas: clientes recentes · agenda de hoje · ações rápidas */}
         {carregando ? (
-          <div className="grid grid-cols-1 gap-5 px-4 pt-6 pb-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 px-4 pt-6 pb-4 lg:grid-cols-4 lg:gap-6 lg:px-8">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -1263,7 +1269,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : dados ? (
-          <div className="grid grid-cols-1 gap-5 px-4 pt-6 pb-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 px-4 pt-6 pb-4 lg:grid-cols-4 lg:gap-6 lg:px-8">
             <DonutStatus
               ativas={dados.clientesAtivas}
               atencao={dados.clientesAtencao}

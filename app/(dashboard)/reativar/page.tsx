@@ -6,7 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { textoSemAparecer } from '@/lib/formatters'
 import { linkWhatsApp } from '@/lib/whatsapp'
 import { SkeletonLista } from '@/components/SkeletonLista'
-import { IconeVoltar, IconeWhatsApp } from '@/components/icons'
+import { BotaoWhatsApp } from '@/components/BotaoWhatsApp'
+import { IconeVoltar, IconeFesta } from '@/components/icons'
 import type { ClienteReativar } from '@/types'
 
 function BadgeStatus({ status }: { status: 'vermelho' | 'amarelo' }) {
@@ -109,7 +110,7 @@ export default function ReativarPage() {
           </p>
         ) : clientes.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
-            <span className="text-5xl" aria-hidden="true">🎉</span>
+            <IconeFesta size={44} className="text-text-muted" />
             <p className="font-medium text-text">
               Nenhuma cliente sumida no momento
             </p>
@@ -135,22 +136,18 @@ export default function ReativarPage() {
                     </p>
                   </div>
                 </div>
-                <a
-                  href={montarLinkWhatsApp(cliente)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    if (salaoId) {
-                      void supabase
-                        .from('reativacoes')
-                        .insert({ salao_id: salaoId, cliente_id: cliente.id })
-                    }
-                  }}
-                  className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] text-base font-semibold text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] hover:shadow-[0_4px_14px_rgba(37,211,102,0.4)] active:bg-[#1AA34C] active:scale-[0.98]"
-                >
-                  <IconeWhatsApp />
-                  Mandar mensagem
-                </a>
+                <div className="mt-3 flex justify-end">
+                  <BotaoWhatsApp
+                    href={montarLinkWhatsApp(cliente)}
+                    onClick={() => {
+                      if (salaoId) {
+                        void supabase
+                          .from('reativacoes')
+                          .insert({ salao_id: salaoId, cliente_id: cliente.id })
+                      }
+                    }}
+                  />
+                </div>
               </li>
             ))}
           </ul>

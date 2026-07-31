@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js'
 import { CampoSenha } from '@/components/CampoSenha'
 import { CampoWhatsApp } from '@/components/CampoWhatsApp'
 import { DDI_BRASIL, normalizarWhatsAppCompleto, validarNumeroWhatsApp } from '@/lib/whatsapp'
+import { IconeCheck } from '@/components/icons'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
@@ -165,8 +166,8 @@ export default function FormularioOnboarding({ token }: Props) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#F3F0FF] px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
-            <p className="text-5xl">✅</p>
-            <h1 className="text-xl font-bold text-zinc-900">Conta criada com sucesso!</h1>
+            <IconeCheck size={48} className="mx-auto text-emerald-500" />
+            <h1 className="mt-3 text-xl font-bold text-zinc-900">Conta criada com sucesso!</h1>
           </div>
           <div className="rounded-2xl bg-white px-6 py-8 shadow-lg text-center">
             <p className="text-sm leading-relaxed text-zinc-600">

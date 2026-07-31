@@ -87,7 +87,7 @@
   --color-sidebar:#0D1524; --color-topbar:#0E1728; --color-hover:#202B3E;
   --color-border:rgba(148,163,184,.12); --color-border-strong:rgba(148,163,184,.20);
   --color-divider:rgba(148,163,184,.08);
-  --color-text:#F8FAFC; --color-text-secondary:#94A3B8; --color-text-muted:#64748B;
+  --color-text:#F8FAFC; --color-text-secondary:#94A3B8; --color-text-muted:#8B98AC;
   --color-text-on-primary:#FFFFFF; --color-icon:#94A3B8;
   --color-success:#4ADE80; --color-success-soft:rgba(34,197,94,.14);
   --color-warning:#FBBF24; --color-warning-soft:rgba(245,158,11,.14);
@@ -100,6 +100,14 @@
   --shadow-lg:0 16px 40px rgba(0,0,0,.55);
   --shadow-xl:0 24px 56px rgba(0,0,0,.6);
   --glow-primary:0 0 0 1px rgba(124,58,227,.35), 0 0 28px rgba(124,58,227,.25);
+}
+
+/* Contraste (auditoria Fase 5): texto/link violeta sobre superfície escura usa o tom
+   mais claro (--color-primary-hover, ~5:1) em vez de --color-primary (~3:1). O primary
+   "base" continua intacto para fundos sólidos (botões, badges) — só a cor de TEXTO muda. */
+:root[data-theme="dark"] .text-primary,
+.dark .text-primary {
+  color: var(--color-primary-hover);
 }
 
 body {

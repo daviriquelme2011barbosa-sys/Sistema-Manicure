@@ -6,7 +6,18 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { montarNumeroInternacional } from '@/lib/whatsapp'
 import { CampoSenha } from '@/components/CampoSenha'
-import { IconeCasa, IconeAgenda, IconeLista, IconeRelogio, IconePessoa, IconeAlerta } from '@/components/icons'
+import {
+  IconeCasa,
+  IconeAgenda,
+  IconeLista,
+  IconeRelogio,
+  IconePessoa,
+  IconeAlerta,
+  IconeTesoura,
+  IconeCheck,
+  IconeCaixaVazia,
+  IconeWhatsApp,
+} from '@/components/icons'
 import { AvatarCliente } from '@/components/AvatarCliente'
 
 type EstadoAuth = 'carregando' | 'login' | 'verificando' | 'pendente' | 'nao_encontrado' | 'autenticado'
@@ -561,11 +572,15 @@ export default function FormularioAgendamento({
           ) : proximoAgendamento ? (
             <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
               <p className="text-sm font-semibold text-primary">
-                📅 {formatarDataBR(proximoAgendamento.data)}
+                <IconeAgenda size={14} className="mr-1 inline-block -translate-y-px" />
+                {formatarDataBR(proximoAgendamento.data)}
                 {proximoAgendamento.horario ? ` às ${proximoAgendamento.horario}` : ''}
               </p>
               {proximoAgendamento.servico && (
-                <p className="mt-1 text-sm text-text-secondary">✂️ {proximoAgendamento.servico}</p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  <IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />
+                  {proximoAgendamento.servico}
+                </p>
               )}
               <span
                 className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${badgeStatus(proximoAgendamento.status).classes}`}
@@ -622,7 +637,8 @@ export default function FormularioAgendamento({
           onClick={() => { setSecao('agendar'); resetarAgendar() }}
           className="flex h-12 w-full items-center justify-center rounded-xl bg-primary font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
         >
-          📅 Fazer novo agendamento
+          <IconeAgenda size={18} className="mr-2 inline-block -translate-y-px" />
+          Fazer novo agendamento
         </button>
       </div>
     )
@@ -790,7 +806,8 @@ export default function FormularioAgendamento({
 
           <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
             <p className="text-sm font-medium text-primary">
-              📅 {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
+              <IconeAgenda size={14} className="mr-1 inline-block -translate-y-px" />
+              {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
             </p>
           </div>
 
@@ -831,7 +848,7 @@ export default function FormularioAgendamento({
       const temWhatsApp = !!whatsappManicure
       return (
         <div className="flex flex-col items-center gap-5 px-4 py-8 text-center">
-          <p className="text-5xl">✅</p>
+          <IconeCheck size={48} className="text-success" />
           <div>
             <h2 className="text-lg font-semibold text-text">Agendamento solicitado!</h2>
             <p className="mt-1 text-sm text-text-secondary">
@@ -841,9 +858,13 @@ export default function FormularioAgendamento({
 
           <div className="w-full rounded-2xl border border-primary/30 bg-primary-soft p-4 text-left">
             <p className="text-sm font-medium text-text-secondary">
-              📅 {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
+              <IconeAgenda size={14} className="mr-1 inline-block -translate-y-px" />
+              {formatarDataBR(dataSelecionada)} às {horarioSelecionado}
             </p>
-            <p className="mt-1 text-sm text-text-secondary">✂️ {servico}</p>
+            <p className="mt-1 text-sm text-text-secondary">
+              <IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />
+              {servico}
+            </p>
           </div>
 
           {temWhatsApp && (
@@ -854,7 +875,7 @@ export default function FormularioAgendamento({
               className="flex h-12 w-full items-center justify-center gap-2 rounded-xl font-semibold text-white shadow-sm transition-colors duration-200"
               style={{ backgroundColor: '#25D366' }}
             >
-              <span>📱</span> Confirmar pelo WhatsApp
+              <IconeWhatsApp /> Confirmar pelo WhatsApp
             </a>
           )}
 
@@ -884,7 +905,7 @@ export default function FormularioAgendamento({
           </div>
         ) : agendamentosAtivos.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <p className="text-4xl">📭</p>
+            <IconeCaixaVazia size={40} className="text-text-muted" />
             <p className="text-sm font-medium text-text">Nenhum agendamento ativo</p>
             <p className="text-xs text-text-muted">Seus próximos agendamentos aparecerão aqui.</p>
             <button
@@ -903,10 +924,11 @@ export default function FormularioAgendamento({
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-text">
-                        📅 {formatarDataBR(ag.data)}{ag.horario ? ` às ${ag.horario}` : ''}
+                        <IconeAgenda size={13} className="mr-1 inline-block -translate-y-px" />
+                        {formatarDataBR(ag.data)}{ag.horario ? ` às ${ag.horario}` : ''}
                       </p>
                       {ag.servico && (
-                        <p className="mt-0.5 truncate text-sm text-text-secondary">✂️ {ag.servico}</p>
+                        <p className="mt-0.5 truncate text-sm text-text-secondary"><IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />{ag.servico}</p>
                       )}
                     </div>
                     <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.classes}`}>
@@ -941,7 +963,7 @@ export default function FormularioAgendamento({
           </div>
         ) : historicoAgendamentos.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-12 text-center">
-            <p className="text-4xl">🕐</p>
+            <IconeRelogio size={40} className="text-text-muted" />
             <p className="text-sm font-medium text-text">Nenhum histórico ainda</p>
             <p className="text-xs text-text-muted">Seus agendamentos passados aparecerão aqui.</p>
           </div>
@@ -954,10 +976,11 @@ export default function FormularioAgendamento({
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-text-secondary">
-                        📅 {formatarDataBR(ag.data)}{ag.horario ? ` às ${ag.horario}` : ''}
+                        <IconeAgenda size={13} className="mr-1 inline-block -translate-y-px" />
+                        {formatarDataBR(ag.data)}{ag.horario ? ` às ${ag.horario}` : ''}
                       </p>
                       {ag.servico && (
-                        <p className="mt-0.5 truncate text-sm text-text-muted">✂️ {ag.servico}</p>
+                        <p className="mt-0.5 truncate text-sm text-text-muted"><IconeTesoura size={13} className="mr-1 inline-block -translate-y-px" />{ag.servico}</p>
                       )}
                     </div>
                     <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.classes}`}>

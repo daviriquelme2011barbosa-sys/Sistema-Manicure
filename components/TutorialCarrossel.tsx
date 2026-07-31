@@ -203,7 +203,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
 
         {/* Counter */}
         <div className="flex items-center justify-between px-5 pt-4">
-          <span className="text-xs font-semibold tracking-wide" style={{ color: 'rgba(236,72,153,0.7)' }}>
+          <span className="text-xs font-semibold tracking-wide" style={{ color: 'var(--color-primary-hover)' }}>
             TUTORIAL
           </span>
           <span className="tabular-nums text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -230,8 +230,8 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
                 <div
                   className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl mx-auto"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(147,51,234,0.15))',
-                    border: '1px solid rgba(236,72,153,0.2)',
+                    background: 'rgba(124,58,227,0.16)',
+                    border: '1px solid rgba(124,58,227,0.25)',
                   }}
                 >
                   {slide.emoji}
@@ -265,22 +265,26 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
             </svg>
           </button>
 
-          {/* Dots */}
-          <div className="flex flex-1 flex-wrap items-center justify-center gap-1.5">
+          {/* Dots — cada botão tem alvo de toque de 44px; o ponto visual continua pequeno (8px) */}
+          <div className="flex flex-1 flex-wrap items-center justify-center">
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => irPara(i)}
                 aria-label={`Ir para slide ${i + 1}`}
-                className="carrossel-dot rounded-full"
-                style={{
-                  width: i === indice ? '18px' : '6px',
-                  height: '6px',
-                  background: i === indice
-                    ? 'linear-gradient(90deg, #7C3AE3, #14B8A6)'
-                    : 'rgba(255,255,255,0.22)',
-                }}
-              />
+                className="flex h-11 w-6 flex-shrink-0 items-center justify-center"
+              >
+                <span
+                  className="carrossel-dot rounded-full"
+                  style={{
+                    width: i === indice ? '20px' : '8px',
+                    height: '8px',
+                    background: i === indice
+                      ? 'linear-gradient(90deg, #7C3AE3, #14B8A6)'
+                      : 'rgba(255,255,255,0.22)',
+                  }}
+                />
+              </button>
             ))}
           </div>
 
@@ -291,7 +295,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
               className="flex h-11 flex-shrink-0 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, #7C3AE3, #14B8A6)',
-                boxShadow: '0 4px 16px rgba(236,72,153,0.35)',
+                boxShadow: '0 4px 16px rgba(124,58,227,0.4)',
               }}
             >
               Concluir
@@ -303,7 +307,7 @@ export function TutorialCarrossel({ plano, onFechar }: Props) {
               className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-white transition hover:opacity-90 active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, #7C3AE3, #14B8A6)',
-                boxShadow: '0 4px 16px rgba(236,72,153,0.35)',
+                boxShadow: '0 4px 16px rgba(124,58,227,0.4)',
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

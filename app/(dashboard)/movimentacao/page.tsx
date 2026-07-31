@@ -1,9 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, type ComponentType } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { SkeletonLista } from '@/components/SkeletonLista'
+import {
+  IconePessoa,
+  IconeTesoura,
+  IconeMensagem,
+  IconeBolo,
+  IconeAgenda,
+  IconeCancelar,
+  IconeLupa,
+} from '@/components/icons'
 import type { FiltroMovimentacao, ItemMovimentacao, TipoMovimentacao } from '@/types'
 
 function calcularCutoff(filtro: FiltroMovimentacao): Date {
@@ -25,13 +34,15 @@ function tempoRelativo(iso: string): string {
   return `há ${diffDias} ${diffDias === 1 ? 'dia' : 'dias'}`
 }
 
-const CONFIG_TIPO: Record<TipoMovimentacao, { emoji: string; bg: string; cor: string }> = {
-  cadastro: { emoji: '👤', bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
-  atendimento: { emoji: '✂️', bg: 'var(--color-success-soft)', cor: 'var(--color-success)' },
-  reativacao: { emoji: '💬', bg: 'var(--color-warning-soft)', cor: 'var(--color-warning)' },
-  aniversario: { emoji: '🎂', bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
-  resumo_mes: { emoji: '📅', bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
-  cancelamento: { emoji: '❌', bg: 'var(--color-danger-soft)', cor: 'var(--color-danger)' },
+type IconeComponente = ComponentType<{ size?: number; className?: string }>
+
+const CONFIG_TIPO: Record<TipoMovimentacao, { Icone: IconeComponente; bg: string; cor: string }> = {
+  cadastro: { Icone: IconePessoa, bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
+  atendimento: { Icone: IconeTesoura, bg: 'var(--color-success-soft)', cor: 'var(--color-success)' },
+  reativacao: { Icone: IconeMensagem, bg: 'var(--color-warning-soft)', cor: 'var(--color-warning)' },
+  aniversario: { Icone: IconeBolo, bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
+  resumo_mes: { Icone: IconeAgenda, bg: 'var(--color-primary-soft)', cor: 'var(--color-primary)' },
+  cancelamento: { Icone: IconeCancelar, bg: 'var(--color-danger-soft)', cor: 'var(--color-danger)' },
 }
 
 const OPCOES_FILTRO: { valor: FiltroMovimentacao; rotulo: string }[] = [
@@ -301,7 +312,7 @@ export default function MovimentacaoPage() {
           </p>
         ) : itens.length === 0 && !cardResumoMes ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
-            <span className="text-4xl" aria-hidden="true">🔍</span>
+            <IconeLupa size={40} className="text-text-muted" />
             <p className="font-medium text-text">
               Nenhuma movimentação ainda
             </p>
@@ -327,11 +338,11 @@ function CardMovimentacao({ item }: { item: ItemMovimentacao }) {
   const conteudo = (
     <div className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm transition hover:bg-hover">
       <span
-        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-lg"
+        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
         style={{ backgroundColor: config.bg, color: config.cor }}
         aria-hidden="true"
       >
-        {config.emoji}
+        <config.Icone size={18} />
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-text">

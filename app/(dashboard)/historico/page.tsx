@@ -118,7 +118,7 @@ export default function HistoricoPage() {
         <select
           value={mes}
           onChange={(e) => setMes(Number(e.target.value))}
-          className="form-select h-11 flex-1 text-sm"
+          className="form-select h-11 w-44 flex-shrink-0 text-sm"
         >
           {MESES.map((nome, i) => (
             <option key={i + 1} value={i + 1}>
@@ -183,7 +183,7 @@ export default function HistoricoPage() {
                         </p>
                         {atendimento.horario && (
                           <p className="mt-0.5 text-xs text-text-muted">
-                            {atendimento.horario}
+                            {atendimento.horario.slice(0, 5)}
                           </p>
                         )}
                       </div>

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { formatarData } from '@/lib/formatters'
 import { montarNumeroInternacional } from '@/lib/whatsapp'
-import { IconeWhatsApp } from '@/components/icons'
+import { BotaoWhatsApp } from '@/components/BotaoWhatsApp'
+import { IconeCheck } from '@/components/icons'
 
 type Faltou = {
   id: string
@@ -76,7 +77,7 @@ export default function FaltaramPage() {
           </div>
         ) : faltaram.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-            <span className="text-5xl" aria-hidden="true">✅</span>
+            <IconeCheck size={44} className="text-text-muted" />
             <p className="mt-3 font-medium text-text">
               Nenhuma cliente faltou ainda
             </p>
@@ -111,15 +112,11 @@ export default function FaltaramPage() {
                   </div>
 
                   {whatsapp && (
-                    <a
+                    <BotaoWhatsApp
                       href={construirLinkWhatsApp(whatsapp, nome)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] active:bg-[#1AA34C]"
-                      aria-label={`Enviar mensagem para ${nome}`}
-                    >
-                      <IconeWhatsApp />
-                    </a>
+                      compact
+                      ariaLabel={`Enviar mensagem para ${nome}`}
+                    />
                   )}
                 </li>
               )

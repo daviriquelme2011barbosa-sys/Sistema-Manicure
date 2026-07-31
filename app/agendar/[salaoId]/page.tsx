@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { UUID_REGEX } from '@/lib/validators'
+import { IconeCadeado } from '@/components/icons'
 import FormularioAgendamento from './formulario-agendamento'
 
 type SalaoConfig = {
@@ -52,7 +53,7 @@ export default async function AgendarPage({
   if (plano !== 'profissional' && plano !== 'master') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 text-center">
-        <p className="text-4xl">🔒</p>
+        <IconeCadeado size={40} className="mx-auto text-slate-400" />
         <h1 className="mt-4 text-xl font-semibold text-slate-800">
           Agendamento online não disponível para este salão
         </h1>

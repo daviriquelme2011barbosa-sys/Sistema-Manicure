@@ -1,5 +1,5 @@
 import { formatarData, textoUltimaVisita } from '@/lib/formatters'
-import { IconeLapis, IconeNota } from '@/components/icons'
+import { IconeLapis, IconeNota, IconeBolo } from '@/components/icons'
 import { AvatarCliente } from '@/components/AvatarCliente'
 import type { ClienteStatus, StatusCliente } from '@/types'
 
@@ -43,8 +43,9 @@ export function ClienteCard({
           )}
         </p>
         {cliente.data_nascimento && (
-          <p className="mt-1 text-xs text-text-muted">
-            🎂 {formatarData(cliente.data_nascimento)}
+          <p className="mt-1 flex items-center gap-1 text-xs text-text-muted">
+            <IconeBolo size={12} />
+            {formatarData(cliente.data_nascimento)}
           </p>
         )}
         {cliente.observacoes && (

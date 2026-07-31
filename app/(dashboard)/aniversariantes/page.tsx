@@ -5,7 +5,8 @@ import { supabase } from '@/lib/supabase'
 import { formatarDiaMes } from '@/lib/formatters'
 import { linkWhatsApp } from '@/lib/whatsapp'
 import { SkeletonLista } from '@/components/SkeletonLista'
-import { IconeWhatsApp, IconeChevronBaixo } from '@/components/icons'
+import { BotaoWhatsApp } from '@/components/BotaoWhatsApp'
+import { IconeChevronBaixo, IconeBolo, IconeFesta } from '@/components/icons'
 import type { Aniversariante } from '@/types'
 
 function montarLinkWhatsApp(cliente: Aniversariante): string {
@@ -93,21 +94,28 @@ export default function AniversariantesPage() {
           </p>
         ) : semNenhum ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center px-4">
-            <span className="text-5xl" aria-hidden="true">🎂</span>
+            <IconeBolo size={44} className="text-text-muted" />
             <p className="font-medium text-text">
               Nenhum aniversariante este mês
             </p>
             <p className="text-sm text-text-muted">
               As clientes precisam informar a data de nascimento no formulário de cadastro.
             </p>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('abrir-configuracoes'))}
+              className="btn-primary mt-2 h-10 px-4 text-sm"
+            >
+              Cadastrar cliente
+            </button>
           </div>
         ) : (
           <div className="flex flex-col gap-5">
             {/* Aniversariantes de hoje */}
             {deHoje.length > 0 && (
               <section>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-warning">
-                  🎂 Hoje
+                <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-warning">
+                  <IconeBolo size={14} />
+                  Hoje
                 </p>
                 <ul className="animar-lista flex flex-col gap-3">
                   {deHoje.map((cliente) => (
@@ -116,25 +124,20 @@ export default function AniversariantesPage() {
                       className="rounded-xl border border-warning/30 bg-warning-soft p-4 shadow-sm"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="flex-shrink-0 text-2xl" aria-hidden="true">🎂</span>
+                        <IconeBolo size={24} className="flex-shrink-0 text-warning" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-semibold text-text">
                             {cliente.nome}
                           </p>
-                          <span className="mt-1 inline-flex items-center rounded-full bg-warning px-2 py-0.5 text-xs font-medium text-white">
-                            🎉 Aniversário hoje!
+                          <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-warning px-2 py-0.5 text-xs font-medium text-white">
+                            <IconeFesta size={12} />
+                            Aniversário hoje!
                           </span>
                         </div>
                       </div>
-                      <a
-                        href={montarLinkWhatsApp(cliente)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] text-sm font-semibold text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] active:bg-[#1AA34C] active:scale-[0.98]"
-                      >
-                        <IconeWhatsApp />
-                        Mandar mensagem
-                      </a>
+                      <div className="mt-3 flex justify-end">
+                        <BotaoWhatsApp href={montarLinkWhatsApp(cliente)} />
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -168,7 +171,7 @@ export default function AniversariantesPage() {
                         className="rounded-xl border border-border bg-surface p-4 shadow-sm transition hover:bg-hover"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="flex-shrink-0 text-xl" aria-hidden="true">🎂</span>
+                          <IconeBolo size={20} className="flex-shrink-0 text-text-muted" />
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-medium text-text">
                               {cliente.nome}
@@ -178,15 +181,9 @@ export default function AniversariantesPage() {
                             </span>
                           </div>
                         </div>
-                        <a
-                          href={montarLinkWhatsApp(cliente)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] text-sm font-semibold text-white shadow-[0_2px_8px_rgba(37,211,102,0.3)] transition hover:bg-[#20BD5A] active:bg-[#1AA34C] active:scale-[0.98]"
-                        >
-                          <IconeWhatsApp />
-                          Mandar mensagem
-                        </a>
+                        <div className="mt-3 flex justify-end">
+                          <BotaoWhatsApp href={montarLinkWhatsApp(cliente)} />
+                        </div>
                       </li>
                     ))}
                   </ul>

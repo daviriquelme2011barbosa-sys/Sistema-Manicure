@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { formatarData, formatarWhatsApp, normalizarWhatsApp } from '@/lib/formatters'
 import { useToast } from '@/hooks/useToast'
 import { ToastView } from '@/components/Toast'
+import { IconeWhatsApp, IconeEmail, IconeBolo, IconeCheck, IconeFechar } from '@/components/icons'
 
 type ClienteCadastrado = {
   id: string
@@ -166,16 +167,19 @@ export default function CadastrosPage() {
 
                       <div className="mt-2 flex flex-col gap-1">
                         <p className="text-sm text-text-secondary">
-                          📱 {formatarWhatsApp(cliente.whatsapp)}
+                          <IconeWhatsApp size={13} className="mr-1 inline-block -translate-y-px" />
+                          {formatarWhatsApp(cliente.whatsapp)}
                         </p>
                         {cliente.email && (
                           <p className="text-sm text-text-secondary">
-                            ✉️ {cliente.email}
+                            <IconeEmail size={13} className="mr-1 inline-block -translate-y-px" />
+                            {cliente.email}
                           </p>
                         )}
                         {cliente.data_nascimento && (
                           <p className="text-sm text-text-secondary">
-                            🎂 {formatarData(cliente.data_nascimento)}
+                            <IconeBolo size={13} className="mr-1 inline-block -translate-y-px" />
+                            {formatarData(cliente.data_nascimento)}
                           </p>
                         )}
                         {cliente.observacoes && (
@@ -191,14 +195,24 @@ export default function CadastrosPage() {
                           disabled={processando[cliente.id]}
                           className="btn-primary h-9 flex-1 text-sm"
                         >
-                          {processando[cliente.id] ? '…' : '✅ Aprovar'}
+                          {processando[cliente.id] ? '…' : (
+                            <>
+                              <IconeCheck size={14} className="mr-1 inline-block -translate-y-px" />
+                              Aprovar
+                            </>
+                          )}
                         </button>
                         <button
                           onClick={() => setConfirmarRemoverId(cliente.id)}
                           disabled={processando[cliente.id]}
                           className="btn-secondary h-9 flex-1 text-sm"
                         >
-                          {processando[cliente.id] ? '…' : '❌ Não conheço'}
+                          {processando[cliente.id] ? '…' : (
+                            <>
+                              <IconeFechar size={14} className="mr-1 inline-block -translate-y-px" />
+                              Não conheço
+                            </>
+                          )}
                         </button>
                       </div>
                     </li>
@@ -228,16 +242,19 @@ export default function CadastrosPage() {
 
                         <div className="mt-2 flex flex-col gap-1">
                           <p className="text-sm text-text-secondary">
-                            📱 {formatarWhatsApp(cliente.whatsapp)}
+                            <IconeWhatsApp size={13} className="mr-1 inline-block -translate-y-px" />
+                            {formatarWhatsApp(cliente.whatsapp)}
                           </p>
                           {cliente.email && (
                             <p className="text-sm text-text-secondary">
-                              ✉️ {cliente.email}
+                              <IconeEmail size={13} className="mr-1 inline-block -translate-y-px" />
+                              {cliente.email}
                             </p>
                           )}
                           {cliente.data_nascimento && (
                             <p className="text-sm text-text-secondary">
-                              🎂 {formatarData(cliente.data_nascimento)}
+                              <IconeBolo size={13} className="mr-1 inline-block -translate-y-px" />
+                              {formatarData(cliente.data_nascimento)}
                             </p>
                           )}
                           {cliente.observacoes && (
@@ -245,10 +262,11 @@ export default function CadastrosPage() {
                               📝 {cliente.observacoes}
                             </p>
                           )}
-                          <p className="text-sm text-text-secondary">
+                          <p className="flex items-center gap-1 text-sm text-text-secondary">
+                            {cliente.autoriza_contato ? <IconeCheck size={13} /> : <IconeFechar size={13} />}
                             {cliente.autoriza_contato
-                              ? '✅ Autoriza contato via WhatsApp'
-                              : '❌ Não autoriza contato via WhatsApp'}
+                              ? 'Autoriza contato via WhatsApp'
+                              : 'Não autoriza contato via WhatsApp'}
                           </p>
                         </div>
                       </li>
